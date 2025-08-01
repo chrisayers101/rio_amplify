@@ -15,7 +15,16 @@
               :class="{ 'nav-item-active': $route.name === 'Workbench' }"
             >
               <HomeIcon class="h-5 w-5" />
-              <span class="text-sm font-medium">Workbench</span>
+              <span class="text-sm font-medium">Home</span>
+            </router-link>
+
+            <router-link
+              to="/dashboard"
+              class="nav-item"
+              :class="{ 'nav-item-active': $route.name === 'Dashboard' }"
+            >
+              <ChartBarIcon class="h-5 w-5" />
+              <span class="text-sm font-medium">Dashboard</span>
             </router-link>
 
             <router-link
@@ -57,7 +66,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
-import { ArrowLeftStartOnRectangleIcon, HomeIcon, ServerStackIcon, FolderIcon } from '@heroicons/vue/24/outline'
+import { ArrowLeftStartOnRectangleIcon, HomeIcon, ServerStackIcon, FolderIcon, ChartBarIcon } from '@heroicons/vue/24/outline'
 
 const authStore = useAuthStore()
 const router = useRouter()
