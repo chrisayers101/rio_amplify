@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import {
   DocumentDuplicateIcon,
   HandThumbUpIcon,
@@ -74,8 +74,30 @@ import {
   InformationCircleIcon
 } from '@heroicons/vue/24/outline'
 
+// Props for context data
+interface Props {
+  selectedProjects?: string[]
+  selectedAudience?: string[]
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  selectedProjects: () => [],
+  selectedAudience: () => []
+})
+
 // Reactive state
 const userInput = ref('')
+
+// Computed property for context text
+const contextText = computed(() => {
+  const projectCount = props.selectedProjects.length
+  const audienceCount = props.selectedAudience.length
+
+  const projectText = projectCount === 1 ? '1 project' : `${projectCount} projects`
+  const audienceText = audienceCount === 1 ? '1 manager' : `${audienceCount} managers`
+
+  return `Context: ${projectText} ${audienceText}`
+})
 
 // Methods
 const sendMessage = () => {
