@@ -1,0 +1,61 @@
+@import './base.css';
+@import './theme.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ✅ Navigation Layout System - Production Fix for Home Route */
+:root {
+  /* Navigation height calculations based on TopNavigation.vue */
+  --nav-height-mobile: 64px;  /* px-4 py-3 + content height */
+  --nav-height-desktop: 72px; /* sm:px-6 sm:py-4 + content height */
+  
+  /* Current navigation height (responsive) */
+  --navigation-height: var(--nav-height-mobile);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --navigation-height: var(--nav-height-desktop);
+  }
+}
+
+/* ✅ Reusable utility class for navigation-aware layouts */
+.navigation-aware-layout {
+  height: calc(100vh - var(--navigation-height));
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--navigation-height);
+}
+
+/* ✅ Alternative pattern for routes that need different behavior */
+.navigation-padded-layout {
+  min-height: calc(100vh - var(--navigation-height));
+  padding-top: var(--navigation-height);
+}
+
+/* ✅ iOS safe area support for modern devices */
+@supports (padding: max(0px)) {
+  .navigation-aware-layout {
+    height: calc(100vh - max(var(--navigation-height), env(safe-area-inset-top)));
+    margin-top: max(var(--navigation-height), env(safe-area-inset-top));
+  }
+}
+
+/* ✅ Touch target optimization for mobile */
+@media (max-width: 640px) {
+  .navigation-aware-layout {
+    /* Ensure proper touch area clearance */
+    height: calc(100vh - var(--navigation-height) - 1px);
+    margin-top: calc(var(--navigation-height) + 1px);
+  }
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+

@@ -1,0 +1,45 @@
+/* Theme variables are now defined in theme.css */
+:root {
+  --section-gap: 160px;
+}
+
+@layer base {
+  *, *::before, *::after {
+    @apply box-border m-0 font-normal;
+  }
+  html, body {
+    @apply h-full w-full;
+  }
+  body {
+    @apply min-h-screen font-sans antialiased transition-colors duration-500;
+    color: var(--color-text-primary);
+    background: var(--color-background-primary);
+    line-height: 1.6;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -moz-osx-font-smoothing: grayscale;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+  code, pre, .numeric {
+    @apply font-mono;
+  }
+  .fade-enter-active, .fade-leave-active {
+    @apply transition-opacity duration-300;
+  }
+  .fade-enter-from, .fade-leave-to {
+    opacity: 0;
+  }
+}
+
+@layer components {
+  /* Component styles are now defined in theme.css */
+}
+
+@layer base {
+  @media (hover: hover) {
+    a:hover {
+      background-color: rgba(229, 57, 53, 0.1);
+    }
+  }
+}

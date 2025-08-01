@@ -1,0 +1,185 @@
+/* Theme Configuration - Based on Screenshot Analysis */
+:root {
+  /* Primary Colors */
+  --color-primary-red: #E53935;      /* Vibrant red for primary actions */
+  --color-primary-red-hover: #D32F2F; /* Darker red for hover states */
+  --color-primary-blue: #4285F4;     /* Blue for secondary actions like "Publish" */
+  --color-primary-purple: #9C27B0;   /* Purple for "Upgrade" button */
+  --color-primary-green: #4CAF50;    /* Green for active status indicators */
+  
+  /* Background Colors */
+  --color-background-primary: #FFFFFF;    /* Main white background */
+  --color-background-secondary: #F8F8F8; /* Very light gray for subtle backgrounds */
+  --color-background-card: #FFFFFF;      /* White for cards */
+  
+  /* Text Colors */
+  --color-text-primary: #333333;     /* Dark gray/black for headings */
+  --color-text-secondary: #666666;   /* Medium gray for descriptions */
+  --color-text-tertiary: #888888;    /* Light gray for subtle text */
+  --color-text-white: #FFFFFF;       /* White text on colored backgrounds */
+  
+  /* Border Colors */
+  --color-border-light: #E0E0E0;     /* Light gray borders */
+  --color-border-medium: #CCCCCC;    /* Medium gray borders */
+  --color-border-red: #E53935;       /* Red borders for active states */
+  
+  /* Status Colors */
+  --color-status-active: #4CAF50;    /* Green for active status */
+  --color-status-inactive: #9E9E9E;  /* Gray for inactive status */
+}
+
+/* Tailwind Utility Classes for Theme */
+@layer utilities {
+  /* Background Colors */
+  .bg-theme-primary { background-color: var(--color-background-primary); }
+  .bg-theme-secondary { background-color: var(--color-background-secondary); }
+  .bg-theme-card { background-color: var(--color-background-card); }
+  .bg-theme-red { background-color: var(--color-primary-red); }
+  .bg-theme-red-hover { background-color: var(--color-primary-red-hover); }
+  .bg-theme-blue { background-color: var(--color-primary-blue); }
+  .bg-theme-purple { background-color: var(--color-primary-purple); }
+  .bg-theme-green { background-color: var(--color-primary-green); }
+  
+  /* Text Colors */
+  .text-theme-primary { color: var(--color-text-primary); }
+  .text-theme-secondary { color: var(--color-text-secondary); }
+  .text-theme-tertiary { color: var(--color-text-tertiary); }
+  .text-theme-white { color: var(--color-text-white); }
+  .text-theme-red { color: var(--color-primary-red); }
+  .text-theme-blue { color: var(--color-primary-blue); }
+  .text-theme-purple { color: var(--color-primary-purple); }
+  
+  /* Border Colors */
+  .border-theme-light { border-color: var(--color-border-light); }
+  .border-theme-medium { border-color: var(--color-border-medium); }
+  .border-theme-red { border-color: var(--color-border-red); }
+  
+  /* Interactive States */
+  .hover\:bg-theme-red-hover:hover { background-color: var(--color-primary-red-hover); }
+  .hover\:text-theme-primary:hover { color: var(--color-text-primary); }
+  .hover\:border-theme-red:hover { border-color: var(--color-border-red); }
+  
+  /* Focus States */
+  .focus\:ring-theme-red:focus { --tw-ring-color: var(--color-primary-red); }
+  .focus\:border-theme-red:focus { border-color: var(--color-primary-red); }
+}
+
+/* Component Classes */
+@layer components {
+  /* Button Styles */
+  .btn-primary {
+    @apply bg-red-600 text-white font-semibold py-2 px-4 rounded-md 
+           hover:bg-red-700 transition-colors duration-200 
+           flex items-center gap-2;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-gray-800 font-semibold py-2 px-4 rounded-md 
+           border border-gray-300 hover:border-red-600 hover:text-red-600 
+           transition-colors duration-200 flex items-center gap-2;
+  }
+  
+  .btn-blue {
+    @apply bg-blue-600 text-white font-semibold py-2 px-4 rounded-md 
+           hover:opacity-90 transition-opacity duration-200 
+           flex items-center gap-2;
+  }
+  
+  .btn-purple {
+    @apply bg-white text-purple-600 font-semibold py-2 px-4 rounded-md 
+           hover:bg-purple-600 hover:text-white transition-colors duration-200 
+           flex items-center gap-2;
+  }
+  
+  /* Card Styles */
+  .card {
+    @apply bg-white rounded-lg p-4 shadow-sm border border-gray-200 
+           hover:shadow-md transition-shadow duration-200;
+  }
+  
+  .card-header {
+    @apply flex items-center justify-between mb-3;
+  }
+  
+  .card-title {
+    @apply text-gray-800 font-medium text-sm;
+  }
+  
+  .card-icon {
+    @apply w-5 h-5 text-gray-500;
+  }
+  
+  .card-badge {
+    @apply flex items-center gap-2 text-xs text-gray-600;
+  }
+  
+  .card-badge-dot {
+    @apply w-4 h-4 rounded-full;
+  }
+  
+  /* Navigation Styles */
+  .nav-item {
+    @apply flex items-center space-x-2 px-3 py-2 text-gray-600 
+           hover:text-gray-800 hover:bg-gray-100 rounded-md 
+           transition-colors duration-200;
+  }
+  
+  .nav-item-active {
+    @apply text-red-600 bg-red-50;
+  }
+  
+  /* Tab Styles */
+  .tab {
+    @apply px-4 py-2 text-gray-600 font-medium transition-colors duration-200;
+  }
+  
+  .tab-active {
+    @apply bg-red-600 text-white;
+  }
+  
+  .tab-inactive {
+    @apply bg-white text-gray-800;
+  }
+  
+  /* Status Indicators */
+  .status-active {
+    @apply bg-green-500 text-white px-2 py-1 rounded-full text-xs 
+           flex items-center gap-1;
+  }
+  
+  .status-inactive {
+    @apply bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-xs 
+           flex items-center gap-1;
+  }
+  
+  /* Input Styles */
+  .input-theme {
+    @apply bg-white border border-gray-300 rounded-md px-3 py-2 
+           text-gray-800 placeholder:text-gray-500
+           focus:border-red-600 focus:ring-1 focus:ring-red-500 
+           transition-colors duration-200;
+  }
+  
+  /* Checkbox Styles */
+  .checkbox-theme {
+    @apply w-4 h-4 border border-gray-400 rounded 
+           checked:bg-red-600 checked:border-red-600 
+           checked:text-white transition-colors duration-200;
+  }
+  
+  /* Badge Styles */
+  .badge-red {
+    @apply bg-red-600 text-white text-xs px-2 py-1 rounded-full;
+  }
+  
+  .badge-gray {
+    @apply bg-gray-200 text-gray-600 text-xs px-2 py-1 rounded-full;
+  }
+}
+
+/* Dark mode support (if needed in future) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark mode overrides can be added here if needed */
+  }
+} 

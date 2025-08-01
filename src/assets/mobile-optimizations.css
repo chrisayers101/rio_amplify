@@ -1,0 +1,498 @@
+/* Mobile-First Responsive Design Optimizations */
+
+/* CSS Custom Properties for Dynamic Viewport Heights */
+:root {
+  /* Dynamic viewport height - updates when mobile browser UI changes */
+  --vh: 1vh;
+  --dvh: 1dvh; /* Modern browsers support */
+}
+
+/* Update viewport height on resize - handled by JavaScript */
+.viewport-height-aware {
+  height: calc(var(--vh, 1vh) * 100);
+}
+
+/* Base mobile optimizations */
+* {
+  /* Prevent horizontal scrolling */
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Smooth scrolling for better UX */
+html {
+  scroll-behavior: smooth;
+  /* Handle mobile viewport properly */
+  height: 100%;
+  width: 100%;
+}
+
+/* Optimize body for mobile */
+body {
+  /* Prevent zoom on input focus */
+  touch-action: manipulation;
+  /* Improve text rendering */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Prevent overscroll bounce on iOS */
+  overscroll-behavior: none;
+  /* Ensure full height */
+  height: 100%;
+  width: 100%;
+}
+
+/* Mobile Layout Fixes for Home Interface */
+@media (max-width: 768px) {
+  /* Ensure full height layout using dynamic viewport */
+  html, body {
+    height: 100%;
+    width: 100%;
+    /* Support for dynamic viewport units */
+    min-height: 100dvh;
+    min-height: calc(var(--vh, 1vh) * 100);
+  }
+
+  #app {
+    height: 100%;
+    /* Support for dynamic viewport units */
+    min-height: 100dvh;
+    min-height: calc(var(--vh, 1vh) * 100);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Home interface mobile optimizations */
+  .premium-chat-interface {
+    height: 100%;
+    /* Use dynamic viewport height for proper mobile browser UI handling */
+    min-height: 100dvh;
+    min-height: calc(var(--vh, 1vh) * 100);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    /* Remove any conflicting margins */
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* Home header positioning - fixed to prevent gaps */
+  .chat-header {
+    position: relative;
+    top: 0;
+    z-index: 100;
+    flex-shrink: 0;
+    padding: 0.75rem 1rem;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    /* Safe area support */
+    padding-top: max(0.75rem, env(safe-area-inset-top));
+  }
+
+  /* Messages container - takes remaining space */
+  .messages-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1rem;
+    background: #f8fafc;
+    /* Ensure smooth scrolling on mobile */
+    -webkit-overflow-scrolling: touch;
+    /* Enable momentum scrolling on iOS */
+    scroll-behavior: smooth;
+    /* Ensure minimum space and prevent flex shrinking issues */
+    min-height: 0;
+  }
+
+  /* Input container - ALWAYS visible at bottom */
+  .message-input-container {
+    position: relative;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    padding: 0.75rem 1rem;
+    /* Safe area padding for iOS devices with home indicator */
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+    flex-shrink: 0;
+    /* Ensure always at bottom */
+    margin-top: auto;
+    /* Minimum height to ensure visibility */
+    min-height: 70px;
+  }
+
+  /* Input area mobile optimizations */
+  .input-area {
+    width: 100%;
+  }
+
+  .input-wrapper {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 1rem;
+    padding: 0.75rem;
+    transition: border-color 0.2s ease;
+  }
+
+  .input-wrapper:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .message-textarea {
+    flex: 1;
+    border: none;
+    outline: none;
+    resize: none;
+    font-size: 16px; /* Prevent zoom on iOS */
+    line-height: 1.5;
+    max-height: 120px;
+    min-height: 24px;
+    background: transparent;
+    font-family: inherit;
+  }
+
+  .message-textarea::placeholder {
+    color: #9ca3af;
+  }
+
+  /* Send button mobile styling */
+  .send-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: #3b82f6;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .send-button:hover:not(:disabled) {
+    background: #2563eb;
+    transform: scale(1.05);
+  }
+
+  .send-button:disabled {
+    background: #d1d5db;
+    color: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .send-button.active {
+    background: #3b82f6;
+    transform: scale(1.05);
+  }
+
+  /* Agent avatar mobile sizing - keep header avatar visible */
+  .chat-header .agent-avatar .avatar-container {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+  }
+
+  /* Hide message avatars on mobile to avoid duplication */
+  .message-avatar {
+    display: none !important;
+  }
+
+  /* Message bubbles mobile styling */
+  .message-bubble {
+    max-width: 85%;
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .message-wrapper.user-message {
+    justify-content: flex-end;
+  }
+
+  .message-wrapper.user-message .message-bubble {
+    background: #3b82f6;
+    color: white;
+    margin-left: auto;
+  }
+
+  .message-wrapper.agent-message {
+    justify-content: flex-start;
+  }
+
+  .message-wrapper.agent-message .message-bubble {
+    background: white;
+    color: #1f2937;
+    border: 1px solid #e5e7eb;
+    margin-left: 0;
+  }
+
+  /* Loading states */
+  .loading-spinner {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Typing indicator mobile */
+  .typing-message {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    opacity: 0.8;
+    justify-content: flex-start;
+  }
+
+  .typing-bubble {
+    background: #f3f4f6;
+    border-radius: 1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+    margin-left: 0;
+  }
+
+  .typing-animation {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .typing-dot {
+    width: 6px;
+    height: 6px;
+    background: #6b7280;
+    border-radius: 50%;
+    animation: typing-bounce 1.4s infinite ease-in-out;
+  }
+
+  .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+  .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+  .typing-dot:nth-child(3) { animation-delay: 0s; }
+
+  @keyframes typing-bounce {
+    0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Hide desktop elements on mobile */
+  .desktop-only {
+    display: none !important;
+  }
+
+  /* Show mobile elements */
+  .mobile-only {
+    display: block !important;
+  }
+}
+
+/* Touch target improvements */
+button, 
+[role="button"],
+.btn,
+.nav-button,
+.app-icon-container {
+  /* Ensure minimum touch target size */
+  min-height: 44px;
+  min-width: 44px;
+  /* Optimize touch interactions */
+  touch-action: manipulation;
+  /* Remove default touch highlights */
+  -webkit-tap-highlight-color: transparent;
+  /* Improve accessibility */
+  cursor: pointer;
+}
+
+/* Enhanced focus states for accessibility */
+button:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+/* Input optimizations for mobile */
+input,
+textarea,
+select {
+  /* Prevent zoom on iOS */
+  font-size: 16px;
+  /* Improve touch interaction */
+  touch-action: manipulation;
+  /* Better visual feedback */
+  transition: all 0.2s ease-in-out;
+}
+
+/* Enhanced visual hierarchy */
+.mobile-section {
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.mobile-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Loading states optimized for mobile */
+.mobile-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Responsive breakpoint utilities */
+.mobile-only {
+  display: block;
+}
+
+.desktop-only {
+  display: none;
+}
+
+/* Small screens (640px and up) */
+@media (min-width: 640px) {
+  .mobile-section {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .mobile-card {
+    padding: 2rem;
+  }
+}
+
+/* Medium screens (768px and up) */
+@media (min-width: 768px) {
+  .mobile-only {
+    display: none;
+  }
+  
+  .desktop-only {
+    display: block;
+  }
+  
+  .mobile-section {
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+  }
+}
+
+/* Large screens (1024px and up) */
+@media (min-width: 1024px) {
+  .mobile-section {
+    padding: 2.5rem;
+    margin-bottom: 3rem;
+  }
+  
+  .mobile-card {
+    padding: 2.5rem;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .mobile-card {
+    border: 2px solid #000;
+    box-shadow: none;
+  }
+  
+  button,
+  [role="button"] {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+  
+  .mobile-skeleton {
+    animation: none;
+    background: #f0f0f0;
+  }
+}
+
+/* Dark mode support preparation */
+@media (prefers-color-scheme: dark) {
+  .mobile-card {
+    background: #1f2937;
+    border-color: #374151;
+    color: #f9fafb;
+  }
+  
+  .mobile-skeleton {
+    background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+    background-size: 200% 100%;
+  }
+}
+
+/* Print styles */
+@media print {
+  .top-navigation,
+  .mobile-only,
+  button,
+  [role="button"] {
+    display: none !important;
+  }
+  
+  .mobile-card {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+}
+
+/* Ultra-wide screen optimizations */
+@media (min-width: 1400px) {
+  .mobile-section {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Very small screens optimization */
+@media (max-width: 320px) {
+  .mobile-section {
+    padding: 0.75rem;
+  }
+  
+  .mobile-card {
+    padding: 1rem;
+    border-radius: 8px;
+  }
+} 
