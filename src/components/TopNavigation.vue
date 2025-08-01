@@ -39,19 +39,15 @@
 
 
 
-          <!-- User Info and Logout -->
-          <div class="flex items-center space-x-3">
-            <div class="flex items-center space-x-2 text-sm text-gray-600">
-              <span class="font-medium">{{ getUserDisplayName() }}</span>
-            </div>
-            <button
-              @click="signOut"
-              class="text-theme-secondary hover:text-theme-primary p-2 rounded-md transition-colors duration-200"
-              title="Sign Out"
-            >
-              <ArrowLeftStartOnRectangleIcon class="h-5 w-5" />
-            </button>
-          </div>
+          <!-- User Info and Logout Button -->
+          <button
+            @click="signOut"
+            class="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-800 bg-gray-50 hover:bg-gray-100 p-2 rounded-md transition-colors duration-200 border border-gray-200"
+            title="Sign Out"
+          >
+            <span class="font-medium">{{ getUserDisplayName() }}</span>
+            <ArrowLeftStartOnRectangleIcon class="h-5 w-5" />
+          </button>
         </div>
       </div>
     </div>

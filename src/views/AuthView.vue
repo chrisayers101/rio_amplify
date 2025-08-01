@@ -9,14 +9,9 @@
 
     <!-- Main Auth Content -->
     <main class="auth-main">
-      <!-- Form Title -->
+      <!-- Logo Section -->
       <div class="auth-title-section">
-        <h1 class="auth-title">
-          {{ isSignUp ? 'Create Your Account' : 'Sign In' }}
-        </h1>
-        <p class="auth-subtitle">
-          {{ isSignUp ? 'Start building today' : '' }}
-        </p>
+        <img src="@/assets/RioLogo.svg" alt="Rio Tinto" class="auth-logo" />
       </div>
 
       <!-- Auth Form -->
@@ -105,7 +100,7 @@
             Forgot Password?
           </button>
 
-          <button
+          <button style="display: none;"
             type="button"
             @click="toggleMode"
             class="link-button primary"
@@ -317,8 +312,9 @@ const showForgotPassword = async () => {
 }
 
 .auth-logo {
-  height: 40px;
+  height: 60px;
   width: auto;
+  margin-bottom: 1rem;
 }
 
 .brand-name {
