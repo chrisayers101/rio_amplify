@@ -11,6 +11,13 @@
           <button class="bg-red-600 text-white px-4 py-2 rounded-md border border-red-600 hover:bg-red-700 transition-colors duration-200">
             Open Workbench
           </button>
+          <button
+            @click="signOut"
+            class="text-gray-600 hover:text-gray-800 p-2 rounded-md transition-colors duration-200"
+            title="Sign Out"
+          >
+            <ArrowLeftStartOnRectangleIcon class="h-5 w-5" />
+          </button>
         </div>
       </div>
     </header>
@@ -104,10 +111,26 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from '@/stores/authStore'
+import { useRouter } from 'vue-router'
 import {
   DocumentIcon,
   ExclamationTriangleIcon,
   ChartBarIcon,
-  ChatBubbleLeftRightIcon
+  ChatBubbleLeftRightIcon,
+  ArrowLeftStartOnRectangleIcon
 } from '@heroicons/vue/24/outline'
+
+const authStore = useAuthStore()
+const router = useRouter()
+
+const signOut = async () => {
+  try {
+    await authStore.signOut()
+    // Redirect to landing page after successful sign out
+    router.push('/')
+  } catch (error) {
+    console.error('Sign out error:', error)
+  }
+}
 </script>

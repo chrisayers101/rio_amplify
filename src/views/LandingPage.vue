@@ -17,9 +17,6 @@
             Get Started
           </router-link>
           
-          <button class="btn-secondary text-lg px-8 py-4">
-            <span>Open Workbench</span>
-          </button>
         </div>
       </div>
     </div>
