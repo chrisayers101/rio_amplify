@@ -8,5 +8,6 @@ export const chatOrchestratorFunction = defineFunction({
   // Add environment variables
   environment: {
     OPENAI_API_KEY: process.env.OPENAI_API_KEY || ''
-  }
+  },
+  timeoutSeconds: 900 // 15 minutes
 });

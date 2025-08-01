@@ -38,37 +38,46 @@
               <input
                 type="checkbox"
                 v-model="selectedProjects"
+                value="Hamersley"
+                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              >
+              <span class="text-gray-700">Hamersley</span>
+            </label>
+            <label class="flex items-center space-x-3 cursor-pointer">
+              <input
+                type="checkbox"
+                v-model="selectedProjects"
+                value="Brockman"
+                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              >
+              <span class="text-gray-700">Brockman</span>
+            </label>
+            <label class="flex items-center space-x-3 cursor-pointer">
+              <input
+                type="checkbox"
+                v-model="selectedProjects"
+                value="Yandicoogina"
+                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              >
+              <span class="text-gray-700">Yandicoogina</span>
+            </label>
+            <label class="flex items-center space-x-3 cursor-pointer">
+              <input
+                type="checkbox"
+                v-model="selectedProjects"
+                value="Gudai-Darri"
+                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              >
+              <span class="text-gray-700">Gudai-Darri</span>
+            </label>
+            <label class="flex items-center space-x-3 cursor-pointer">
+              <input
+                type="checkbox"
+                v-model="selectedProjects"
                 value="Amrun"
                 class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
               >
               <span class="text-gray-700">Amrun</span>
-            </label>
-            <label class="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                v-model="selectedProjects"
-                value="Barlow"
-                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
-              >
-              <span class="text-gray-700">Barlow</span>
-            </label>
-            <label class="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                v-model="selectedProjects"
-                value="Anderson"
-                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
-              >
-              <span class="text-gray-700">Anderson</span>
-            </label>
-            <label class="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                v-model="selectedProjects"
-                value="Caldwell"
-                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
-              >
-              <span class="text-gray-700">Caldwell</span>
             </label>
           </div>
         </div>
