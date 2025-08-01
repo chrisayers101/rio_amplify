@@ -1,9 +1,9 @@
 <template>
   <nav class="bg-theme-primary shadow-sm border-b border-theme-light">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16">
         <div class="flex items-center">
-          <h1 class="text-xl font-semibold text-theme-primary">agent-workbench-chat</h1>
+          <img src="@/assets/RioLogo.svg" alt="Rio Tinto" class="h-8 w-auto" />
         </div>
 
         <div class="flex items-center space-x-4">
