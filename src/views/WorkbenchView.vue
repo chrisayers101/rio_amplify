@@ -31,7 +31,7 @@
         <div class="mb-6">
           <div class="flex items-center space-x-2 mb-3">
             <DocumentIcon class="w-4 h-4 text-gray-600" />
-            <h4 class="font-medium text-gray-800">Projects</h4>
+            <h4 class="font-bold text-gray-800 text-base">Projects</h4>
           </div>
           <div class="space-y-2">
             <label class="flex items-center space-x-3 cursor-pointer">
@@ -49,38 +49,55 @@
           </div>
         </div>
 
-        <!-- Managers Section -->
+        <!-- Minerals Section -->
         <div class="mb-6">
           <div class="flex items-center space-x-2 mb-3">
-            <UserGroupIcon class="w-4 h-4 text-gray-600" />
-            <h4 class="font-medium text-gray-800">Managers</h4>
+            <CubeIcon class="w-4 h-4 text-gray-600" />
+            <h4 class="font-bold text-gray-800 text-base">Minerals</h4>
           </div>
           <div class="space-y-2">
             <label class="flex items-center space-x-3 cursor-pointer">
               <input type="checkbox" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
-              <span class="text-gray-700">Beatrix</span>
+              <span class="text-gray-700">Iron Ore</span>
             </label>
             <label class="flex items-center space-x-3 cursor-pointer">
               <input type="checkbox" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
-              <span class="text-gray-700">Dan</span>
+              <span class="text-gray-700">Copper</span>
             </label>
             <label class="flex items-center space-x-3 cursor-pointer">
               <input type="checkbox" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
-              <span class="text-gray-700">Cindy</span>
+              <span class="text-gray-700">Aluminum</span>
             </label>
             <label class="flex items-center space-x-3 cursor-pointer">
               <input type="checkbox" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
-              <span class="text-gray-700">Andrew</span>
+              <span class="text-gray-700">Gold</span>
+            </label>
+            <label class="flex items-center space-x-3 cursor-pointer">
+              <input type="checkbox" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+              <span class="text-gray-700">Coal</span>
             </label>
           </div>
         </div>
 
-        <!-- Refinements Section -->
-        <div class="mt-auto">
-          <h4 class="font-medium text-gray-800 mb-2">Refinements:</h4>
-          <div class="text-sm text-gray-600 space-y-1">
-            <p>Audience - Board, Technical, Other types</p>
-            <p>Hunter - Thesis + al, Employee</p>
+        <!-- Audience Section -->
+        <div class="mb-6">
+          <div class="flex items-center space-x-2 mb-3">
+            <UserGroupIcon class="w-4 h-4 text-gray-600" />
+            <h4 class="font-bold text-gray-800 text-base">Audience</h4>
+          </div>
+          <div class="space-y-2">
+            <label class="flex items-center space-x-3 cursor-pointer">
+              <input type="checkbox" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+              <span class="text-gray-700">Board</span>
+            </label>
+            <label class="flex items-center space-x-3 cursor-pointer">
+              <input type="checkbox" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+              <span class="text-gray-700">Technical</span>
+            </label>
+            <label class="flex items-center space-x-3 cursor-pointer">
+              <input type="checkbox" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+              <span class="text-gray-700">Other types</span>
+            </label>
           </div>
         </div>
       </div>
@@ -140,7 +157,8 @@ import {
   DocumentIcon,
   UserGroupIcon,
   ChatBubbleLeftRightIcon,
-  HomeIcon
+  HomeIcon,
+  CubeIcon
 } from '@heroicons/vue/24/outline'
 
 const router = useRouter()
