@@ -1,0 +1,111 @@
+import type { Schema } from '../../data/resource';
+import OpenAI from 'openai';
+
+interface ChatRequest {
+  message: string;
+  threadId?: string;
+  context?: string;
+  messages?: string;
+}
+
+interface ChatChunk {
+  type: 'chunk';
+  content: string;
+  threadId: string;
+}
+
+interface ChatResponse {
+  chunks: ChatChunk[];
+  success: boolean;
+  error?: string;
+}
+
+export const handler: Schema['chatOrchestrator']['functionHandler'] = async (event) => {
+  const startTime = Date.now();
+  try {
+    console.log('Handler started at:', new Date().toISOString());
+
+    // Parse all arguments
+    const { message, threadId, context, messages } = event.arguments;
+
+    // Validate required fields
+    if (!message || !message.trim()) {
+      throw new Error('Message cannot be empty');
+    }
+
+    // Check for API key first
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY environment variable not set in Lambda function');
+    }
+
+    // Initialize OpenAI client
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
+    // Parse context and messages
+    const parsedContext = context ? JSON.parse(context) : {};
+    const parsedMessages = messages ? JSON.parse(messages) : [];
+
+    // Convert conversation history to OpenAI format
+    const conversationHistory = parsedMessages.map((msg: any) => ({
+      role: msg.type === 'user' ? 'user' : 'assistant',
+      content: msg.content || msg.message || ''
+    }));
+
+    // Add current message
+    conversationHistory.push({
+      role: 'user',
+      content: message
+    });
+
+    // Stream the response
+    console.log('Starting OpenAI streaming request...');
+    const stream = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: conversationHistory,
+      temperature: 0.7,
+      stream: true,
+      max_tokens: 1000, // Limit response length to avoid timeouts
+    });
+
+    const chunks: ChatChunk[] = [];
+    const threadIdValue = threadId || 'default';
+    let chunkCount = 0;
+
+    // Process each chunk
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content;
+      if (content) {
+        chunks.push({
+          type: 'chunk',
+          content,
+          threadId: threadIdValue
+        });
+        chunkCount++;
+      }
+    }
+
+    console.log(`Streaming completed. Received ${chunkCount} chunks.`);
+
+    // Return the response
+    const response: ChatResponse = {
+      chunks,
+      success: true
+    };
+
+    const endTime = Date.now();
+    console.log(`Handler completed in ${endTime - startTime}ms`);
+
+    return JSON.stringify(response);
+
+  } catch (error) {
+    console.error('Handler error:', error);
+    const errorResponse: ChatResponse = {
+      chunks: [],
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+    return JSON.stringify(errorResponse);
+  }
+};
