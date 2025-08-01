@@ -1,11 +1,11 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="h-full bg-gray-50 flex flex-col">
 
 
     <!-- Main Content Area -->
-    <div class="flex h-screen">
+    <div class="flex flex-1">
       <!-- Left Sidebar -->
-      <div class="w-80 bg-white border-r border-gray-200 p-6">
+      <div class="w-80 bg-white border-r border-gray-200 p-6 overflow-y-auto">
         <!-- Navigation Buttons -->
         <div class="mb-6">
           <div class="flex items-center space-x-1 mb-4">
@@ -143,7 +143,7 @@
       </div>
 
       <!-- Main Content Area -->
-      <div class="flex-1 bg-white">
+      <div class="flex-1 bg-white flex flex-col min-h-0">
         <!-- Welcome View -->
         <div v-if="!showConversationStarters && !showSummaryAgent" class="flex items-center justify-center h-full p-8">
           <div class="text-center max-w-2xl">

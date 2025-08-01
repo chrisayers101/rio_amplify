@@ -1,17 +1,7 @@
 <template>
-  <div class="h-full flex flex-col">
+  <div class="flex-1 flex flex-col">
     <!-- Agent Header -->
-    <div class="p-6 border-b border-gray-200">
-      <div class="flex items-center space-x-3">
-        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-          <DocumentIcon class="w-5 h-5 text-blue-600" />
-        </div>
-        <div>
-          <h2 class="text-lg font-semibold text-gray-800">Summary Agent</h2>
-          <p class="text-sm text-gray-600">AI-powered analysis and insights</p>
-        </div>
-      </div>
-    </div>
+
 
     <!-- Chat Messages Area -->
     <div class="flex-1 p-6 overflow-y-auto">
@@ -77,7 +67,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import {
-  DocumentIcon,
   DocumentDuplicateIcon,
   HandThumbUpIcon,
   HandThumbDownIcon,
