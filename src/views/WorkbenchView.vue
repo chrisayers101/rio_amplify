@@ -160,7 +160,7 @@
       <!-- Main Content Area -->
       <div class="flex-1 bg-white flex flex-col h-full">
         <!-- Welcome View -->
-        <div v-if="!showConversationStarters && !showSummaryAgent" class="flex items-center justify-center h-full p-8">
+        <div v-if="!showConversationStarters && !showSummaryAgent && !showConversation" class="flex items-center justify-center h-full p-8">
           <div class="text-center max-w-2xl">
             <!-- Welcome Header -->
             <div class="mb-8">
@@ -200,6 +200,17 @@
           @select="selectConversationStarter"
         />
 
+        <!-- Conversation Component -->
+        <Conversation
+          v-else-if="showConversation"
+          ref="conversationRef"
+          :selected-projects="selectedProjects"
+          :selected-minerals="selectedMinerals"
+          :selected-audience="selectedAudience"
+          :initial-message="conversationConfig.initialMessage"
+          @send-message="handleSendMessage"
+        />
+
         <!-- Summary Agent Component -->
         <SummaryAgent
           v-else-if="showSummaryAgent"
@@ -218,6 +229,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import ConversationStarters from '@/components/ConversationStarters.vue'
 import SummaryAgent from '@/components/SummaryAgent.vue'
+import Conversation from '@/components/Conversation.vue' // Added Conversation component import
 import {
   DocumentIcon,
   UserGroupIcon,
@@ -229,6 +241,15 @@ const router = useRouter()
 // Reactive state for different views
 const showConversationStarters = ref(false)
 const showSummaryAgent = ref(false)
+const showConversation = ref(false)
+
+// Conversation configuration
+const conversationConfig = ref({
+  initialMessage: ''
+})
+
+// Conversation ref
+const conversationRef = ref<InstanceType<typeof Conversation> | null>(null)
 
 // Track selected projects, minerals, and audience
 const selectedProjects = ref<string[]>([])
@@ -248,19 +269,40 @@ const selectConversationStarter = (type: string) => {
   // Handle the conversation starter selection
   console.log('Selected conversation starter:', type)
 
-  // Show appropriate component based on selection
-  if (type === 'project-summary') {
-    showConversationStarters.value = false
-    showSummaryAgent.value = true
-  } else {
-    // For other conversation starters, you can add more conditions here
-    alert(`Starting conversation: ${type}`)
+  // Configure conversation based on type
+  switch (type) {
+    case 'project-summary':
+      conversationConfig.value.initialMessage = "Hello! I'm your summary agent. I'd like to create a detailed project summary. Please analyse the selected projects and provide a comprehensive overview."
+      break
+    case 'risk-assessment':
+      conversationConfig.value.initialMessage = "Hello! I'm your risk assessment agent. I'll help you identify and analyse potential project risks and mitigation strategies."
+      break
+    case 'performance-insights':
+      conversationConfig.value.initialMessage = "Hello! I'm your performance insights agent. I'll analyse project metrics and generate actionable insights for you."
+      break
+    case 'ai-recommendations':
+      conversationConfig.value.initialMessage = "Hello! I'm your AI recommendations agent. I'll provide intelligent suggestions for project optimization."
+      break
+    default:
+      conversationConfig.value.initialMessage = "Hello! I'm here to help you with your project analysis."
   }
+
+  // Show conversation component
+  showConversationStarters.value = false
+  showConversation.value = true
 }
 
 const handleSendMessage = (message: string) => {
   console.log('User sent message:', message)
+
   // Here you can handle the message sending logic
   // For example, making API calls to your AI service
+
+  // Simulate AI response for now
+  setTimeout(() => {
+    if (conversationRef.value) {
+      conversationRef.value.addAgentMessage("I'm processing your request. This is where the AI response would appear.")
+    }
+  }, 1000)
 }
 </script>

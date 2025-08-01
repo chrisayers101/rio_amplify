@@ -1,78 +1,35 @@
 <template>
   <div class="flex-1 flex flex-col">
     <!-- Agent Header -->
-
-
-    <!-- Chat Messages Area -->
-    <div class="flex-1 p-6 overflow-y-auto">
-      <!-- Agent Message -->
-      <div class="mb-6">
-        <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-200 max-w-3xl">
-          <p class="text-gray-800 mb-3">
-            Hello! I'm your summary agent. I'd like to create a detailed project summary. Please analyse the selected projects and provide a comprehensive overview.
-          </p>
-
-          <!-- Message Footer -->
-          <div class="flex items-center justify-between text-sm text-gray-500">
-            <span>10:19</span>
-            <div class="flex items-center space-x-2">
-              <button class="p-1 hover:bg-gray-100 rounded transition-colors duration-200" title="Copy">
-                <DocumentDuplicateIcon class="w-4 h-4" />
-              </button>
-              <button class="p-1 hover:bg-gray-100 rounded transition-colors duration-200" title="Thumbs up">
-                <HandThumbUpIcon class="w-4 h-4" />
-              </button>
-              <button class="p-1 hover:bg-gray-100 rounded transition-colors duration-200" title="Thumbs down">
-                <HandThumbDownIcon class="w-4 h-4" />
-              </button>
-            </div>
-          </div>
+    <div class="bg-white border-b border-gray-200 p-4">
+      <div class="flex items-center">
+        <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+          <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900">Summary Agent</h2>
+          <p class="text-sm text-gray-500">AI-powered project analysis</p>
         </div>
       </div>
     </div>
 
-    <!-- Input Area -->
-    <div class="p-6 border-t border-gray-200">
-      <!-- Input Field -->
-      <div class="flex items-end space-x-3">
-        <div class="flex-1">
-          <textarea
-            v-model="userInput"
-            @keydown.enter.prevent="sendMessage"
-            placeholder="Type your message..."
-            class="w-full p-3 border border-red-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-            rows="3"
-          ></textarea>
-        </div>
-
-        <!-- Send Button -->
-        <button
-          @click="sendMessage"
-          :disabled="!userInput.trim()"
-          class="bg-red-600 text-white p-3 rounded-full hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
-        >
-          <PaperAirplaneIcon class="w-5 h-5" />
-        </button>
-      </div>
-
-      <!-- Context Bar -->
-      <div class="mt-3 flex items-center space-x-2 text-sm text-gray-600">
-        <InformationCircleIcon class="w-4 h-4" />
-        <span>{{ contextText }}</span>
-      </div>
-    </div>
+    <!-- Conversation Component -->
+    <Conversation
+      ref="conversationRef"
+      :selected-projects="selectedProjects"
+      :selected-minerals="selectedMinerals"
+      :selected-audience="selectedAudience"
+      :initial-message="initialMessage"
+      @send-message="handleSendMessage"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import {
-  DocumentDuplicateIcon,
-  HandThumbUpIcon,
-  HandThumbDownIcon,
-  PaperAirplaneIcon,
-  InformationCircleIcon
-} from '@heroicons/vue/24/outline'
+import { ref } from 'vue'
+import Conversation from './Conversation.vue'
 
 // Props for context data
 interface Props {
@@ -88,44 +45,23 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 // Reactive state
-const userInput = ref('')
+const conversationRef = ref<InstanceType<typeof Conversation> | null>(null)
 
-// Computed property for context text
-const contextText = computed(() => {
-  const projects = props.selectedProjects
-  const minerals = props.selectedMinerals
-  const audience = props.selectedAudience
-
-  const parts = []
-
-  if (projects.length > 0) {
-    parts.push(`Projects: ${projects.join(', ')}`)
-  }
-
-  if (minerals.length > 0) {
-    parts.push(`Minerals: ${minerals.join(', ')}`)
-  }
-
-  if (audience.length > 0) {
-    parts.push(`Audience: ${audience.join(', ')}`)
-  }
-
-  if (parts.length === 0) {
-    return 'Context: No selections'
-  }
-
-  return `Context: ${parts.join(' | ')}`
-})
+// Initial message for the summary agent
+const initialMessage = "Hello! I'm your summary agent. I'd like to create a detailed project summary. Please analyse the selected projects and provide a comprehensive overview."
 
 // Methods
-const sendMessage = () => {
-  if (!userInput.value.trim()) return
-
+const handleSendMessage = (message: string) => {
   // Emit the message to parent component
-  emit('send-message', userInput.value)
+  emit('send-message', message)
 
-  // Clear input
-  userInput.value = ''
+  // Here you would typically make an API call to get the AI response
+  // For now, we'll simulate a response
+  setTimeout(() => {
+    if (conversationRef.value) {
+      conversationRef.value.addAgentMessage("I'm processing your request. This is where the AI response would appear.")
+    }
+  }, 1000)
 }
 
 // Define emits for parent component communication
