@@ -37,21 +37,7 @@
             </router-link>
           </div>
 
-          <!-- Action Buttons -->
-          <div class="flex items-center space-x-2">
-            <button class="btn-secondary">
-              <span class="text-theme-red font-bold">R</span>
-              <span>Invite</span>
-            </button>
-            
-            <button class="btn-purple">
-              <span>Upgrade</span>
-            </button>
-            
-            <button class="btn-blue">
-              <span>Publish</span>
-            </button>
-          </div>
+
 
           <button
             @click="signOut"

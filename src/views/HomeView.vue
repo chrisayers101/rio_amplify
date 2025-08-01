@@ -1,92 +1,105 @@
 <template>
-  <div class="navigation-aware-layout">
-    <div class="flex-1 flex flex-col">
-      <div class="flex-1 p-4">
-        <h1 class="text-2xl font-bold text-theme-primary mb-4">Project Intelligence Workbench</h1>
-        <p class="text-theme-secondary mb-6">
-          AI-powered project management and analysis
-        </p>
-
-        <!-- Welcome Section -->
-        <div class="card mb-6">
-          <h2 class="text-xl font-semibold text-theme-primary mb-4">Start a Conversation with AI</h2>
-          <p class="text-theme-secondary mb-4">
-            Select projects and managers from the sidebar, then choose a conversation starter to begin your AI-powered analysis.
-          </p>
-
-          <button class="btn-primary">
-            <span>Choose Conversation Starter</span>
+  <div class="min-h-screen bg-white">
+    <!-- Header -->
+    <header class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex justify-between items-start">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800 mb-1">Project Intelligence Workbench</h1>
+          <p class="text-gray-600">AI-powered project management and analysis</p>
+        </div>
+        <div class="flex items-center space-x-4">
+          <button class="bg-red-600 text-white px-4 py-2 rounded-md border border-red-600 hover:bg-red-700 transition-colors duration-200">
+            Open Workbench
           </button>
         </div>
+      </div>
+    </header>
 
-        <!-- Conversation Starters -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">Project Summary</h3>
-              <DocumentIcon class="card-icon text-theme-red" />
-            </div>
-            <p class="text-theme-secondary text-sm mb-3">Get a comprehensive overview of selected projects</p>
-            <button class="btn-primary text-sm py-1 px-3">Start Conversation</button>
-          </div>
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Main Introduction -->
+      <div class="text-center mb-12">
+        <h2 class="text-4xl font-bold text-gray-800 mb-4">Start a Conversation with AI</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Choose from our specialized AI agents to get insights, summaries, and recommendations for your projects. Each agent is designed to help you with specific aspects of project management.
+        </p>
+      </div>
 
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">Risk Analysis</h3>
-              <ExclamationTriangleIcon class="card-icon text-theme-red" />
-            </div>
-            <p class="text-theme-secondary text-sm mb-3">Identify potential risks and mitigation strategies</p>
-            <button class="btn-primary text-sm py-1 px-3">Start Conversation</button>
-          </div>
-
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">Performance Metrics</h3>
-              <ChartBarIcon class="card-icon text-theme-red" />
-            </div>
-            <p class="text-theme-secondary text-sm mb-3">Analyze key performance indicators and trends</p>
-            <button class="btn-primary text-sm py-1 px-3">Start Conversation</button>
-          </div>
-
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">Team Insights</h3>
-              <ChatBubbleLeftRightIcon class="card-icon text-theme-red" />
-            </div>
-            <p class="text-theme-secondary text-sm mb-3">Get insights about team dynamics and collaboration</p>
-            <button class="btn-primary text-sm py-1 px-3">Start Conversation</button>
-          </div>
-        </div>
-
-        <!-- How it works -->
-        <div class="card">
-          <h2 class="text-xl font-semibold text-theme-primary mb-4">How it works</h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="text-center">
-              <div class="w-12 h-12 bg-theme-red rounded-full flex items-center justify-center mx-auto mb-3">
-                <span class="text-theme-white font-bold">1</span>
+      <!-- Conversation Starters -->
+      <div class="mb-12">
+        <h3 class="text-xl font-bold text-gray-800 mb-6">Conversation Starters</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Card 1: Create a detailed project summary -->
+          <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex-1">
+                <h4 class="text-lg font-bold text-gray-800 mb-2">Create a detailed project summary</h4>
+                <p class="text-gray-600 text-sm mb-4">Generate comprehensive project overviews and status reports</p>
               </div>
-              <h3 class="text-theme-primary font-medium mb-2">Select Projects</h3>
-              <p class="text-theme-secondary text-sm">Choose the projects you want to analyze from the sidebar</p>
+              <DocumentIcon class="w-8 h-8 text-red-500 flex-shrink-0 ml-4" />
             </div>
-            <div class="text-center">
-              <div class="w-12 h-12 bg-theme-red rounded-full flex items-center justify-center mx-auto mb-3">
-                <span class="text-theme-white font-bold">2</span>
+            <button class="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors duration-200">
+              Start Conversation
+            </button>
+          </div>
+
+          <!-- Card 2: Risk Assessment -->
+          <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex-1">
+                <h4 class="text-lg font-bold text-gray-800 mb-2">Risk Assessment</h4>
+                <p class="text-gray-600 text-sm mb-4">Identify and analyze potential project risks and mitigation strategies</p>
               </div>
-              <h3 class="text-theme-primary font-medium mb-2">Choose Starter</h3>
-              <p class="text-theme-secondary text-sm">Pick a conversation starter that matches your analysis needs</p>
+              <ExclamationTriangleIcon class="w-8 h-8 text-red-500 flex-shrink-0 ml-4" />
             </div>
-            <div class="text-center">
-              <div class="w-12 h-12 bg-theme-red rounded-full flex items-center justify-center mx-auto mb-3">
-                <span class="text-theme-white font-bold">3</span>
+            <button class="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors duration-200">
+              Start Conversation
+            </button>
+          </div>
+
+          <!-- Card 3: Performance Insights -->
+          <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex-1">
+                <h4 class="text-lg font-bold text-gray-800 mb-2">Performance Insights</h4>
+                <p class="text-gray-600 text-sm mb-4">Analyze project metrics and generate actionable insights</p>
               </div>
-              <h3 class="text-theme-primary font-medium mb-2">Get Insights</h3>
-              <p class="text-theme-secondary text-sm">Receive AI-powered insights and recommendations</p>
+              <ChartBarIcon class="w-8 h-8 text-red-500 flex-shrink-0 ml-4" />
             </div>
+            <button class="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors duration-200">
+              Start Conversation
+            </button>
+          </div>
+
+          <!-- Card 4: AI Recommendations -->
+          <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex-1">
+                <h4 class="text-lg font-bold text-gray-800 mb-2">AI Recommendations</h4>
+                <p class="text-gray-600 text-sm mb-4">Get intelligent suggestions for project optimization</p>
+              </div>
+              <ChatBubbleLeftRightIcon class="w-8 h-8 text-red-500 flex-shrink-0 ml-4" />
+            </div>
+            <button class="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors duration-200">
+              Start Conversation
+            </button>
           </div>
         </div>
       </div>
-    </div>
+
+      <!-- How it works -->
+      <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+        <div class="flex items-start justify-between mb-4">
+          <div class="flex-1">
+            <h3 class="text-xl font-bold text-gray-800 mb-2">How it works</h3>
+            <p class="text-gray-600">
+              Select a conversation starter to launch the workbench with a specialized AI agent. You can then choose specific projects and managers to focus your analysis. The AI will provide targeted insights and recommendations based on your selections.
+            </p>
+          </div>
+          <ChatBubbleLeftRightIcon class="w-8 h-8 text-red-500 flex-shrink-0 ml-4" />
+        </div>
+      </div>
+    </main>
   </div>
 </template>
 
@@ -96,5 +109,5 @@ import {
   ExclamationTriangleIcon,
   ChartBarIcon,
   ChatBubbleLeftRightIcon
-} from '@heroicons/vue/24/outline';
+} from '@heroicons/vue/24/outline'
 </script>
