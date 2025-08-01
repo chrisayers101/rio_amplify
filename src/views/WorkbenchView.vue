@@ -127,15 +127,30 @@
           </div>
           <div class="space-y-2">
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="checkbox" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+              <input
+                type="checkbox"
+                v-model="selectedAudience"
+                value="Board"
+                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              >
               <span class="text-gray-700">Board</span>
             </label>
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="checkbox" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+              <input
+                type="checkbox"
+                v-model="selectedAudience"
+                value="Technical"
+                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              >
               <span class="text-gray-700">Technical</span>
             </label>
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="checkbox" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+              <input
+                type="checkbox"
+                v-model="selectedAudience"
+                value="Other types"
+                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              >
               <span class="text-gray-700">Other types</span>
             </label>
           </div>
@@ -188,6 +203,9 @@
         <!-- Summary Agent Component -->
         <SummaryAgent
           v-else-if="showSummaryAgent"
+          :selected-projects="selectedProjects"
+          :selected-minerals="selectedMinerals"
+          :selected-audience="selectedAudience"
           @send-message="handleSendMessage"
         />
       </div>
@@ -212,9 +230,10 @@ const router = useRouter()
 const showConversationStarters = ref(false)
 const showSummaryAgent = ref(false)
 
-// Track selected projects and minerals
+// Track selected projects, minerals, and audience
 const selectedProjects = ref<string[]>([])
 const selectedMinerals = ref<string[]>([])
+const selectedAudience = ref<string[]>([])
 
 // Computed property to check if any projects are selected
 const hasSelectedProjects = computed(() => {

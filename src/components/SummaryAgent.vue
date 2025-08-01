@@ -58,7 +58,7 @@
       <!-- Context Bar -->
       <div class="mt-3 flex items-center space-x-2 text-sm text-gray-600">
         <InformationCircleIcon class="w-4 h-4" />
-        <span>Context: 1 project(s) 1 manager(s)</span>
+        <span>{{ contextText }}</span>
       </div>
     </div>
   </div>
@@ -77,11 +77,13 @@ import {
 // Props for context data
 interface Props {
   selectedProjects?: string[]
+  selectedMinerals?: string[]
   selectedAudience?: string[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
   selectedProjects: () => [],
+  selectedMinerals: () => [],
   selectedAudience: () => []
 })
 
@@ -90,13 +92,29 @@ const userInput = ref('')
 
 // Computed property for context text
 const contextText = computed(() => {
-  const projectCount = props.selectedProjects.length
-  const audienceCount = props.selectedAudience.length
+  const projects = props.selectedProjects
+  const minerals = props.selectedMinerals
+  const audience = props.selectedAudience
 
-  const projectText = projectCount === 1 ? '1 project' : `${projectCount} projects`
-  const audienceText = audienceCount === 1 ? '1 manager' : `${audienceCount} managers`
+  const parts = []
 
-  return `Context: ${projectText} ${audienceText}`
+  if (projects.length > 0) {
+    parts.push(`Projects: ${projects.join(', ')}`)
+  }
+
+  if (minerals.length > 0) {
+    parts.push(`Minerals: ${minerals.join(', ')}`)
+  }
+
+  if (audience.length > 0) {
+    parts.push(`Audience: ${audience.join(', ')}`)
+  }
+
+  if (parts.length === 0) {
+    return 'Context: No selections'
+  }
+
+  return `Context: ${parts.join(' | ')}`
 })
 
 // Methods
