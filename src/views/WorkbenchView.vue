@@ -103,36 +103,57 @@
       </div>
 
       <!-- Main Content Area -->
-      <div class="flex-1 bg-white flex items-center justify-center">
-        <div class="text-center max-w-md">
-          <!-- Speech Bubble Icon -->
-          <div class="flex justify-center mb-6">
-            <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
-              <ChatBubbleLeftRightIcon class="w-8 h-8 text-gray-400" />
+      <div class="flex-1 bg-white">
+        <!-- Ready to Start View -->
+        <div v-if="!showConversationStarters && !showSummaryAgent" class="flex items-center justify-center h-full">
+          <div class="text-center max-w-md">
+            <!-- Speech Bubble Icon -->
+            <div class="flex justify-center mb-6">
+              <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
+                <ChatBubbleLeftRightIcon class="w-8 h-8 text-gray-400" />
+              </div>
             </div>
+
+            <!-- Ready to Start Text -->
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Ready to Start</h2>
+            <p class="text-gray-600 mb-8 leading-relaxed">
+              Select projects and managers from the sidebar, then choose a conversation starter to begin your AI-powered analysis.
+            </p>
+
+            <!-- Choose Conversation Starter Button -->
+            <button
+              @click="showConversationStarters = true"
+              class="bg-red-600 text-white px-6 py-3 rounded-md font-medium hover:bg-red-700 transition-colors duration-200"
+            >
+              Choose Conversation Starter
+            </button>
           </div>
-
-          <!-- Ready to Start Text -->
-          <h2 class="text-2xl font-bold text-gray-800 mb-4">Ready to Start</h2>
-          <p class="text-gray-600 mb-8 leading-relaxed">
-            Select projects and managers from the sidebar, then choose a conversation starter to begin your AI-powered analysis.
-          </p>
-
-          <!-- Choose Conversation Starter Button -->
-          <button class="bg-red-600 text-white px-6 py-3 rounded-md font-medium hover:bg-red-700 transition-colors duration-200">
-            Choose Conversation Starter
-          </button>
         </div>
+
+        <!-- Conversation Starters Component -->
+        <ConversationStarters
+          v-else-if="showConversationStarters"
+          @back="showConversationStarters = false"
+          @select="selectConversationStarter"
+        />
+
+        <!-- Summary Agent Component -->
+        <SummaryAgent
+          v-else-if="showSummaryAgent"
+          @send-message="handleSendMessage"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import ConversationStarters from '@/components/ConversationStarters.vue'
+import SummaryAgent from '@/components/SummaryAgent.vue'
 import {
-  ArrowRightIcon,
   DocumentIcon,
   UserGroupIcon,
   ChatBubbleLeftRightIcon,
@@ -141,6 +162,10 @@ import {
 
 const router = useRouter()
 const authStore = useAuthStore()
+
+// Reactive state for different views
+const showConversationStarters = ref(false)
+const showSummaryAgent = ref(false)
 
 const goBack = () => {
   router.push('/home')
@@ -152,5 +177,25 @@ const goHome = () => {
 
 const goToDashboard = () => {
   router.push('/dashboard')
+}
+
+const selectConversationStarter = (type: string) => {
+  // Handle the conversation starter selection
+  console.log('Selected conversation starter:', type)
+
+  // Show appropriate component based on selection
+  if (type === 'project-summary') {
+    showConversationStarters.value = false
+    showSummaryAgent.value = true
+  } else {
+    // For other conversation starters, you can add more conditions here
+    alert(`Starting conversation: ${type}`)
+  }
+}
+
+const handleSendMessage = (message: string) => {
+  console.log('User sent message:', message)
+  // Here you can handle the message sending logic
+  // For example, making API calls to your AI service
 }
 </script>
