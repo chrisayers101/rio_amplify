@@ -72,10 +72,23 @@ When responding to queries, provide detailed, accurate, and practical insights b
     // Add system prompt at the beginning of conversation history
     conversationHistory.unshift(systemPrompt);
 
-    // Add current message
+    // Format context information as IMPORTANT section
+    let contextInfo = '';
+    if (parsedContext.projects && parsedContext.projects.length > 0) {
+      contextInfo += `\n\nIMPORTANT CONTEXT - SELECTED PROJECTS:\n${parsedContext.projects.join(', ')}`;
+    }
+    if (parsedContext.minerals && parsedContext.minerals.length > 0) {
+      contextInfo += `\n\nIMPORTANT CONTEXT - SELECTED MINERALS:\n${parsedContext.minerals.join(', ')}`;
+    }
+    if (parsedContext.audience && parsedContext.audience.length > 0) {
+      contextInfo += `\n\nIMPORTANT CONTEXT - TARGET AUDIENCE:\n${parsedContext.audience.join(', ')}`;
+    }
+
+    // Add current message with context information
+    const enhancedMessage = contextInfo ? `${contextInfo}\n\nUser Query: ${message}` : message;
     conversationHistory.push({
       role: 'user',
-      content: message
+      content: enhancedMessage
     });
 
     // Stream the response
