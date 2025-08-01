@@ -38,6 +38,15 @@
               <input
                 type="checkbox"
                 v-model="selectedProjects"
+                value="Amrun"
+                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              >
+              <span class="text-gray-700">Amrun</span>
+            </label>
+            <label class="flex items-center space-x-3 cursor-pointer">
+              <input
+                type="checkbox"
+                v-model="selectedProjects"
                 value="Barlow"
                 class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
               >
@@ -71,6 +80,15 @@
             <h4 class="font-bold text-gray-800 text-base">Minerals</h4>
           </div>
           <div class="space-y-2">
+            <label class="flex items-center space-x-3 cursor-pointer">
+              <input
+                type="checkbox"
+                v-model="selectedMinerals"
+                value="auxite"
+                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              >
+              <span class="text-gray-700">auxite</span>
+            </label>
             <label class="flex items-center space-x-3 cursor-pointer">
               <input
                 type="checkbox"

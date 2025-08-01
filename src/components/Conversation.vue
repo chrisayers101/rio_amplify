@@ -245,6 +245,19 @@ onMounted(() => {
   }
 })
 
+// Watch for changes in selected projects, minerals, and audience to update context
+watch(
+  () => [props.selectedProjects, props.selectedMinerals, props.selectedAudience],
+  ([projects, minerals, audience]) => {
+    chatStore.updateContext({
+      projects: projects || [],
+      minerals: minerals || [],
+      audience: audience || []
+    })
+  },
+  { deep: true }
+)
+
 // Watch for new messages and scroll to bottom
 watch(() => chatStore.messages.length, () => {
   nextTick(() => {
