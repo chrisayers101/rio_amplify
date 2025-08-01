@@ -1,24 +1,9 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <!-- Top Navigation Bar -->
-    <header class="bg-white border-b border-gray-200">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div class="flex items-center justify-between">
-          <!-- Right Side - Breadcrumb Navigation -->
-          <div class="flex items-center space-x-2 text-sm text-gray-600">
-            <div class="flex items-center space-x-2 cursor-pointer hover:text-gray-800" @click="goHome">
-              <HomeIcon class="w-4 h-4" />
-              <span>Home</span>
-            </div>
-            <div class="w-px h-4 bg-gray-300"></div>
-            <span class="font-bold text-gray-800">Workbench</span>
-          </div>
-        </div>
-      </div>
-    </header>
+
 
     <!-- Main Content Area -->
-    <div class="flex h-[calc(100vh-80px)]">
+    <div class="flex h-screen">
       <!-- Left Sidebar -->
       <div class="w-80 bg-white border-r border-gray-200 p-6">
         <!-- Navigation Buttons -->
