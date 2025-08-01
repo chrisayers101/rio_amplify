@@ -9,14 +9,17 @@
             <button class="bg-red-600 text-white px-4 py-2 rounded-md font-medium">
               Workbench
             </button>
-            <button class="bg-white text-gray-600 px-4 py-2 rounded-md font-medium border border-gray-200">
+            <button
+              @click="goToDashboard"
+              class="bg-white text-gray-600 px-4 py-2 rounded-md font-medium border border-gray-200 hover:bg-gray-50"
+            >
               Dashboard
             </button>
           </div>
 
           <!-- Right Side - Breadcrumb Navigation -->
           <div class="flex items-center space-x-2 text-sm text-gray-600">
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-2 cursor-pointer hover:text-gray-800" @click="goHome">
               <HomeIcon class="w-4 h-4" />
               <span>Home</span>
             </div>
@@ -141,5 +144,13 @@ const authStore = useAuthStore()
 
 const goBack = () => {
   router.push('/home')
+}
+
+const goHome = () => {
+  router.push('/home')
+}
+
+const goToDashboard = () => {
+  router.push('/dashboard')
 }
 </script>
