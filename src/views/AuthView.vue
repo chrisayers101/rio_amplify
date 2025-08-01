@@ -159,8 +159,8 @@ const errors = reactive({
 onMounted(async () => {
   try {
     if (await authStore.checkAuthState()) {
-      // User is already signed in, redirect to home
-      router.push('/home')
+      // User is already signed in, redirect to workbench
+      router.push('/workbench')
     }
     // User is not signed in, stay on auth page
   } catch {
@@ -218,7 +218,7 @@ const handleSubmit = async () => {
     try {
       await confirmSignUp({ username: form.email, confirmationCode: confirmationCode.value })
       await signIn({ username: form.email, password: form.password })
-      router.push('/home')
+      router.push('/workbench')
     } catch (error) {
       globalError.value = (error as Error).message || 'Confirmation failed'
     }
@@ -243,7 +243,7 @@ const handleSubmit = async () => {
       })
       if (result.isSignUpComplete) {
         await signIn({ username: form.email, password: form.password })
-        router.push('/home')
+        router.push('/workbench')
       } else {
         needsConfirmation.value = true
       }
@@ -252,7 +252,7 @@ const handleSubmit = async () => {
         username: form.email,
         password: form.password
       })
-      router.push('/home')
+      router.push('/workbench')
     }
   } catch (error) {
     console.error('Authentication error:', error)

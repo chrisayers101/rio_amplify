@@ -26,12 +26,7 @@ const router = createRouter({
             name: 'Auth',
             component: AuthView,
         },
-        {
-            path: '/home',
-            name: 'Home',
-            component: () => import('@/views/HomeView.vue'),
-            meta: { requiresAuth: true }
-        },
+
         {
             path: '/entities',
             name: 'Entities',
@@ -74,9 +69,9 @@ router.beforeEach(async (to) => {
     return { name: 'Auth' }
   }
 
-  // If user is authenticated and trying to access landing or auth, redirect to home
+  // If user is authenticated and trying to access landing or auth, redirect to workbench
   if (authenticated && (to.name === 'LandingPage' || to.name === 'Auth')) {
-    return { name: 'Home' }
+    return { name: 'Workbench' }
   }
 })
 

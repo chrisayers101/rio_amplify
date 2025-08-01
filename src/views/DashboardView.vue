@@ -76,7 +76,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 const goHome = () => {
-  router.push('/home')
+  router.push('/workbench')
 }
 
 const goToWorkbench = () => {

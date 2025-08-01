@@ -1,5 +1,5 @@
 <template>
-  <nav class="bg-theme-primary shadow-sm border-b border-theme-light" style="display: none;">
+  <nav class="bg-theme-primary shadow-sm border-b border-theme-light">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16">
         <div class="flex items-center">
@@ -10,12 +10,12 @@
           <!-- Navigation Links -->
           <div class="flex items-center space-x-2">
             <router-link
-              to="/home"
+              to="/workbench"
               class="nav-item"
-              :class="{ 'nav-item-active': $route.name === 'Home' }"
+              :class="{ 'nav-item-active': $route.name === 'Workbench' }"
             >
               <HomeIcon class="h-5 w-5" />
-              <span class="text-sm font-medium">Home</span>
+              <span class="text-sm font-medium">Workbench</span>
             </router-link>
 
             <router-link
@@ -39,13 +39,19 @@
 
 
 
-          <button
-            @click="signOut"
-            class="text-theme-secondary hover:text-theme-primary p-2 rounded-md transition-colors duration-200"
-            title="Sign Out"
-          >
-            <ArrowLeftStartOnRectangleIcon class="h-5 w-5" />
-          </button>
+          <!-- User Info and Logout -->
+          <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-2 text-sm text-gray-600">
+              <span class="font-medium">{{ getUserDisplayName() }}</span>
+            </div>
+            <button
+              @click="signOut"
+              class="text-theme-secondary hover:text-theme-primary p-2 rounded-md transition-colors duration-200"
+              title="Sign Out"
+            >
+              <ArrowLeftStartOnRectangleIcon class="h-5 w-5" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -59,6 +65,33 @@ import { ArrowLeftStartOnRectangleIcon, HomeIcon, ServerStackIcon, FolderIcon } 
 
 const authStore = useAuthStore()
 const router = useRouter()
+
+const getUserDisplayName = () => {
+  const user = authStore.user
+  if (!user) return 'User'
+
+  // If username looks like an email, use it
+  if (user.username && user.username.includes('@')) {
+    return user.username
+  }
+
+  // If email is available and username is not an email, use email
+  if (user.email && user.email.includes('@')) {
+    return user.email
+  }
+
+  // If username is a UUID or long ID, use email or fallback
+  if (user.username && user.username.length > 20) {
+    return user.email || 'User'
+  }
+
+  // Use username if it's a reasonable name
+  if (user.username) {
+    return user.username
+  }
+
+  return user.email || 'User'
+}
 
 const signOut = async () => {
   try {

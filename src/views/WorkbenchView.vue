@@ -4,8 +4,26 @@
     <header class="bg-white border-b border-gray-200">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div class="flex items-center justify-between">
-          <!-- Left Side - Navigation Buttons -->
-          <div class="flex items-center space-x-1">
+          <!-- Right Side - Breadcrumb Navigation -->
+          <div class="flex items-center space-x-2 text-sm text-gray-600">
+            <div class="flex items-center space-x-2 cursor-pointer hover:text-gray-800" @click="goHome">
+              <HomeIcon class="w-4 h-4" />
+              <span>Home</span>
+            </div>
+            <div class="w-px h-4 bg-gray-300"></div>
+            <span class="font-bold text-gray-800">Workbench</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="flex h-[calc(100vh-80px)]">
+      <!-- Left Sidebar -->
+      <div class="w-80 bg-white border-r border-gray-200 p-6">
+        <!-- Navigation Buttons -->
+        <div class="mb-6">
+          <div class="flex items-center space-x-1 mb-4">
             <button class="bg-red-600 text-white px-4 py-2 rounded-md font-medium">
               Workbench
             </button>
@@ -16,28 +34,8 @@
               Dashboard
             </button>
           </div>
-
-          <!-- Right Side - Breadcrumb Navigation -->
-          <div class="flex items-center space-x-2 text-sm text-gray-600">
-            <div class="flex items-center space-x-2 cursor-pointer hover:text-gray-800" @click="goHome">
-              <HomeIcon class="w-4 h-4" />
-              <span>Home</span>
-            </div>
-            <div class="w-px h-4 bg-gray-300"></div>
-            <span class="font-bold text-gray-800">Workbench</span>
-            <div class="flex items-center space-x-2 bg-gray-100 px-3 py-1 rounded-full">
-              <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span class="text-sm text-gray-700">Summary Agent</span>
-            </div>
-          </div>
         </div>
-      </div>
-    </header>
 
-    <!-- Main Content Area -->
-    <div class="flex h-[calc(100vh-80px)]">
-      <!-- Left Sidebar -->
-      <div class="w-80 bg-white border-r border-gray-200 p-6">
         <!-- Elements Section -->
         <div class="mb-6">
           <h3 class="text-lg font-semibold text-gray-800 mb-1">Elements</h3>
@@ -168,11 +166,11 @@ const showConversationStarters = ref(false)
 const showSummaryAgent = ref(false)
 
 const goBack = () => {
-  router.push('/home')
+  router.push('/dashboard')
 }
 
 const goHome = () => {
-  router.push('/home')
+  router.push('/dashboard')
 }
 
 const goToDashboard = () => {
