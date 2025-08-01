@@ -231,7 +231,7 @@ const messagesContainer = ref<HTMLElement>()
 const messageInput = ref<HTMLTextAreaElement>()
 
 // Initialize with context if provided
-onMounted(() => {
+onMounted(async () => {
   if (props.selectedProjects.length > 0 || props.selectedMinerals.length > 0 || props.selectedAudience.length > 0) {
     chatStore.updateContext({
       projects: props.selectedProjects,
@@ -240,8 +240,47 @@ onMounted(() => {
     })
   }
 
+  // If there's an initial message and no existing messages, automatically send it
   if (props.initialMessage && !chatStore.hasMessages) {
-    chatStore.addMessage(props.initialMessage, 'agent')
+    // Add the initial message as a user message (since we want to send it to the model)
+    chatStore.addMessage(props.initialMessage, 'user')
+
+    // Start streaming response
+    const messageId = chatStore.startStreamingMessage()
+    chatStore.setLoading(true)
+
+    try {
+      // Call streaming API with the initial message
+      await chatApi.streamChat(
+        {
+          message: props.initialMessage,
+          threadId: 'default',
+          context: {
+            projects: [...chatStore.context.projects],
+            minerals: [...chatStore.context.minerals],
+            audience: [...chatStore.context.audience]
+          },
+          messages: [...chatStore.messages] // Pass conversation history
+        },
+        (chunk) => {
+          if (chunk.type === 'chunk') {
+            chatStore.appendToStreamingMessage(messageId, chunk.content)
+          } else if (chunk.type === 'error') {
+            chatStore.setError(chunk.content)
+          }
+        },
+        (error) => {
+          chatStore.setError(error)
+        },
+        () => {
+          chatStore.finishStreamingMessage(messageId)
+          chatStore.setLoading(false)
+        }
+      )
+    } catch (error) {
+      chatStore.setError(error instanceof Error ? error.message : 'Failed to send initial message')
+      chatStore.setLoading(false)
+    }
   }
 })
 
