@@ -35,15 +35,30 @@
           </div>
           <div class="space-y-2">
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="checkbox" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+              <input
+                type="checkbox"
+                v-model="selectedProjects"
+                value="Barlow"
+                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              >
               <span class="text-gray-700">Barlow</span>
             </label>
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="checkbox" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+              <input
+                type="checkbox"
+                v-model="selectedProjects"
+                value="Anderson"
+                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              >
               <span class="text-gray-700">Anderson</span>
             </label>
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="checkbox" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+              <input
+                type="checkbox"
+                v-model="selectedProjects"
+                value="Caldwell"
+                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              >
               <span class="text-gray-700">Caldwell</span>
             </label>
           </div>
@@ -57,23 +72,48 @@
           </div>
           <div class="space-y-2">
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="checkbox" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+              <input
+                type="checkbox"
+                v-model="selectedMinerals"
+                value="Iron Ore"
+                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              >
               <span class="text-gray-700">Iron Ore</span>
             </label>
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="checkbox" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+              <input
+                type="checkbox"
+                v-model="selectedMinerals"
+                value="Copper"
+                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              >
               <span class="text-gray-700">Copper</span>
             </label>
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="checkbox" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+              <input
+                type="checkbox"
+                v-model="selectedMinerals"
+                value="Aluminum"
+                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              >
               <span class="text-gray-700">Aluminum</span>
             </label>
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="checkbox" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+              <input
+                type="checkbox"
+                v-model="selectedMinerals"
+                value="Gold"
+                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              >
               <span class="text-gray-700">Gold</span>
             </label>
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="checkbox" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+              <input
+                type="checkbox"
+                v-model="selectedMinerals"
+                value="Coal"
+                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              >
               <span class="text-gray-700">Coal</span>
             </label>
           </div>
@@ -104,29 +144,29 @@
 
       <!-- Main Content Area -->
       <div class="flex-1 bg-white">
-        <!-- Ready to Start View -->
-        <div v-if="!showConversationStarters && !showSummaryAgent" class="flex items-center justify-center h-full">
-          <div class="text-center max-w-md">
-            <!-- Speech Bubble Icon -->
-            <div class="flex justify-center mb-6">
-              <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
-                <ChatBubbleLeftRightIcon class="w-8 h-8 text-gray-400" />
-              </div>
+        <!-- Welcome View -->
+        <div v-if="!showConversationStarters && !showSummaryAgent" class="flex items-center justify-center h-full p-8">
+          <div class="text-center max-w-2xl">
+            <!-- Welcome Header -->
+            <div class="mb-8">
+              <h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome</h2>
+              <p class="text-gray-700 text-lg leading-relaxed mb-6">
+                Rio Amplify is an AI-powered analysis tool that helps you generate insights from your project and mineral data.
+              </p>
+              <p class="text-gray-700 text-lg leading-relaxed">
+                Please select a project and other settings from the sidebar to begin your analysis.
+              </p>
             </div>
 
-            <!-- Ready to Start Text -->
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">Ready to Start</h2>
-            <p class="text-gray-600 mb-8 leading-relaxed">
-              Select projects and managers from the sidebar, then choose a conversation starter to begin your AI-powered analysis.
-            </p>
-
-            <!-- Choose Conversation Starter Button -->
-            <button
-              @click="showConversationStarters = true"
-              class="bg-red-600 text-white px-6 py-3 rounded-md font-medium hover:bg-red-700 transition-colors duration-200"
-            >
-              Choose Conversation Starter
-            </button>
+            <!-- Get Started Button - Only show if projects are selected -->
+            <div v-if="hasSelectedProjects" class="mt-8">
+              <button
+                @click="showConversationStarters = true"
+                class="bg-red-600 text-white px-8 py-3 rounded-md font-medium hover:bg-red-700 transition-colors duration-200 text-lg"
+              >
+                Get Started
+              </button>
+            </div>
           </div>
         </div>
 
@@ -148,33 +188,30 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/authStore'
 import ConversationStarters from '@/components/ConversationStarters.vue'
 import SummaryAgent from '@/components/SummaryAgent.vue'
 import {
   DocumentIcon,
   UserGroupIcon,
-  ChatBubbleLeftRightIcon,
-  HomeIcon,
   CubeIcon
 } from '@heroicons/vue/24/outline'
 
 const router = useRouter()
-const authStore = useAuthStore()
 
 // Reactive state for different views
 const showConversationStarters = ref(false)
 const showSummaryAgent = ref(false)
 
-const goBack = () => {
-  router.push('/dashboard')
-}
+// Track selected projects and minerals
+const selectedProjects = ref<string[]>([])
+const selectedMinerals = ref<string[]>([])
 
-const goHome = () => {
-  router.push('/dashboard')
-}
+// Computed property to check if any projects are selected
+const hasSelectedProjects = computed(() => {
+  return selectedProjects.value.length > 0 || selectedMinerals.value.length > 0
+})
 
 const goToDashboard = () => {
   router.push('/dashboard')
