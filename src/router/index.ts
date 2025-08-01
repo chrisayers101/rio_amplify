@@ -3,6 +3,7 @@ import LandingPage from '@/views/LandingPage.vue'
 import AuthView from '@/views/AuthView.vue'
 import EntitiesView from '@/views/EntitiesView.vue'
 import FilesView from '@/views/FilesView.vue'
+import WorkbenchView from '@/views/WorkbenchView.vue'
 
 import { useAuthStore } from '@/stores/authStore'
 
@@ -40,6 +41,12 @@ const router = createRouter({
             path: '/files',
             name: 'Files',
             component: FilesView,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/workbench',
+            name: 'Workbench',
+            component: WorkbenchView,
             meta: { requiresAuth: true }
         }
     ],

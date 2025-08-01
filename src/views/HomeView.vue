@@ -8,7 +8,10 @@
           <p class="text-gray-600">AI-powered project management and analysis</p>
         </div>
         <div class="flex items-center space-x-4">
-          <button class="bg-red-600 text-white px-4 py-2 rounded-md border border-red-600 hover:bg-red-700 transition-colors duration-200">
+          <button
+            @click="openWorkbench"
+            class="bg-red-600 text-white px-4 py-2 rounded-md border border-red-600 hover:bg-red-700 transition-colors duration-200"
+          >
             Open Workbench
           </button>
           <button
@@ -45,7 +48,10 @@
               </div>
               <DocumentIcon class="w-8 h-8 text-red-500 flex-shrink-0 ml-4" />
             </div>
-            <button class="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors duration-200">
+            <button
+              @click="openWorkbench"
+              class="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors duration-200"
+            >
               Start Conversation
             </button>
           </div>
@@ -59,7 +65,10 @@
               </div>
               <ExclamationTriangleIcon class="w-8 h-8 text-red-500 flex-shrink-0 ml-4" />
             </div>
-            <button class="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors duration-200">
+            <button
+              @click="openWorkbench"
+              class="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors duration-200"
+            >
               Start Conversation
             </button>
           </div>
@@ -73,7 +82,10 @@
               </div>
               <ChartBarIcon class="w-8 h-8 text-red-500 flex-shrink-0 ml-4" />
             </div>
-            <button class="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors duration-200">
+            <button
+              @click="openWorkbench"
+              class="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors duration-200"
+            >
               Start Conversation
             </button>
           </div>
@@ -87,7 +99,10 @@
               </div>
               <ChatBubbleLeftRightIcon class="w-8 h-8 text-red-500 flex-shrink-0 ml-4" />
             </div>
-            <button class="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors duration-200">
+            <button
+              @click="openWorkbench"
+              class="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors duration-200"
+            >
               Start Conversation
             </button>
           </div>
@@ -132,5 +147,9 @@ const signOut = async () => {
   } catch (error) {
     console.error('Sign out error:', error)
   }
+}
+
+const openWorkbench = () => {
+  router.push('/workbench')
 }
 </script>
