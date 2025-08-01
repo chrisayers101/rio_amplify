@@ -19,9 +19,9 @@
       <div class="mb-6">
         <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-200 max-w-3xl">
           <p class="text-gray-800 mb-3">
-            Hello! I'm your summary agent. I'd like to create a detailed project summary. Please analyze the selected projects and provide a comprehensive overview.
+            Hello! I'm your summary agent. I'd like to create a detailed project summary. Please analyse the selected projects and provide a comprehensive overview.
           </p>
-          
+
           <!-- Message Footer -->
           <div class="flex items-center justify-between text-sm text-gray-500">
             <span>10:19</span>
@@ -54,7 +54,7 @@
             rows="3"
           ></textarea>
         </div>
-        
+
         <!-- Send Button -->
         <button
           @click="sendMessage"
@@ -91,10 +91,10 @@ const userInput = ref('')
 // Methods
 const sendMessage = () => {
   if (!userInput.value.trim()) return
-  
+
   // Emit the message to parent component
   emit('send-message', userInput.value)
-  
+
   // Clear input
   userInput.value = ''
 }
@@ -103,4 +103,4 @@ const sendMessage = () => {
 const emit = defineEmits<{
   'send-message': [message: string]
 }>()
-</script> 
+</script>

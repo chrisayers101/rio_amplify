@@ -29,7 +29,7 @@
   margin-top: var(--navigation-height);
 }
 
-/* ✅ Alternative pattern for routes that need different behavior */
+/* ✅ Alternative pattern for routes that need different behaviour */
 .navigation-padded-layout {
   min-height: calc(100vh - var(--navigation-height));
   padding-top: var(--navigation-height);
@@ -43,7 +43,7 @@
   }
 }
 
-/* ✅ Touch target optimization for mobile */
+/* ✅ Touch target optimisation for mobile */
 @media (max-width: 640px) {
   .navigation-aware-layout {
     /* Ensure proper touch area clearance */

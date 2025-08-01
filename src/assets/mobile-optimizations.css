@@ -27,7 +27,7 @@ html {
   width: 100%;
 }
 
-/* Optimize body for mobile */
+/* Optimise body for mobile */
 body {
   /* Prevent zoom on input focus */
   touch-action: manipulation;
@@ -311,7 +311,7 @@ button,
   /* Ensure minimum touch target size */
   min-height: 44px;
   min-width: 44px;
-  /* Optimize touch interactions */
+  /* Optimise touch interactions */
   touch-action: manipulation;
   /* Remove default touch highlights */
   -webkit-tap-highlight-color: transparent;
@@ -355,7 +355,7 @@ select {
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* Loading states optimized for mobile */
+/* Loading states optimised for mobile */
 .mobile-skeleton {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;

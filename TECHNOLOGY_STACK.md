@@ -26,7 +26,7 @@
 ## Styling & UI
 - **Tailwind CSS 3.4.1** - Utility-first CSS framework
 - **Heroicons 2.2.0** - SVG icon library
-- **Custom CSS** - Mobile optimizations and responsive design
+- **Custom CSS** - Mobile optimisations and responsive design
 - **PostCSS 8.4.35** - CSS processing
 
 ## Development Tools
@@ -55,15 +55,15 @@
 - Support for multiple file types
 
 ### Mobile-First Design
-- Responsive layout with mobile optimizations
+- Responsive layout with mobile optimisations
 - Viewport handling for mobile browsers
 - Touch-friendly interface elements
 - iOS Safari compatibility fixes
 
-### Performance Optimizations
+### Performance Optimisations
 - Code splitting with manual chunks
 - Lazy loading for route components
-- Optimized build configuration
+- Optimised build configuration
 - Mobile viewport height calculations
 
 ### Development Experience
@@ -98,4 +98,4 @@ src/
 
 ## Summary
 
-This is a modern full-stack web application built with **Vue.js 3** and **TypeScript**, powered by **AWS Amplify** for backend services. The application features a comprehensive authentication system using AWS Cognito, DynamoDB for data storage, and S3 for file management. The frontend utilizes **Pinia** for state management, **Vue Router** for navigation with authentication guards, and **Tailwind CSS** for responsive, mobile-first styling. The project includes comprehensive development tooling including ESLint, Prettier, and Vitest for testing. The architecture is designed for scalability with code splitting, lazy loading, and optimized build configurations, making it a robust foundation for modern web applications with cloud-native backend services. 
+This is a modern full-stack web application built with **Vue.js 3** and **TypeScript**, powered by **AWS Amplify** for backend services. The application features a comprehensive authentication system using AWS Cognito, DynamoDB for data storage, and S3 for file management. The frontend utilises **Pinia** for state management, **Vue Router** for navigation with authentication guards, and **Tailwind CSS** for responsive, mobile-first styling. The project includes comprehensive development tooling including ESLint, Prettier, and Vitest for testing. The architecture is designed for scalability with code splitting, lazy loading, and optimised build configurations, making it a robust foundation for modern web applications with cloud-native backend services. 

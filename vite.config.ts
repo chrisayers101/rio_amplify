@@ -24,7 +24,7 @@ export default defineConfig({
     exclude: ['@aws-amplify/backend']
   },
   build: {
-    // Optimize build performance
+    // Optimise build performance
     target: 'es2020',
     sourcemap: false,
     rollupOptions: {
@@ -41,7 +41,7 @@ export default defineConfig({
     // Reduce chunk size warning limit
     chunkSizeWarningLimit: 1000
   },
-  // Optimize dev server for mobile testing
+  // Optimise dev server for mobile testing
   server: {
     host: true, // Allow external access for mobile testing
     port: 5173,
