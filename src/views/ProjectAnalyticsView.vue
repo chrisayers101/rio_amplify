@@ -9,91 +9,138 @@
         </div>
       </div>
 
-      <!-- Project Facts Cards -->
-      <div class="project-facts-section">
-        <h3>Project Facts</h3>
-        <div class="facts-grid">
-          <div class="fact-card">
-            <div class="fact-icon">
-              <MapPinIcon />
-            </div>
-            <div class="fact-content">
-              <h4>Location</h4>
-              <p>{{ currentProject?.country_region || 'N/A' }}</p>
-            </div>
-          </div>
+      <!-- Tab Navigation -->
+      <div class="tab-navigation">
+        <button
+          v-for="tab in tabs"
+          :key="tab.id"
+          @click="activeTab = tab.id"
+          :class="['tab-button', { active: activeTab === tab.id }]"
+        >
+          {{ tab.label }}
+        </button>
+      </div>
 
-          <div class="fact-card">
-            <div class="fact-icon">
-              <CurrencyDollarIcon />
-            </div>
-            <div class="fact-content">
-              <h4>Capital Cost</h4>
-              <p>{{ currentProject?.capital_cost_usd_billion ? `$${currentProject.capital_cost_usd_billion}B` : 'TBD' }}</p>
-            </div>
-          </div>
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <!-- Project Facts Tab -->
+        <div v-if="activeTab === 'facts'" class="tab-panel">
+          <div class="project-facts-section">
+            <h3>Project Facts</h3>
+            <div class="facts-grid">
+              <div class="fact-card">
+                <div class="fact-icon">
+                  <MapPinIcon />
+                </div>
+                <div class="fact-content">
+                  <h4>Location</h4>
+                  <p>{{ currentProject?.country_region || 'N/A' }}</p>
+                </div>
+              </div>
 
-          <div class="fact-card">
-            <div class="fact-icon">
-              <ChartBarIcon />
-            </div>
-            <div class="fact-content">
-              <h4>IRR</h4>
-              <p>{{ currentProject?.post_tax_irr_percent || 'TBD' }}</p>
-            </div>
-          </div>
+              <div class="fact-card">
+                <div class="fact-icon">
+                  <CurrencyDollarIcon />
+                </div>
+                <div class="fact-content">
+                  <h4>Capital Cost</h4>
+                  <p>{{ currentProject?.capital_cost_usd_billion ? `$${currentProject.capital_cost_usd_billion}B` : 'TBD' }}</p>
+                </div>
+              </div>
 
-          <div class="fact-card">
-            <div class="fact-icon">
-              <UserGroupIcon />
-            </div>
-            <div class="fact-content">
-              <h4>Workforce</h4>
-              <p>{{ currentProject?.workforce_construction_ops || 'TBD' }}</p>
-            </div>
-          </div>
+              <div class="fact-card">
+                <div class="fact-icon">
+                  <ChartBarIcon />
+                </div>
+                <div class="fact-content">
+                  <h4>IRR</h4>
+                  <p>{{ currentProject?.post_tax_irr_percent || 'TBD' }}</p>
+                </div>
+              </div>
 
-          <div class="fact-card">
-            <div class="fact-icon">
-              <BuildingOfficeIcon />
-            </div>
-            <div class="fact-content">
-              <h4>Status</h4>
-              <p>{{ formatStatus(currentProject?.status) }}</p>
-            </div>
-          </div>
+              <div class="fact-card">
+                <div class="fact-icon">
+                  <UserGroupIcon />
+                </div>
+                <div class="fact-content">
+                  <h4>Workforce</h4>
+                  <p>{{ currentProject?.workforce_construction_ops || 'TBD' }}</p>
+                </div>
+              </div>
 
-          <div class="fact-card">
-            <div class="fact-icon">
-              <GlobeAltIcon />
-            </div>
-            <div class="fact-content">
-              <h4>Key Minerals</h4>
-              <div class="minerals-tags">
-                <span v-for="mineral in currentProject?.key_minerals" :key="mineral" class="mineral-tag">
-                  {{ mineral }}
-                </span>
+              <div class="fact-card">
+                <div class="fact-icon">
+                  <BuildingOfficeIcon />
+                </div>
+                <div class="fact-content">
+                  <h4>Status</h4>
+                  <p>{{ formatStatus(currentProject?.status) }}</p>
+                </div>
+              </div>
+
+              <div class="fact-card">
+                <div class="fact-icon">
+                  <GlobeAltIcon />
+                </div>
+                <div class="fact-content">
+                  <h4>Key Minerals</h4>
+                  <div class="minerals-tags">
+                    <span v-for="mineral in currentProject?.key_minerals" :key="mineral" class="mineral-tag">
+                      {{ mineral }}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Project Details -->
-      <div class="project-details-section">
-        <h3>Project Details</h3>
-        <div class="details-content">
-          <div class="detail-item">
-            <h4>Current Status</h4>
-            <p>{{ currentProject?.current_status || 'N/A' }}</p>
+        <!-- Project Details Tab -->
+        <div v-if="activeTab === 'details'" class="tab-panel">
+          <div class="project-details-section">
+            <h3>Project Details</h3>
+            <div class="details-content">
+              <div class="detail-item">
+                <h4>Current Status</h4>
+                <p>{{ currentProject?.current_status || 'N/A' }}</p>
+              </div>
+              <div class="detail-item">
+                <h4>Summary</h4>
+                <p>{{ currentProject?.summary || 'N/A' }}</p>
+              </div>
+              <div class="detail-item">
+                <h4>Key Issues & Risks</h4>
+                <p>{{ currentProject?.key_issues_risks || 'N/A' }}</p>
+              </div>
+            </div>
           </div>
-          <div class="detail-item">
-            <h4>Summary</h4>
-            <p>{{ currentProject?.summary || 'N/A' }}</p>
+        </div>
+
+        <!-- Governance Tab -->
+        <div v-if="activeTab === 'governance'" class="tab-panel">
+          <div class="governance-section">
+            <h3>Governance</h3>
+            <div class="empty-state">
+              <div class="empty-icon">
+                <BuildingOfficeIcon />
+              </div>
+              <h4>Governance Information</h4>
+              <p>Governance details and compliance information will be displayed here.</p>
+            </div>
           </div>
-          <div class="detail-item">
-            <h4>Key Issues & Risks</h4>
-            <p>{{ currentProject?.key_issues_risks || 'N/A' }}</p>
+        </div>
+
+        <!-- AI Insight Tab -->
+        <div v-if="activeTab === 'ai-insight'" class="tab-panel">
+          <div class="ai-insight-section">
+            <h3>AI Insight</h3>
+            <div class="empty-state">
+              <div class="empty-icon">
+                <ChartBarIcon />
+              </div>
+              <h4>AI-Powered Insights</h4>
+              <p>AI-generated analysis and recommendations will be displayed here.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -102,7 +149,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useProjectStore } from '@/stores/projectStore'
 import {
   MapPinIcon,
@@ -116,6 +163,15 @@ import {
 const projectStore = useProjectStore()
 
 const currentProject = computed(() => projectStore.selectedProject)
+
+const activeTab = ref('facts')
+
+const tabs = [
+  { id: 'facts', label: 'Project Facts' },
+  { id: 'details', label: 'Project Details' },
+  { id: 'governance', label: 'Governance' },
+  { id: 'ai-insight', label: 'AI Insight' }
+]
 
 const formatStatus = (status: string) => {
   const statusMap: Record<string, string> = {
@@ -160,8 +216,59 @@ const formatStatus = (status: string) => {
   margin: 0;
 }
 
+/* Tab Navigation Styles */
+.tab-navigation {
+  display: flex;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 32px;
+  gap: 0;
+}
 
+.tab-button {
+  padding: 16px 24px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+  position: relative;
+}
 
+.tab-button:hover {
+  color: #008C8E;
+  background-color: #f0f9fa;
+}
+
+.tab-button.active {
+  color: #008C8E;
+  border-bottom-color: #008C8E;
+  font-weight: 600;
+}
+
+/* Tab Content Styles */
+.tab-content {
+  min-height: 400px;
+}
+
+.tab-panel {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Project Facts Section */
 .project-facts-section {
   margin-bottom: 32px;
 }
@@ -245,6 +352,7 @@ const formatStatus = (status: string) => {
   font-weight: 500;
 }
 
+/* Project Details Section */
 .project-details-section {
   margin-top: 32px;
 }
@@ -281,10 +389,82 @@ const formatStatus = (status: string) => {
   margin: 0;
 }
 
+/* Governance and AI Insight Sections */
+.governance-section,
+.ai-insight-section {
+  margin-top: 32px;
+}
+
+.governance-section h3,
+.ai-insight-section h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 24px 0;
+}
+
+/* Empty State Styles */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  text-align: center;
+  background: #f7f9fc;
+  border-radius: 12px;
+  border: 2px dashed #e5e7eb;
+}
+
+.empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #008C8E, #009688);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.empty-icon svg {
+  width: 32px;
+  height: 32px;
+  color: white;
+}
+
+.empty-state h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 12px 0;
+}
+
+.empty-state p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 400px;
+}
+
 /* Mobile responsive styles */
 @media (max-width: 768px) {
+  .tab-navigation {
+    flex-wrap: wrap;
+  }
+
+  .tab-button {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
   .facts-grid {
     grid-template-columns: 1fr;
+  }
+
+  .empty-state {
+    padding: 60px 16px;
   }
 }
 </style>

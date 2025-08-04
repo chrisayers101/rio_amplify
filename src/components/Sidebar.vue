@@ -49,7 +49,7 @@
         </div>
       </div>
     </div>
-    <button class="sidebar-toggle" @click="collapsed = !collapsed">
+    <button class="sidebar-toggle" @click="sidebarStore.toggleSidebar()">
       <ChevronLeftIcon v-if="collapsed" class="toggle-icon" />
       <ChevronRightIcon v-else class="toggle-icon" />
     </button>
@@ -57,8 +57,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useSidebarStore } from '@/stores/sidebarStore'
 import { user } from '@/mockdata/mockData'
 import RioLogo from '@/assets/RioLogo.svg'
 import {
@@ -76,7 +77,9 @@ import {
 } from '@heroicons/vue/24/outline'
 
 const route = useRoute()
-const collapsed = ref(false)
+const sidebarStore = useSidebarStore()
+
+const collapsed = computed(() => sidebarStore.collapsed)
 
 const navItems = [
   {

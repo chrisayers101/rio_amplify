@@ -6,12 +6,14 @@ import Sidebar from '@/components/Sidebar.vue'
 import ConversationPanel from '@/components/Conversation.vue'
 import ToggleConversationButton from '@/components/ToggleConversationButton.vue'
 import { useAuthStore } from '@/stores/authStore'
+import { useSidebarStore } from '@/stores/sidebarStore'
 import { ViewportHandler } from '@/utils/viewport'
 import './assets/main.css'
 import './assets/mobile-optimizations.css'
 
 const route = useRoute()
 const authStore = useAuthStore()
+const sidebarStore = useSidebarStore()
 const conversationOpen = ref(false)
 let viewportHandler: ViewportHandler | null = null
 
@@ -43,6 +45,13 @@ const showSidebar = computed(() => {
   return route.path !== '/auth' && authStore.isAuthenticated
 })
 const showConversationPanel = computed(() => showSidebar.value && conversationOpen.value)
+
+// Compute main content margin based on sidebar state
+const mainContentMargin = computed(() => {
+  if (!showSidebar.value) return '0'
+  return sidebarStore.collapsed ? '72px' : '260px'
+})
+
 function toggleConversation() {
   conversationOpen.value = !conversationOpen.value
 }
@@ -52,7 +61,7 @@ function toggleConversation() {
   <div id="app">
     <TopNavigation v-if="showSidebar" />
     <Sidebar v-if="showSidebar" />
-    <main class="main-content" v-if="showSidebar">
+    <main class="main-content" v-if="showSidebar" :style="{ marginLeft: mainContentMargin }">
       <router-view />
     </main>
     <router-view v-else />
@@ -103,12 +112,12 @@ code, pre, .numeric {
 }
 
 .main-content {
-  margin-left: 260px;
   margin-top: 0;
   height: calc(100vh - 64px);
   overflow-y: auto;
   background: #fff;
   padding: 0;
+  transition: margin-left 0.2s ease-in-out;
 }
 
 /* Smooth transitions for layout changes */
@@ -119,7 +128,7 @@ main {
 /* Mobile responsive styles */
 @media (max-width: 768px) {
   .main-content {
-    margin-left: 0;
+    margin-left: 0 !important;
     margin-top: 64px;
     width: 100%;
     height: calc(100vh - 64px);
