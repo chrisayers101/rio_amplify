@@ -1,0 +1,158 @@
+{
+  "appName": "AIRIS",
+  "theme": {
+    "fontFamily": "Inter, sans-serif",
+    "primaryColor": "#008C8E",
+    "secondaryColor": "#009688",
+    "dangerColor": "#E63757",
+    "warningColor": "#F2B66D",
+    "successColor": "#00B37E",
+    "backgroundColor": "#FFFFFF",
+    "surfaceColor": "#F7F9FC",
+    "borderRadius": 8,
+    "spacingBase": 8
+  },
+  "layout": {
+    "topNav": {
+      "logo": "rio-logo.svg",
+      "betaBadge": true,
+      "projectSwitcher": true,
+      "notificationBell": true,
+      "newProjectButton": {
+        "text": "New Project",
+        "icon": "plus-square",
+        "variant": "primary"
+      },
+      "userMenu": {
+        "avatarBinding": "currentUser.avatar",
+        "nameBinding": "currentUser.name",
+        "emailBinding": "currentUser.email",
+        "logout": true
+      }
+    },
+    "sidebar": {
+      "collapsible": true,
+      "branding": {
+        "logo": "rio-logo.svg",
+        "title": "AIRIS Analytica",
+        "position": "top"
+      },
+      "width": 260,
+      "collapsedWidth": 72,
+      "items": [
+        { "icon": "home", "label": "Home", "route": "/", "subLabel": "Project overview" },
+        { "icon": "bar-chart-2", "label": "Dashboard", "route": "/dashboard", "subLabel": "Analytics dashboard" },
+        {
+          "icon": "clipboard-list",
+          "label": "Evaluation",
+          "subLabel": "Rio evaluation matrix",
+          "children": [
+            { "icon": "dollar-sign", "label": "Commercial (Contracts & Costs)", "route": "/evaluation/commercial", "subLabel": "Contracts and cost evaluation" },
+            { "icon": "shield", "label": "Health, Safety & Environment (HSE)", "route": "/evaluation/hse", "subLabel": "HSE compliance and standards" },
+            { "icon": "cpu", "label": "Technical", "route": "/evaluation/technical", "subLabel": "Technical requirements assessment" },
+            { "icon": "database", "label": "Asset Management and Lifecycle Costs", "route": "/evaluation/asset", "subLabel": "Asset lifecycle cost analysis" },
+            { "icon": "calendar", "label": "Schedule", "route": "/evaluation/schedule", "subLabel": "Schedule and timeline evaluation" }
+          ]
+        }
+      ],
+      "footerUser": {
+        "avatarBinding": "currentUser.avatar",
+        "nameBinding": "currentUser.name",
+        "emailBinding": "currentUser.email"
+      }
+    },
+    "content": { "padding": 24, "maxWidth": 1680 }
+  },
+  "pages": [
+    {
+      "id": "home",
+      "title": "Dashboard Home",
+      "route": "/dashboard",
+      "components": [
+        {
+          "type": "pageTitle",
+          "text": "Welcome back, {{user.name}}",
+          "subtext": "Here's what's happening with your bid analysis today"
+        },
+        {
+          "type": "grid",
+          "columns": 4,
+          "gap": 24,
+          "children": [
+            {
+              "type": "metricCard",
+              "id": "activeProjects",
+              "title": "Active Projects",
+              "icon": "activity",
+              "valueBinding": "stats.activeProjects",
+              "subtext": "+{{stats.activeProjectsDelta}} from last month"
+            },
+            {
+              "type": "metricCard",
+              "id": "totalBidValue",
+              "title": "Total Bid Value",
+              "icon": "dollar-sign",
+              "valueBinding": "stats.totalBidValue",
+              "format": "currency",
+              "subtext": "Across all projects"
+            },
+            {
+              "type": "metricCard",
+              "id": "pendingReviews",
+              "title": "Pending Reviews",
+              "icon": "clock",
+              "valueBinding": "stats.pendingReviews",
+              "subtext": "Requires attention"
+            },
+            {
+              "type": "metricCard",
+              "id": "completionRate",
+              "title": "Completion Rate",
+              "icon": "bar-chart-2",
+              "valueBinding": "stats.completionRate",
+              "format": "percent",
+              "subtext": "This quarter"
+            }
+          ]
+        },
+        {
+          "type": "tabs",
+          "id": "homeTabs",
+          "selected": "overview",
+          "items": [
+            { "id": "overview", "label": "Overview" },
+            { "id": "projects", "label": "Projects" },
+            { "id": "insights", "label": "All Insights" }
+          ]
+        },
+        {
+          "type": "twoColumn",
+          "left": [
+            {
+              "type": "sectionHeader",
+              "text": "Recent Projects",
+              "subtext": "Your most recent bid analysis projects"
+            },
+            {
+              "type": "list",
+              "itemType": "projectRow",
+              "dataBinding": "recentProjects"
+            }
+          ],
+          "right": [
+            {
+              "type": "sectionHeader",
+              "text": "AI Suggestions",
+              "subtext": "Recommended actions based on your workflow"
+            },
+            {
+              "type": "list",
+              "itemType": "suggestionCard",
+              "dataBinding": "aiSuggestions"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

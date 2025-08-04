@@ -3,8 +3,7 @@ import LandingPage from '@/views/LandingPage.vue'
 import AuthView from '@/views/AuthView.vue'
 import EntitiesView from '@/views/EntitiesView.vue'
 import FilesView from '@/views/FilesView.vue'
-import WorkbenchView from '@/views/WorkbenchView.vue'
-import DashboardView from '@/views/DashboardView.vue'
+import HomeView from '@/views/HomeView.vue'
 
 import { useAuthStore } from '@/stores/authStore'
 
@@ -18,8 +17,9 @@ const router = createRouter({
     routes: [
         {
             path: '/',
-            name: 'LandingPage',
-            component: AuthView
+            name: 'Home',
+            component: HomeView,
+            meta: { requiresAuth: true }
         },
         {
             path: '/auth',
@@ -39,18 +39,6 @@ const router = createRouter({
             component: FilesView,
             meta: { requiresAuth: true }
         },
-        {
-            path: '/workbench',
-            name: 'Workbench',
-            component: WorkbenchView,
-            meta: { requiresAuth: true }
-        },
-        {
-            path: '/dashboard',
-            name: 'Dashboard',
-            component: DashboardView,
-            meta: { requiresAuth: true }
-        }
     ],
 })
 
@@ -69,9 +57,9 @@ router.beforeEach(async (to) => {
     return { name: 'Auth' }
   }
 
-  // If user is authenticated and trying to access landing or auth, redirect to workbench
+  // If user is authenticated and trying to access landing or auth, redirect to home
   if (authenticated && (to.name === 'LandingPage' || to.name === 'Auth')) {
-    return { name: 'Workbench' }
+    return { name: 'Home' }
   }
 })
 

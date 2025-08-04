@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 import TopNavigation from '@/components/TopNavigation.vue'
+import Sidebar from '@/components/Sidebar.vue'
+import ConversationPanel from '@/components/Conversation.vue'
+import ToggleConversationButton from '@/components/TopNavigation.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { ViewportHandler } from '@/utils/viewport'
 import './assets/main.css'
@@ -9,6 +12,7 @@ import './assets/mobile-optimizations.css'
 
 const route = useRoute()
 const authStore = useAuthStore()
+const conversationOpen = ref(false)
 let viewportHandler: ViewportHandler | null = null
 
 // Initialize authentication state and viewport handler on app startup
@@ -34,23 +38,26 @@ onUnmounted(() => {
   }
 })
 
-// Show navigation on authenticated routes (not on landing page or auth page)
-const showNavigation = computed(() => {
-  return route.path !== '/' && route.path !== '/auth'
-})
+// Show sidebar on authenticated routes (not on auth page)
+const showSidebar = computed(() => route.path !== '/auth')
+const showConversationPanel = computed(() => showSidebar.value && conversationOpen.value)
+function toggleConversation() {
+  conversationOpen.value = !conversationOpen.value
+}
 </script>
 
 <template>
-  <div id="app" class="h-full flex flex-col">
-    <!-- Top Navigation - only show on authenticated views -->
-    <TopNavigation v-if="showNavigation" class="flex-shrink-0" />
-
-    <!-- Main content that grows to fill remaining space below navigation -->
-    <main class="flex-1 min-h-0 relative">
-      <RouterView />
-    </main>
-
-
+  <div id="app">
+    <TopNavigation v-if="showSidebar" />
+    <div class="main-layout" v-if="showSidebar">
+      <Sidebar />
+      <main class="main-content">
+        <router-view />
+      </main>
+    </div>
+    <router-view v-else />
+    <ConversationPanel v-if="showConversationPanel" :open="conversationOpen" @close="toggleConversation" />
+    <ToggleConversationButton v-if="showSidebar" @click="toggleConversation" />
   </div>
 </template>
 
@@ -93,6 +100,18 @@ code, pre, .numeric {
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.main-layout {
+  display: flex;
+  height: calc(100vh - 64px);
+  margin-top: 64px;
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  background: #f7f9fc;
 }
 
 /* Smooth transitions for layout changes */

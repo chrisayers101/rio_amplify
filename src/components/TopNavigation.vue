@@ -1,62 +1,29 @@
 <template>
-  <nav class="bg-theme-primary shadow-sm border-b border-theme-light">
-    <div class="px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16">
-        <div class="flex items-center">
-          <img src="@/assets/RioLogo.svg" alt="Rio Tinto" class="h-8 w-auto" />
+  <nav class="top-nav">
+    <div class="top-nav-left">
+      <img :src="RioLogo" alt="Rio Tinto" class="logo" />
+      <span class="beta-badge">BETA</span>
+      <select class="project-switcher" v-model="selectedProject">
+        <option v-for="project in projects" :key="project.id" :value="project.id">{{ project.name }}</option>
+      </select>
+    </div>
+    <div class="top-nav-center"></div>
+    <div class="top-nav-right">
+      <button class="icon-btn notification-btn" title="Notifications">
+        <BellIcon class="icon" />
+      </button>
+      <button class="primary-btn new-project-btn">
+        <PlusIcon class="icon" /> New Project
+      </button>
+      <div class="user-menu" @click="toggleMenu">
+        <img :src="user.avatar" alt="User" class="avatar" />
+        <div class="user-info">
+          <div class="user-name">{{ user.name }}</div>
+          <div class="user-email">{{ user.email }}</div>
         </div>
-
-        <div class="flex items-center space-x-4">
-          <!-- Navigation Links -->
-          <div class="flex items-center space-x-2">
-            <router-link
-              to="/workbench"
-              class="nav-item"
-              :class="{ 'nav-item-active': $route.name === 'Workbench' }"
-            >
-              <HomeIcon class="h-5 w-5" />
-              <span class="text-sm font-medium">Home</span>
-            </router-link>
-
-            <router-link
-              to="/dashboard"
-              class="nav-item"
-              :class="{ 'nav-item-active': $route.name === 'Dashboard' }"
-            >
-              <ChartBarIcon class="h-5 w-5" />
-              <span class="text-sm font-medium">Dashboard</span>
-            </router-link>
-
-            <router-link
-              to="/entities"
-              class="nav-item"
-              :class="{ 'nav-item-active': $route.name === 'Entities' }"
-            >
-              <ServerStackIcon class="h-5 w-5" />
-              <span class="text-sm font-medium">Entities</span>
-            </router-link>
-
-            <router-link
-              to="/files"
-              class="nav-item"
-              :class="{ 'nav-item-active': $route.name === 'Files' }"
-            >
-              <FolderIcon class="h-5 w-5" />
-              <span class="text-sm font-medium">Files</span>
-            </router-link>
-          </div>
-
-
-
-          <!-- User Info and Logout Button -->
-          <button
-            @click="signOut"
-            class="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-800 bg-gray-50 hover:bg-gray-100 p-2 rounded-md transition-colors duration-200 border border-gray-200"
-            title="Sign Out"
-          >
-            <span class="font-medium">{{ getUserDisplayName() }}</span>
-            <ArrowLeftStartOnRectangleIcon class="h-5 w-5" />
-          </button>
+        <ChevronDownIcon class="icon chevron" />
+        <div v-if="menuOpen" class="user-dropdown">
+          <button @click="signOut" class="dropdown-item">Logout</button>
         </div>
       </div>
     </div>
@@ -64,47 +31,165 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
-import { useRouter } from 'vue-router'
-import { ArrowLeftStartOnRectangleIcon, HomeIcon, ServerStackIcon, FolderIcon, ChartBarIcon } from '@heroicons/vue/24/outline'
-
+import RioLogo from '@/assets/RioLogo.svg'
+import { BellIcon, PlusIcon, ChevronDownIcon } from '@heroicons/vue/24/outline'
 const authStore = useAuthStore()
-const router = useRouter()
-
-const getUserDisplayName = () => {
-  const user = authStore.user
-  if (!user) return 'User'
-
-  // If username looks like an email, use it
-  if (user.username && user.username.includes('@')) {
-    return user.username
-  }
-
-  // If email is available and username is not an email, use email
-  if (user.email && user.email.includes('@')) {
-    return user.email
-  }
-
-  // If username is a UUID or long ID, use email or fallback
-  if (user.username && user.username.length > 20) {
-    return user.email || 'User'
-  }
-
-  // Use username if it's a reasonable name
-  if (user.username) {
-    return user.username
-  }
-
-  return user.email || 'User'
+const user = {
+  name: authStore.user?.username || 'User',
+  email: authStore.user?.email || 'user@email.com',
+  avatar: '/assets/avatar.png',
 }
-
-const signOut = async () => {
-  try {
-    await authStore.signOut()
-    // Redirect to landing page after successful sign out
-    router.push('/')
-  } catch (error) {
-    console.error('Sign out error:', error)
-  }
+const projects = [
+  { id: 1, name: 'Hamersley Iron Expansion' },
+  { id: 2, name: 'Brockman 4 Upgrade' },
+  { id: 3, name: 'Yandicoogina Mine Study' },
+]
+const selectedProject = ref(projects[0].id)
+const menuOpen = ref(false)
+function toggleMenu() {
+  menuOpen.value = !menuOpen.value
+}
+async function signOut() {
+  await authStore.signOut()
+  window.location.href = '/'
 }
 </script>
+
+<style scoped>
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.top-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.logo {
+  height: 32px;
+  width: auto;
+}
+.beta-badge {
+  background: #E63757;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 2px 8px;
+  margin-left: 8px;
+}
+.project-switcher {
+  margin-left: 16px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid #eee;
+  font-size: 14px;
+}
+.top-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+.icon-btn:hover {
+  background: #f7f9fc;
+}
+.icon {
+  width: 20px;
+  height: 20px;
+}
+.primary-btn {
+  background: #008C8E;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.primary-btn:hover {
+  background: #009688;
+}
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+.user-menu:hover {
+  background: #f7f9fc;
+}
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.user-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+.user-email {
+  font-size: 12px;
+  color: #888;
+}
+.chevron {
+  margin-left: 4px;
+}
+.user-dropdown {
+  position: absolute;
+  right: 0;
+  top: 110%;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  min-width: 120px;
+  z-index: 10;
+}
+.dropdown-item {
+  width: 100%;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  color: #E63757;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+.dropdown-item:hover {
+  background: #f7f9fc;
+}
+</style>
