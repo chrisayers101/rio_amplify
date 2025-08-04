@@ -15,7 +15,7 @@
             <p>Comprehensive view of all mining projects and their current status</p>
           </div>
           <div class="project-cards-grid">
-            <div v-for="project in rioTintoProjects" :key="project.id" class="project-card-detailed" @click="handleProjectClick(project.id)">
+            <div v-for="project in rioTintoProjects" :key="project.id" class="project-card-detailed" @click="handleProjectClick(project.id as string)">
               <div class="project-card-header">
                 <div class="project-icon" :class="`icon-${project.color}`">
                   <component :is="project.icon" />
@@ -78,7 +78,7 @@
                 <p class="risks-text">{{ project.key_issues_risks }}</p>
               </div>
 
-              <button class="view-project-btn" @click.stop="handleProjectClick(project.id)">View Full Details</button>
+              <button class="view-project-btn" @click.stop="handleProjectClick(project.id || '')">View Full Details</button>
             </div>
           </div>
         </div>
@@ -91,12 +91,14 @@
 import { useAuthStore } from '@/stores/authStore'
 import { useProjectStore } from '@/stores/projectStore'
 import { useRouter } from 'vue-router'
-import { rioTintoProjects } from '@/mockdata/mockData'
 import { MapPinIcon } from '@heroicons/vue/24/outline'
 
 const authStore = useAuthStore()
 const projectStore = useProjectStore()
 const router = useRouter()
+
+// Get all projects from the project store instead of mock data
+const rioTintoProjects = projectStore.getAllProjects()
 
 const formatStatus = (status: string) => {
   const statusMap: Record<string, string> = {
@@ -108,9 +110,11 @@ const formatStatus = (status: string) => {
   return statusMap[status] || status
 }
 
-const handleProjectClick = (projectId: string) => {
-  projectStore.setSelectedProject(projectId)
-  router.push('/dashboard')
+const handleProjectClick = (projectId: string | undefined) => {
+  if (projectId) {
+    projectStore.setSelectedProject(projectId)
+    router.push('/dashboard')
+  }
 }
 </script>
 
