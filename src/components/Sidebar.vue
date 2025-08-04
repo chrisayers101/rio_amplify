@@ -144,13 +144,13 @@ const isActiveSection = (item: any) => {
   width: 260px;
   background: #fff;
   border-right: 1px solid #eee;
-  height: 100vh;
+  height: calc(100vh - 64px);
   display: flex;
   flex-direction: column;
   transition: width 0.2s;
   position: fixed;
   left: 0;
-  top: 60px;
+  top: 64px;
   z-index: 50;
   overflow-y: auto;
 }
@@ -296,5 +296,33 @@ const isActiveSection = (item: any) => {
   width: 12px;
   height: 12px;
   color: #888;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: calc(100vh - 64px);
+    top: 64px;
+    left: 0;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.collapsed {
+    width: 100%;
+    transform: translateX(-100%);
+  }
+
+  .sidebar:not(.collapsed) {
+    transform: translateX(0);
+  }
+
+  .sidebar-toggle {
+    right: 16px;
+    top: 16px;
+    z-index: 1001;
+  }
 }
 </style>

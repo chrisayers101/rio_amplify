@@ -4,7 +4,7 @@ import { RouterView, useRoute } from 'vue-router'
 import TopNavigation from '@/components/TopNavigation.vue'
 import Sidebar from '@/components/Sidebar.vue'
 import ConversationPanel from '@/components/Conversation.vue'
-import ToggleConversationButton from '@/components/TopNavigation.vue'
+import ToggleConversationButton from '@/components/ToggleConversationButton.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { ViewportHandler } from '@/utils/viewport'
 import './assets/main.css'
@@ -104,7 +104,7 @@ code, pre, .numeric {
 
 .main-content {
   margin-left: 260px;
-  margin-top: 0;
+  margin-top: 64px;
   height: calc(100vh - 64px);
   overflow-y: auto;
   background: #f7f9fc;
@@ -114,6 +114,28 @@ code, pre, .numeric {
 /* Smooth transitions for layout changes */
 main {
   transition: all 0.3s ease-in-out;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    margin-top: 64px;
+    width: 100%;
+    height: calc(100vh - 64px);
+  }
+
+  .toggle-conversation-btn {
+    bottom: 16px;
+    right: 16px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .toggle-icon {
+    width: 20px;
+    height: 20px;
+  }
 }
 </style>
 
