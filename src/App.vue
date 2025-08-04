@@ -104,10 +104,10 @@ code, pre, .numeric {
 
 .main-content {
   margin-left: 260px;
-  margin-top: 64px;
+  margin-top: 0;
   height: calc(100vh - 64px);
   overflow-y: auto;
-  background: #f7f9fc;
+  background: #fff;
   padding: 0;
 }
 

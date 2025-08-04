@@ -94,11 +94,13 @@ const selectedTab = ref('overview')
 }
 .dashboard-content {
   background: #fff;
-  padding: 32px;
+  padding: 0 32px 32px 32px;
+  margin-top: 0;
 }
 .dashboard-header {
   margin-bottom: 32px;
   margin-top: 0;
+  padding-top: 64px;
 }
 .header-text h1 {
   font-size: 2rem;
