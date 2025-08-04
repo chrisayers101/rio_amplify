@@ -40,15 +40,7 @@
         </li>
       </ul>
     </nav>
-    <div class="sidebar-footer" v-if="!collapsed">
-      <div class="sidebar-user">
-        <img :src="user.avatar" alt="User" class="sidebar-avatar" />
-        <div class="sidebar-user-info">
-          <div class="sidebar-username">{{ user.name }}</div>
-          <div class="sidebar-email">{{ user.email }}</div>
-        </div>
-      </div>
-    </div>
+
     <button class="sidebar-toggle" @click="sidebarStore.toggleSidebar()">
       <ChevronLeftIcon v-if="collapsed" class="toggle-icon" />
       <ChevronRightIcon v-else class="toggle-icon" />
@@ -60,7 +52,6 @@
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSidebarStore } from '@/stores/sidebarStore'
-import { user } from '@/mockdata/mockData'
 import RioLogo from '@/assets/RioLogo.svg'
 import {
   HomeIcon,
@@ -170,7 +161,6 @@ const toggleSection = (sectionLabel: string) => {
   left: 0;
   top: 64px;
   z-index: 50;
-  overflow-y: auto;
 }
 .sidebar.collapsed {
   width: 72px;
@@ -194,7 +184,6 @@ const toggleSection = (sectionLabel: string) => {
 .sidebar-nav {
   flex: 1;
   padding: 0;
-  overflow-y: auto;
 }
 .sidebar-nav ul {
   list-style: none;
@@ -266,34 +255,6 @@ const toggleSection = (sectionLabel: string) => {
 .sidebar-subnav .sidebar-link.active {
   background: #f0f9fa;
   color: #008C8E;
-}
-.sidebar-footer {
-  padding: 16px;
-  border-top: 1px solid #eee;
-  background: #f7f9fc;
-}
-.sidebar-user {
-  display: flex;
-  align-items: center;
-}
-.sidebar-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  margin-right: 12px;
-}
-.sidebar-user-info {
-  flex: 1;
-}
-.sidebar-username {
-  font-weight: 600;
-  font-size: 14px;
-  color: #333;
-}
-.sidebar-email {
-  font-size: 12px;
-  color: #888;
-  margin-top: 2px;
 }
 .sidebar-toggle {
   position: absolute;
