@@ -9,7 +9,7 @@
         </div>
         <div class="project-selector-container">
           <label class="project-label">Select Project</label>
-          <select class="project-switcher" v-model="selectedProject">
+          <select class="project-switcher" :value="selectedProject" @change="projectStore.setSelectedProject($event.target.value)">
             <option v-for="project in projects" :key="project.id" :value="project.id">{{ project.name }}</option>
           </select>
         </div>
@@ -108,8 +108,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { rioTintoProjects } from '@/mockdata/mockData'
+import { computed } from 'vue'
+import { useProjectStore } from '@/stores/projectStore'
 import {
   MapPinIcon,
   CurrencyDollarIcon,
@@ -119,39 +119,11 @@ import {
   GlobeAltIcon
 } from '@heroicons/vue/24/outline'
 
-// Add Amrun project to the projects list
-const projectsWithAmrun = [
-  {
-    id: 'AMRUN-001',
-    name: 'Amrun',
-    country_region: 'Queensland, Australia',
-    key_minerals: ['Bauxite'],
-    capital_cost_usd_billion: 1.9,
-    npv_usd_billion: null,
-    post_tax_irr_percent: '15-18',
-    workforce_construction_ops: '1,200 / 400',
-    current_status: 'Operational since 2019, producing 22.8 Mtpa bauxite',
-    key_issues_risks: 'Environmental compliance, community relations, market demand fluctuations',
-    summary: 'Rio Tinto\'s newest bauxite mine, supplying the global aluminum industry with high-quality ore.',
-    icon: BuildingOfficeIcon,
-    status: 'operational',
-    color: 'green'
-  },
-  ...rioTintoProjects
-]
+const projectStore = useProjectStore()
 
-const selectedProject = ref('AMRUN-001') // Default to Amrun
-
-const projects = computed(() => {
-  return projectsWithAmrun.map(project => ({
-    id: project.id,
-    name: project.name
-  }))
-})
-
-const currentProject = computed(() => {
-  return projectsWithAmrun.find(project => project.id === selectedProject.value)
-})
+const selectedProject = computed(() => projectStore.selectedProjectId)
+const projects = computed(() => projectStore.projects)
+const currentProject = computed(() => projectStore.selectedProject)
 
 const formatStatus = (status: string) => {
   const statusMap: Record<string, string> = {

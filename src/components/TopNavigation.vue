@@ -2,14 +2,13 @@
   <nav class="top-nav">
     <div class="top-nav-left">
       <img :src="RioLogo" alt="Rio Tinto" class="logo" />
-      <div class="project-selector-container">
-        <label class="project-label">Select Project</label>
-        <select class="project-switcher" v-model="selectedProject">
-          <option v-for="project in projects" :key="project.id" :value="project.id">{{ project.name }}</option>
-        </select>
+    </div>
+    <div class="top-nav-center">
+      <div v-if="projectStore.hasSelectedProject" class="active-project">
+        <span class="active-project-label">Active Project:</span>
+        <span class="active-project-name">{{ projectStore.selectedProject?.name }}</span>
       </div>
     </div>
-    <div class="top-nav-center"></div>
     <div class="top-nav-right">
       <button class="user-btn" @click="signOut" title="Logout">
         <span class="user-email">{{ user.email }}</span>
@@ -20,23 +19,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
+import { useProjectStore } from '@/stores/projectStore'
 import RioLogo from '@/assets/RioLogo.svg'
 import { ArrowLeftStartOnRectangleIcon } from '@heroicons/vue/24/outline'
-import { rioTintoProjects } from '@/mockdata/mockData'
 
 const authStore = useAuthStore()
+const projectStore = useProjectStore()
 const user = {
   name: authStore.user?.username || 'User',
   email: authStore.user?.email || 'user@email.com',
   avatar: '/assets/avatar.png',
 }
-const projects = rioTintoProjects.map(project => ({
-  id: project.id,
-  name: project.name
-}))
-const selectedProject = ref(projects[0].id)
 async function signOut() {
   await authStore.signOut()
   window.location.href = '/'
@@ -59,27 +53,37 @@ async function signOut() {
 .top-nav-left {
   display: flex;
   align-items: center;
-  gap: 100px;
 }
 .logo {
   height: 32px;
   width: auto;
 }
-.project-switcher {
-  padding: 4px 12px;
-  border-radius: 6px;
-  border: 1px solid #eee;
-  font-size: 14px;
+.top-nav-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.project-selector-container {
+
+.active-project {
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 8px 16px;
+  background: #f0f9fa;
+  border-radius: 8px;
+  border: 1px solid #e6f7f8;
 }
-.project-label {
+
+.active-project-label {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.active-project-name {
   font-size: 16px;
-  font-weight: 600;
-  color: #555;
+  font-weight: 700;
+  color: #008C8E;
 }
 .top-nav-right {
   display: flex;
