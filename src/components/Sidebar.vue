@@ -87,7 +87,7 @@ const navItems = [
   },
   {
     icon: ChartBarIcon,
-    label: 'Dashboard',
+    label: 'Project Analytics',
     route: '/dashboard',
     subLabel: 'Analytics dashboard'
   },

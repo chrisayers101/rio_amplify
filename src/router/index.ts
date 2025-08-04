@@ -4,6 +4,7 @@ import AuthView from '@/views/AuthView.vue'
 import EntitiesView from '@/views/EntitiesView.vue'
 import FilesView from '@/views/FilesView.vue'
 import HomeView from '@/views/HomeView.vue'
+import ProjectAnalyticsView from '@/views/ProjectAnalyticsView.vue'
 
 import { useAuthStore } from '@/stores/authStore'
 
@@ -41,6 +42,12 @@ const router = createRouter({
             path: '/files',
             name: 'Files',
             component: FilesView,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/dashboard',
+            name: 'Project Analytics',
+            component: ProjectAnalyticsView,
             meta: { requiresAuth: true }
         },
     ],
