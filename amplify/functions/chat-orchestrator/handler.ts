@@ -1,5 +1,4 @@
 import { OpenAI } from 'openai';
-import { Schema } from '@aws-amplify/amplify-api-next-alpha';
 
 interface ChatRequest {
   message: string;
@@ -20,7 +19,7 @@ interface ChatResponse {
   error?: string;
 }
 
-export const handler: Schema['chatOrchestrator']['functionHandler'] = async (event) => {
+export const handler = async (event: any) => {
   try {
     console.log('Received event:', JSON.stringify(event, null, 2));
 
