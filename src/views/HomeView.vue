@@ -4,21 +4,10 @@
       <div class="dashboard-header">
         <div class="header-text">
           <h1>Welcome back, {{ authStore.displayName }}</h1>
-          <p>Rio Tinto Mining Projects Overview</p>
         </div>
       </div>
 
-      <div class="dashboard-tabs">
-        <button
-          v-for="tab in tabs"
-          :key="tab.id"
-          :class="{ active: tab.id === selectedTab }"
-          @click="selectedTab = tab.id"
-          class="tab-button"
-        >
-          {{ tab.label }}
-        </button>
-      </div>
+
 
       <div class="dashboard-main">
         <div class="dashboard-main-full">
@@ -100,13 +89,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
-import { tabs, rioTintoProjects } from '@/mockdata/mockData'
+import { rioTintoProjects } from '@/mockdata/mockData'
 import { MapPinIcon } from '@heroicons/vue/24/outline'
 
 const authStore = useAuthStore()
-const selectedTab = ref('overview')
 
 const formatStatus = (status: string) => {
   const statusMap: Record<string, string> = {
@@ -133,7 +120,7 @@ const formatStatus = (status: string) => {
 .dashboard-header {
   margin-bottom: 32px;
   margin-top: 0;
-  padding-top: 64px;
+  padding-top: 24px;
 }
 .header-text h1 {
   font-size: 2rem;
@@ -146,30 +133,7 @@ const formatStatus = (status: string) => {
   color: #666;
   margin: 0;
 }
-.dashboard-tabs {
-  display: flex;
-  gap: 0;
-  margin-bottom: 32px;
-  border-bottom: 1px solid #eee;
-}
-.tab-button {
-  background: none;
-  border: none;
-  font-size: 1rem;
-  font-weight: 500;
-  padding: 16px 24px;
-  color: #666;
-  cursor: pointer;
-  border-bottom: 3px solid transparent;
-  transition: all 0.2s;
-}
-.tab-button:hover {
-  color: #008C8E;
-}
-.tab-button.active {
-  color: #008C8E;
-  border-bottom-color: #008C8E;
-}
+
 .dashboard-main {
   display: block;
 }
