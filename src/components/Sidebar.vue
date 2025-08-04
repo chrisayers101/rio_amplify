@@ -11,15 +11,15 @@
               <span class="sidebar-sub-label">{{ item.subLabel }}</span>
             </div>
           </router-link>
-          <div v-else class="sidebar-link" :class="{ active: isActiveSection(item) }">
+          <div v-else class="sidebar-link" :class="{ active: isActiveSection(item) }" @click="toggleSection(item.label)">
             <component :is="item.icon" class="sidebar-icon" />
             <div v-if="!collapsed" class="sidebar-text">
               <span class="sidebar-label">{{ item.label }}</span>
               <span class="sidebar-sub-label">{{ item.subLabel }}</span>
             </div>
-            <ChevronDownIcon v-if="!collapsed" class="chevron" />
+            <ChevronDownIcon v-if="!collapsed" class="chevron" :class="{ 'rotated': isSectionExpanded(item.label) }" />
           </div>
-          <ul v-if="item.children && !collapsed" class="sidebar-subnav">
+          <ul v-if="item.children && !collapsed && isSectionExpanded(item.label)" class="sidebar-subnav">
             <li v-for="child in item.children" :key="child.label">
               <router-link v-if="child.route" :to="child.route" class="sidebar-link sub-link" :class="{ active: isActive(child.route) }">
                 <component :is="child.icon" class="sidebar-icon" />
@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSidebarStore } from '@/stores/sidebarStore'
 import { user } from '@/mockdata/mockData'
@@ -80,6 +80,9 @@ const route = useRoute()
 const sidebarStore = useSidebarStore()
 
 const collapsed = computed(() => sidebarStore.collapsed)
+
+// Track which sections are expanded - default to showing Evaluation
+const expandedSections = ref(new Set<string>(['Evaluation']))
 
 const navItems = [
   {
@@ -140,6 +143,18 @@ const isActive = (routePath: string) => {
 const isActiveSection = (item: any) => {
   return item.children?.some((child: any) => child.route === route.path)
 }
+
+const isSectionExpanded = (sectionLabel: string) => {
+  return expandedSections.value.has(sectionLabel)
+}
+
+const toggleSection = (sectionLabel: string) => {
+  if (expandedSections.value.has(sectionLabel)) {
+    expandedSections.value.delete(sectionLabel)
+  } else {
+    expandedSections.value.add(sectionLabel)
+  }
+}
 </script>
 
 <style scoped>
@@ -198,6 +213,7 @@ const isActiveSection = (item: any) => {
   border-radius: 0;
   transition: all 0.2s;
   position: relative;
+  cursor: pointer;
 }
 .sidebar-link:hover {
   background: #f7f9fc;
@@ -233,6 +249,10 @@ const isActiveSection = (item: any) => {
   height: 16px;
   margin-left: auto;
   color: #888;
+  transition: transform 0.2s ease;
+}
+.chevron.rotated {
+  transform: rotate(180deg);
 }
 .sidebar-subnav {
   padding-left: 0;
@@ -280,8 +300,8 @@ const isActiveSection = (item: any) => {
   right: -12px;
   top: 50%;
   transform: translateY(-50%);
-  background: #fff;
-  border: 1px solid #eee;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
   border-radius: 50%;
   width: 24px;
   height: 24px;

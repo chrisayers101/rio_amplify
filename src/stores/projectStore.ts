@@ -17,6 +17,12 @@ export interface Project {
   icon?: any
   status?: string
   color?: string
+  milestones?: Array<{
+    date: string
+    title: string
+    description: string
+    status: 'completed' | 'pending' | 'in-progress'
+  }>
 }
 
 export const useProjectStore = defineStore('project', () => {
@@ -40,7 +46,14 @@ export const useProjectStore = defineStore('project', () => {
       key_issues_risks: 'Environmental compliance, community relations, market demand fluctuations',
       summary: 'Rio Tinto\'s newest bauxite mine, supplying the global aluminum industry with high-quality ore.',
       status: 'operational',
-      color: 'green'
+      color: 'green',
+      milestones: [
+        { date: '2017 Q2', title: 'Project Approval', description: 'Board approval for Amrun bauxite project development', status: 'completed' },
+        { date: '2018 Q1', title: 'Construction Started', description: 'Major construction activities commence', status: 'completed' },
+        { date: '2019 Q1', title: 'First Production', description: 'First bauxite production from Amrun mine', status: 'completed' },
+        { date: '2020 Q2', title: 'Full Production Ramp-up', description: 'Achieved full production capacity of 22.8 Mtpa', status: 'completed' },
+        { date: '2025 Q4', title: 'Expansion Study', description: 'Study for potential production expansion', status: 'pending' }
+      ]
     },
     ...rioTintoProjects
   ]
@@ -99,4 +112,4 @@ export const useProjectStore = defineStore('project', () => {
     getAllProjects,
     clearError
   }
-}) 
+})

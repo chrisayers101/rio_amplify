@@ -116,6 +116,43 @@
           </div>
         </div>
 
+        <!-- Milestones Tab -->
+        <div v-if="activeTab === 'milestones'" class="tab-panel">
+          <div class="milestones-section">
+            <h3>Project Milestones</h3>
+            <div class="timeline-container">
+              <div v-if="currentProject?.milestones && currentProject.milestones.length > 0" class="timeline">
+                <div v-for="(milestone, index) in currentProject.milestones" :key="index" class="timeline-item">
+                  <div class="timeline-marker" :class="milestone.status">
+                    <CheckIcon v-if="milestone.status === 'completed'" class="marker-icon" />
+                    <ClockIcon v-else-if="milestone.status === 'in-progress'" class="marker-icon" />
+                    <CalendarIcon v-else class="marker-icon" />
+                  </div>
+                  <div class="timeline-content">
+                    <div class="milestone-header">
+                      <h4 class="milestone-title">{{ milestone.title }}</h4>
+                      <span class="milestone-date">{{ milestone.date }}</span>
+                    </div>
+                    <p class="milestone-description">{{ milestone.description }}</p>
+                    <div class="milestone-status">
+                      <span class="status-badge" :class="milestone.status || 'pending'">
+                        {{ formatMilestoneStatus(milestone.status) }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="empty-state">
+                <div class="empty-icon">
+                  <CalendarIcon />
+                </div>
+                <h4>No Milestones Available</h4>
+                <p>Milestone information for this project will be displayed here.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Governance Tab -->
         <div v-if="activeTab === 'governance'" class="tab-panel">
           <div class="governance-section">
@@ -157,7 +194,10 @@ import {
   ChartBarIcon,
   UserGroupIcon,
   BuildingOfficeIcon,
-  GlobeAltIcon
+  GlobeAltIcon,
+  CheckIcon,
+  ClockIcon,
+  CalendarIcon
 } from '@heroicons/vue/24/outline'
 
 const projectStore = useProjectStore()
@@ -169,16 +209,28 @@ const activeTab = ref('facts')
 const tabs = [
   { id: 'facts', label: 'Project Facts' },
   { id: 'details', label: 'Project Details' },
+  { id: 'milestones', label: 'Milestones' },
   { id: 'governance', label: 'Governance' },
   { id: 'ai-insight', label: 'AI Insight' }
 ]
 
-const formatStatus = (status: string) => {
+const formatStatus = (status: string | undefined) => {
+  if (!status) return 'N/A'
   const statusMap: Record<string, string> = {
     'pre-sanction': 'Pre-Sanction',
     'licence-revoked': 'Licence Revoked',
     'operational': 'Operational',
     'pfs-progress': 'PFS Progress'
+  }
+  return statusMap[status] || status
+}
+
+const formatMilestoneStatus = (status: string | undefined) => {
+  if (!status) return 'Unknown'
+  const statusMap: Record<string, string> = {
+    'completed': 'Completed',
+    'in-progress': 'In Progress',
+    'pending': 'Pending'
   }
   return statusMap[status] || status
 }
@@ -389,6 +441,151 @@ const formatStatus = (status: string) => {
   margin: 0;
 }
 
+/* Milestones Section */
+.milestones-section {
+  margin-top: 32px;
+}
+
+.milestones-section h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 24px 0;
+}
+
+.timeline-container {
+  position: relative;
+  padding: 24px 0;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.timeline {
+  position: relative;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  background: #e5e7eb;
+  transform: translateX(-50%);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.timeline-item:last-child {
+  margin-bottom: 0;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.timeline-marker.completed {
+  background: linear-gradient(135deg, #008C8E, #009688);
+  box-shadow: 0 0 0 4px #e5e7eb;
+}
+
+.timeline-marker.in-progress {
+  background: linear-gradient(135deg, #008C8E, #009688);
+  box-shadow: 0 0 0 4px #e5e7eb;
+}
+
+.timeline-marker.upcoming {
+  background: #e5e7eb;
+  box-shadow: 0 0 0 4px #e5e7eb;
+}
+
+.marker-icon {
+  width: 24px;
+  height: 24px;
+  color: white;
+}
+
+.timeline-content {
+  position: relative;
+  padding: 0 0 0 30px; /* Adjust based on marker width */
+  flex-grow: 1;
+}
+
+.milestone-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.milestone-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.milestone-date {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.milestone-description {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0 0 12px 0;
+}
+
+.milestone-status {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.status-badge {
+  background: #f0f9fa;
+  color: #008C8E;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.status-badge.completed {
+  background: #e5f9f0;
+  color: #008C8E;
+}
+
+.status-badge.in-progress {
+  background: #f0f9fa;
+  color: #008C8E;
+}
+
+.status-badge.upcoming {
+  background: #f7f9fc;
+  color: #666;
+}
+
 /* Governance and AI Insight Sections */
 .governance-section,
 .ai-insight-section {
@@ -461,6 +658,56 @@ const formatStatus = (status: string) => {
 
   .facts-grid {
     grid-template-columns: 1fr;
+  }
+
+  .timeline-container {
+    padding: 0 16px;
+  }
+
+  .timeline:before {
+    left: 10px;
+    right: 10px;
+    width: auto;
+    margin-left: -50%;
+  }
+
+  .timeline-item {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 30px;
+  }
+
+  .timeline-marker {
+    position: static;
+    transform: none;
+    margin-bottom: 15px;
+  }
+
+  .timeline-content {
+    padding: 0;
+    width: 100%;
+  }
+
+  .milestone-header {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+
+  .milestone-title {
+    margin-bottom: 4px;
+  }
+
+  .milestone-date {
+    font-size: 12px;
+  }
+
+  .milestone-description {
+    font-size: 13px;
+  }
+
+  .milestone-status {
+    justify-content: flex-start;
   }
 
   .empty-state {

@@ -95,7 +95,14 @@ export const rioTintoProjects = [
     summary: 'The world\'s largest untapped high‑grade iron‑ore deposit now edging toward full sanction.',
     icon: GlobeAltIcon,
     status: 'pre-sanction',
-    color: 'blue'
+    color: 'blue',
+    milestones: [
+      { date: '2024 Q4', title: 'JV Agreement Signed', description: 'Rio Tinto and Winning Consortium Simandou sign joint venture agreement', status: 'completed' },
+      { date: '2025 Q1', title: 'Final Investment Decision', description: 'Board approval for full project sanction', status: 'pending' },
+      { date: '2025 Q2', title: 'Construction Commencement', description: 'Start of major construction activities', status: 'pending' },
+      { date: '2027 Q4', title: 'First Ore Production', description: 'Target for first iron ore production', status: 'pending' },
+      { date: '2028 Q2', title: 'Full Production Ramp-up', description: 'Achieve full production capacity of 60 Mtpa', status: 'pending' }
+    ]
   },
   {
     id: 'JADAR-001',
@@ -111,7 +118,14 @@ export const rioTintoProjects = [
     summary: 'Europe\'s potential flagship lithium source but politically the company\'s most controversial green‑field project.',
     icon: ExclamationCircleIcon,
     status: 'licence-revoked',
-    color: 'red'
+    color: 'red',
+    milestones: [
+      { date: '2021 Q4', title: 'Feasibility Study Completed', description: 'Technical and economic feasibility study finalized', status: 'completed' },
+      { date: '2022 Q1', title: 'Licence Revoked', description: 'Serbian government revokes mining licences', status: 'completed' },
+      { date: '2025 Q1', title: 'EU Strategic Project Status', description: 'Project designated as EU strategic project', status: 'completed' },
+      { date: '2025 Q4', title: 'Parliamentary Vote', description: 'Expected parliamentary vote on lithium mining ban', status: 'pending' },
+      { date: '2026 Q2', title: 'Permit Reinstatement', description: 'Target for reinstatement of mining permits', status: 'pending' }
+    ]
   },
   {
     id: 'RINCON-001',
@@ -127,7 +141,14 @@ export const rioTintoProjects = [
     summary: 'Rio Tinto\'s first full‑scale lithium asset, using direct‑lithium‑extraction to halve water draw.',
     icon: CheckBadgeIcon,
     status: 'operational',
-    color: 'green'
+    color: 'green',
+    milestones: [
+      { date: '2023 Q2', title: 'Acquisition Completed', description: 'Rio Tinto acquires Rincon lithium project', status: 'completed' },
+      { date: '2024 Q1', title: 'Starter Plant Construction', description: '3 kt starter plant construction begins', status: 'completed' },
+      { date: '2024 Q4', title: 'First Lithium Production', description: 'First lithium carbonate produced from starter plant', status: 'completed' },
+      { date: '2025 Q2', title: 'Expansion Earthworks', description: 'Start of expansion project earthworks', status: 'pending' },
+      { date: '2026 Q4', title: 'Full Scale Production', description: 'Target for full scale production ramp-up', status: 'pending' }
+    ]
   },
   {
     id: 'WINU-001',
@@ -143,7 +164,14 @@ export const rioTintoProjects = [
     summary: 'Early‑stage Pilbara copper hub aimed at ~25 yr life; now partnered with Sumitomo Metal Mining.',
     icon: MapPinIcon,
     status: 'pfs-progress',
-    color: 'yellow'
+    color: 'yellow',
+    milestones: [
+      { date: '2023 Q3', title: 'Discovery Confirmed', description: 'Initial discovery and resource estimation completed', status: 'completed' },
+      { date: '2024 Q2', title: 'Sumitomo JV Signed', description: 'Joint venture agreement with Sumitomo Metal Mining', status: 'completed' },
+      { date: '2025 Q1', title: 'PFS Completion', description: 'Pre-feasibility study completion', status: 'pending' },
+      { date: '2026 Q2', title: 'Feasibility Study', description: 'Full feasibility study completion', status: 'pending' },
+      { date: '2027 Q4', title: 'Final Investment Decision', description: 'Board approval for project development', status: 'pending' }
+    ]
   },
   {
     id: 'GUDAI-DARRI-001',
@@ -159,7 +187,14 @@ export const rioTintoProjects = [
     summary: 'Rio\'s most automated iron‑ore mine—autonomous trucks, trains and 34 MW solar farm.',
     icon: BuildingOfficeIcon,
     status: 'operational',
-    color: 'green'
+    color: 'green',
+    milestones: [
+      { date: '2020 Q1', title: 'Construction Started', description: 'Major construction activities commence', status: 'completed' },
+      { date: '2022 Q2', title: 'First Ore Production', description: 'First iron ore produced from Gudai-Darri', status: 'completed' },
+      { date: '2023 Q4', title: 'Full Production Ramp-up', description: 'Achieved 43 Mtpa production capacity', status: 'completed' },
+      { date: '2025 Q2', title: 'Debottlenecking Study', description: 'Study completion for 50 Mtpa expansion', status: 'pending' },
+      { date: '2026 Q4', title: 'Expansion Implementation', description: 'Implementation of debottlenecking measures', status: 'pending' }
+    ]
   },
   {
     id: 'OYU-TOLGOI-001',
@@ -175,7 +210,14 @@ export const rioTintoProjects = [
     summary: 'World‑scale block‑cave set to be the 4th‑largest copper mine once fully ramped.',
     icon: UserGroupIcon,
     status: 'operational',
-    color: 'green'
+    color: 'green',
+    milestones: [
+      { date: '2022 Q4', title: 'Underground Development', description: 'Underground development activities commence', status: 'completed' },
+      { date: '2023 Q1', title: 'First Underground Production', description: 'First copper production from underground mine', status: 'completed' },
+      { date: '2025 Q2', title: 'Ramp-up Phase 1', description: 'Achieve 300 kt Cu/year production', status: 'pending' },
+      { date: '2027 Q4', title: 'Ramp-up Phase 2', description: 'Achieve 400 kt Cu/year production', status: 'pending' },
+      { date: '2028 Q4', title: 'Full Production', description: 'Achieve 500 kt Cu/year production capacity', status: 'pending' }
+    ]
   }
 ]
 
