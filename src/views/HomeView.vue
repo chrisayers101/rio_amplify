@@ -4,7 +4,7 @@
       <div class="dashboard-header">
         <div class="header-text">
           <h1>Welcome back, {{ authStore.displayName }}</h1>
-          <p>Here's what's happening with your bid analysis today</p>
+          <p>Here's what's happening with your project analysis today</p>
         </div>
       </div>
 
@@ -37,7 +37,7 @@
         <div class="dashboard-main-left">
           <div class="section-header">
             <h3>Recent Projects</h3>
-            <p>Your most recent bid analysis projects</p>
+            <p>Your most recent project analysis projects</p>
           </div>
           <div class="project-list">
             <div v-for="project in recentProjects" :key="project.id" class="project-card">
@@ -88,19 +88,17 @@ const selectedTab = ref('overview')
 
 <style scoped>
 .dashboard-layout {
-  padding: 24px;
-  padding-top: 32px;
+  padding: 0;
   max-width: 1680px;
   margin: 0 auto;
 }
 .dashboard-content {
   background: #fff;
-  border-radius: 12px;
   padding: 32px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 .dashboard-header {
   margin-bottom: 32px;
+  margin-top: 0;
 }
 .header-text h1 {
   font-size: 2rem;

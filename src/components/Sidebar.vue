@@ -1,9 +1,6 @@
 <template>
   <aside :class="['sidebar', { collapsed }]">
-    <div class="sidebar-branding">
-      <img :src="RioLogo" alt="Logo" class="sidebar-logo" />
-      <span v-if="!collapsed" class="sidebar-title">AIRIS Analytica</span>
-    </div>
+
     <nav class="sidebar-nav">
       <ul>
         <li v-for="item in navItems" :key="item.label">
@@ -153,7 +150,7 @@ const isActiveSection = (item: any) => {
   transition: width 0.2s;
   position: fixed;
   left: 0;
-  top: 64px;
+  top: 60px;
   z-index: 50;
   overflow-y: auto;
 }
@@ -163,7 +160,7 @@ const isActiveSection = (item: any) => {
 .sidebar-branding {
   display: flex;
   align-items: center;
-  padding: 16px;
+  padding: 0 16px;
   border-bottom: 1px solid #eee;
 }
 .sidebar-logo {
@@ -178,7 +175,7 @@ const isActiveSection = (item: any) => {
 }
 .sidebar-nav {
   flex: 1;
-  padding: 16px 0;
+  padding: 0;
   overflow-y: auto;
 }
 .sidebar-nav ul {
@@ -192,7 +189,7 @@ const isActiveSection = (item: any) => {
 .sidebar-link {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
+  padding: 8px 16px;
   color: #333;
   text-decoration: none;
   border-radius: 0;

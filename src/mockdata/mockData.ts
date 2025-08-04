@@ -24,8 +24,8 @@ export const metricCards = [
     icon: ChartBarIcon,
   },
   {
-    id: 'totalBidValue',
-    title: 'Total Bid Value',
+    id: 'totalProjectValue',
+    title: 'Total Project Value',
     value: '$8,200,000',
     subtext: 'Across all projects',
     icon: CurrencyDollarIcon,

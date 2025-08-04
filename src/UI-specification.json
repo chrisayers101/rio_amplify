@@ -67,7 +67,7 @@
         {
           "type": "pageTitle",
           "text": "Welcome back, {{user.name}}",
-          "subtext": "Here's what's happening with your bid analysis today"
+          "subtext": "Here's what's happening with your project analysis today"
         },
         {
           "type": "grid",
@@ -84,10 +84,10 @@
             },
             {
               "type": "metricCard",
-              "id": "totalBidValue",
-              "title": "Total Bid Value",
+              "id": "totalProjectValue",
+              "title": "Total Project Value",
               "icon": "dollar-sign",
-              "valueBinding": "stats.totalBidValue",
+              "valueBinding": "stats.totalProjectValue",
               "format": "currency",
               "subtext": "Across all projects"
             },
@@ -126,7 +126,7 @@
             {
               "type": "sectionHeader",
               "text": "Recent Projects",
-              "subtext": "Your most recent bid analysis projects"
+              "subtext": "Your most recent project analysis projects"
             },
             {
               "type": "list",
