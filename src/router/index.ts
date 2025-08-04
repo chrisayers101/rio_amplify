@@ -5,6 +5,11 @@ import EntitiesView from '@/views/EntitiesView.vue'
 import FilesView from '@/views/FilesView.vue'
 import HomeView from '@/views/HomeView.vue'
 import ProjectAnalyticsView from '@/views/ProjectAnalyticsView.vue'
+import CommercialView from '@/views/evaluation/CommercialView.vue'
+import HSEView from '@/views/evaluation/HSEView.vue'
+import TechnicalView from '@/views/evaluation/TechnicalView.vue'
+import AssetView from '@/views/evaluation/AssetView.vue'
+import ScheduleView from '@/views/evaluation/ScheduleView.vue'
 
 import { useAuthStore } from '@/stores/authStore'
 
@@ -48,6 +53,36 @@ const router = createRouter({
             path: '/dashboard',
             name: 'Project Analytics',
             component: ProjectAnalyticsView,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/evaluation/commercial',
+            name: 'Commercial Evaluation',
+            component: CommercialView,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/evaluation/hse',
+            name: 'HSE Evaluation',
+            component: HSEView,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/evaluation/technical',
+            name: 'Technical Evaluation',
+            component: TechnicalView,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/evaluation/asset',
+            name: 'Asset Management Evaluation',
+            component: AssetView,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/evaluation/schedule',
+            name: 'Schedule Evaluation',
+            component: ScheduleView,
             meta: { requiresAuth: true }
         },
     ],
