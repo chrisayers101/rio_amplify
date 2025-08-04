@@ -1,12 +1,15 @@
 import { defineStore } from 'pinia'
 import { ref, computed, readonly } from 'vue'
-import { getCurrentUser, signOut as amplifySignOut } from 'aws-amplify/auth'
+import { getCurrentUser, signOut as amplifySignOut, fetchUserAttributes } from 'aws-amplify/auth'
 import type { AuthUser } from 'aws-amplify/auth'
 
 export interface AppUser {
   userId: string
   username: string
   email: string
+  name?: string
+  givenName?: string
+  familyName?: string
   signInDetails?: Record<string, unknown>
 }
 
@@ -19,6 +22,24 @@ export const useAuthStore = defineStore('auth', () => {
   // Computed
   const isAuthenticated = computed(() => !!user.value)
   const currentUserId = computed(() => user.value?.userId || null)
+  const displayName = computed(() => {
+    if (!user.value) return 'User'
+
+    // Try to get the full name first
+    if (user.value.name) return user.value.name
+    if (user.value.givenName && user.value.familyName) {
+      return `${user.value.givenName} ${user.value.familyName}`
+    }
+    if (user.value.givenName) return user.value.givenName
+    if (user.value.familyName) return user.value.familyName
+
+    // Fallback to email or username
+    if (user.value.email && user.value.email !== 'Unknown') {
+      return user.value.email.split('@')[0]
+    }
+
+    return user.value.username || 'User'
+  })
 
   // Actions
   const checkAuthState = async (): Promise<boolean> => {
@@ -27,11 +48,15 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       const currentUser: AuthUser = await getCurrentUser()
+      const userAttributes = await fetchUserAttributes()
 
       const userInfo: AppUser = {
         userId: currentUser.userId,
         username: currentUser.username,
-        email: currentUser.signInDetails?.loginId || 'Unknown',
+        email: userAttributes.email || currentUser.signInDetails?.loginId || 'Unknown',
+        name: userAttributes.name,
+        givenName: userAttributes.given_name,
+        familyName: userAttributes.family_name,
         signInDetails: currentUser.signInDetails as Record<string, unknown>
       }
 
@@ -40,7 +65,10 @@ export const useAuthStore = defineStore('auth', () => {
       console.log('User authenticated:', {
         userId: userInfo.userId,
         username: userInfo.username,
-        email: userInfo.email
+        email: userInfo.email,
+        name: userInfo.name,
+        givenName: userInfo.givenName,
+        familyName: userInfo.familyName
       })
 
       return true
@@ -88,6 +116,7 @@ export const useAuthStore = defineStore('auth', () => {
     // Computed
     isAuthenticated,
     currentUserId,
+    displayName,
 
     // Actions
     checkAuthState,

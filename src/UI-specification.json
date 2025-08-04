@@ -14,20 +14,15 @@
   },
   "layout": {
     "topNav": {
-      "logo": "rio-logo.svg",
-      "betaBadge": true,
-      "projectSwitcher": true,
-      "notificationBell": true,
-      "newProjectButton": {
-        "text": "New Project",
-        "icon": "plus-square",
-        "variant": "primary"
+      "logo": "RioLogo.svg",
+      "projectSwitcher": {
+        "label": "Select Project",
+        "projects": ["Amrun", "Hamersley", "Brockman", "Yandicoogina", "Gudai-Darri"]
       },
       "userMenu": {
-        "avatarBinding": "currentUser.avatar",
-        "nameBinding": "currentUser.name",
         "emailBinding": "currentUser.email",
-        "logout": true
+        "logout": true,
+        "style": "button"
       }
     },
     "sidebar": {

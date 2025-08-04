@@ -3,7 +3,7 @@
     <div class="dashboard-content">
       <div class="dashboard-header">
         <div class="header-text">
-          <h1>Welcome back, {{ user.name }}</h1>
+          <h1>Welcome back, {{ authStore.displayName }}</h1>
           <p>Here's what's happening with your bid analysis today</p>
         </div>
       </div>
@@ -79,8 +79,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { user, metricCards, tabs, recentProjects, aiSuggestions } from '@/mockdata/mockData'
+import { useAuthStore } from '@/stores/authStore'
+import { metricCards, tabs, recentProjects, aiSuggestions } from '@/mockdata/mockData'
 
+const authStore = useAuthStore()
 const selectedTab = ref('overview')
 </script>
 
