@@ -2,15 +2,15 @@
   <nav class="top-nav">
     <div class="top-nav-left">
       <img :src="RioLogo" alt="Rio Tinto" class="logo" />
-      <select class="project-switcher" v-model="selectedProject">
-        <option v-for="project in projects" :key="project.id" :value="project.id">{{ project.name }}</option>
-      </select>
+      <div class="project-selector-container">
+        <label class="project-label">Select Project</label>
+        <select class="project-switcher" v-model="selectedProject">
+          <option v-for="project in projects" :key="project.id" :value="project.id">{{ project.name }}</option>
+        </select>
+      </div>
     </div>
     <div class="top-nav-center"></div>
     <div class="top-nav-right">
-      <button class="icon-btn notification-btn" title="Notifications">
-        <BellIcon class="icon" />
-      </button>
       <button class="user-btn" @click="signOut" title="Logout">
         <span class="user-email">{{ user.email }}</span>
         <ArrowLeftStartOnRectangleIcon class="icon" />
@@ -23,7 +23,7 @@
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import RioLogo from '@/assets/RioLogo.svg'
-import { BellIcon, ArrowLeftStartOnRectangleIcon } from '@heroicons/vue/24/outline'
+import { ArrowLeftStartOnRectangleIcon } from '@heroicons/vue/24/outline'
 const authStore = useAuthStore()
 const user = {
   name: authStore.user?.username || 'User',
@@ -31,9 +31,11 @@ const user = {
   avatar: '/assets/avatar.png',
 }
 const projects = [
-  { id: 1, name: 'Hamersley Iron Expansion' },
-  { id: 2, name: 'Brockman 4 Upgrade' },
-  { id: 3, name: 'Yandicoogina Mine Study' },
+  { id: 1, name: 'Amrun' },
+  { id: 2, name: 'Hamersley' },
+  { id: 3, name: 'Brockman' },
+  { id: 4, name: 'Yandicoogina' },
+  { id: 5, name: 'Gudai-Darri' },
 ]
 const selectedProject = ref(projects[0].id)
 async function signOut() {
@@ -58,34 +60,32 @@ async function signOut() {
 .top-nav-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 100px;
 }
 .logo {
   height: 32px;
   width: auto;
 }
 .project-switcher {
-  margin-left: 16px;
   padding: 4px 12px;
   border-radius: 6px;
   border: 1px solid #eee;
   font-size: 14px;
 }
+.project-selector-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.project-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #555;
+}
 .top-nav-right {
   display: flex;
   align-items: center;
   gap: 16px;
-}
-.icon-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  border-radius: 50%;
-  transition: background 0.2s;
-}
-.icon-btn:hover {
-  background: #f7f9fc;
 }
 .icon {
   width: 20px;
