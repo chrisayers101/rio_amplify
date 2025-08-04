@@ -1,1 +1,2 @@
 npx ampx sandbox --profile aidev --stream-function-logs
+- fixed the commit problems
