@@ -24,19 +24,18 @@ import { ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import RioLogo from '@/assets/RioLogo.svg'
 import { ArrowLeftStartOnRectangleIcon } from '@heroicons/vue/24/outline'
+import { rioTintoProjects } from '@/mockdata/mockData'
+
 const authStore = useAuthStore()
 const user = {
   name: authStore.user?.username || 'User',
   email: authStore.user?.email || 'user@email.com',
   avatar: '/assets/avatar.png',
 }
-const projects = [
-  { id: 1, name: 'Amrun' },
-  { id: 2, name: 'Hamersley' },
-  { id: 3, name: 'Brockman' },
-  { id: 4, name: 'Yandicoogina' },
-  { id: 5, name: 'Gudai-Darri' },
-]
+const projects = rioTintoProjects.map(project => ({
+  id: project.id,
+  name: project.name
+}))
 const selectedProject = ref(projects[0].id)
 async function signOut() {
   await authStore.signOut()

@@ -4,20 +4,7 @@
       <div class="dashboard-header">
         <div class="header-text">
           <h1>Welcome back, {{ authStore.displayName }}</h1>
-          <p>Here's what's happening with your project analysis today</p>
-        </div>
-      </div>
-
-      <div class="dashboard-metrics">
-        <div v-for="card in metricCards" :key="card.id" class="metric-card">
-          <div class="metric-icon">
-            <component :is="card.icon" />
-          </div>
-          <div class="metric-content">
-            <h3 class="metric-title">{{ card.title }}</h3>
-            <div class="metric-value">{{ card.value }}</div>
-            <div class="metric-subtext">{{ card.subtext }}</div>
-          </div>
+          <p>Rio Tinto Mining Projects Overview</p>
         </div>
       </div>
 
@@ -34,41 +21,76 @@
       </div>
 
       <div class="dashboard-main">
-        <div class="dashboard-main-left">
+        <div class="dashboard-main-full">
           <div class="section-header">
-            <h3>Recent Projects</h3>
-            <p>Your most recent project analysis projects</p>
+            <h3>Rio Tinto Projects</h3>
+            <p>Comprehensive view of all mining projects and their current status</p>
           </div>
-          <div class="project-list">
-            <div v-for="project in recentProjects" :key="project.id" class="project-card">
-              <div class="project-header">
-                <h4 class="project-name">{{ project.name }}</h4>
-                <span class="project-id">{{ project.id }}</span>
+          <div class="project-cards-grid">
+            <div v-for="project in rioTintoProjects" :key="project.id" class="project-card-detailed">
+              <div class="project-card-header">
+                <div class="project-icon" :class="`icon-${project.color}`">
+                  <component :is="project.icon" />
+                </div>
+                <div class="project-title-section">
+                  <h4 class="project-name">{{ project.name }}</h4>
+                  <div class="project-location">
+                    <MapPinIcon class="location-icon" />
+                    <span>{{ project.country_region }}</span>
+                  </div>
+                </div>
+                <div class="project-status" :class="`status-${project.status}`">
+                  {{ formatStatus(project.status) }}
+                </div>
               </div>
-              <div class="project-details">
-                <span class="proposer-count">{{ project.proposers }} proposers</span>
-                <span :class="['status-badge', project.status]">{{ project.status }}</span>
-              </div>
-              <button class="view-btn">View</button>
-            </div>
-          </div>
-        </div>
 
-        <div class="dashboard-main-right">
-          <div class="section-header">
-            <h3>AI Suggestions</h3>
-            <p>Recommended actions based on your workflow</p>
-          </div>
-          <div class="suggestion-list">
-            <div v-for="suggestion in aiSuggestions" :key="suggestion.id" class="suggestion-card">
-              <div class="suggestion-icon">
-                <component :is="suggestion.icon" />
+              <div class="project-summary">
+                <p>{{ project.summary }}</p>
               </div>
-              <div class="suggestion-content">
-                <p class="suggestion-text">{{ suggestion.text }}</p>
-                <span class="project-ref">{{ suggestion.projectRef }}</span>
+
+              <div class="project-details-grid">
+                <div class="detail-item">
+                  <div class="detail-label">Capital Cost</div>
+                  <div class="detail-value">
+                    {{ project.capital_cost_usd_billion ? `$${project.capital_cost_usd_billion}B` : 'TBD' }}
+                  </div>
+                </div>
+
+                <div class="detail-item">
+                  <div class="detail-label">IRR</div>
+                  <div class="detail-value">
+                    {{ project.post_tax_irr_percent || 'TBD' }}
+                  </div>
+                </div>
+
+                <div class="detail-item">
+                  <div class="detail-label">Workforce</div>
+                  <div class="detail-value">
+                    {{ project.workforce_construction_ops || 'TBD' }}
+                  </div>
+                </div>
               </div>
-              <button class="view-btn">View</button>
+
+              <div class="project-minerals">
+                <div class="detail-label">Key Minerals</div>
+                <div class="minerals-tags">
+                  <span v-for="mineral in project.key_minerals" :key="mineral" class="mineral-tag">
+                    {{ mineral }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="project-current-status">
+                <div class="detail-label">Current Status</div>
+                <p class="status-text">{{ project.current_status }}</p>
+              </div>
+
+              <div class="project-risks">
+                <div class="detail-label">Key Issues & Risks</div>
+                <p class="risks-text">{{ project.key_issues_risks }}</p>
+              </div>
+
+              <button class="view-project-btn">View Full Details</button>
             </div>
           </div>
         </div>
@@ -80,10 +102,21 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
-import { metricCards, tabs, recentProjects, aiSuggestions } from '@/mockdata/mockData'
+import { tabs, rioTintoProjects } from '@/mockdata/mockData'
+import { MapPinIcon } from '@heroicons/vue/24/outline'
 
 const authStore = useAuthStore()
 const selectedTab = ref('overview')
+
+const formatStatus = (status: string) => {
+  const statusMap: Record<string, string> = {
+    'pre-sanction': 'Pre-Sanction',
+    'licence-revoked': 'Licence Revoked',
+    'operational': 'Operational',
+    'pfs-progress': 'PFS Progress'
+  }
+  return statusMap[status] || status
+}
 </script>
 
 <style scoped>
@@ -113,61 +146,6 @@ const selectedTab = ref('overview')
   color: #666;
   margin: 0;
 }
-.dashboard-metrics {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-  margin-bottom: 32px;
-}
-.metric-card {
-  background: #f7f9fc;
-  border-radius: 12px;
-  padding: 24px;
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  transition: all 0.2s;
-}
-.metric-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-.metric-icon {
-  width: 48px;
-  height: 48px;
-  background: #008C8E;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  flex-shrink: 0;
-}
-.metric-icon svg {
-  width: 24px;
-  height: 24px;
-}
-.metric-content {
-  flex: 1;
-}
-.metric-title {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #666;
-  margin: 0 0 8px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-.metric-value {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin-bottom: 4px;
-}
-.metric-subtext {
-  font-size: 0.9rem;
-  color: #888;
-}
 .dashboard-tabs {
   display: flex;
   gap: 0;
@@ -193,9 +171,10 @@ const selectedTab = ref('overview')
   border-bottom-color: #008C8E;
 }
 .dashboard-main {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px;
+  display: block;
+}
+.dashboard-main-full {
+  width: 100%;
 }
 .section-header {
   margin-bottom: 24px;
@@ -210,108 +189,202 @@ const selectedTab = ref('overview')
   color: #666;
   margin: 0;
 }
-.project-list, .suggestion-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+
+/* Project Cards Grid */
+.project-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 24px;
+  max-height: none;
+  overflow-y: visible;
 }
-.project-card, .suggestion-card {
+
+.project-card-detailed {
   background: #fff;
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  transition: all 0.2s;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
-.project-card:hover, .suggestion-card:hover {
+
+.project-card-detailed:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   border-color: #008C8E;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-.project-header {
-  flex: 1;
+
+.project-card-header {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
 }
-.project-name {
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0;
-}
-.project-id {
-  font-size: 0.9rem;
-  color: #888;
-  font-family: monospace;
-}
-.project-details {
+
+.project-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  flex-shrink: 0;
 }
-.proposer-count {
+
+.project-icon svg {
+  width: 28px;
+  height: 28px;
+  color: white;
+}
+
+.icon-blue { background: linear-gradient(135deg, #3B82F6, #1D4ED8); }
+.icon-red { background: linear-gradient(135deg, #EF4444, #DC2626); }
+.icon-green { background: linear-gradient(135deg, #10B981, #059669); }
+.icon-yellow { background: linear-gradient(135deg, #F59E0B, #D97706); }
+
+.project-title-section {
+  flex: 1;
+}
+
+.project-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+}
+
+.project-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #6B7280;
   font-size: 0.9rem;
-  color: #666;
 }
-.status-badge {
+
+.location-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.project-status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-pre-sanction {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+.status-licence-revoked {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+.status-operational {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+.status-pfs-progress {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.project-summary {
+  margin-bottom: 20px;
+}
+
+.project-summary p {
+  color: #4B5563;
+  line-height: 1.6;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.project-details-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #F9FAFB;
+  border-radius: 12px;
+}
+
+.detail-item {
+  text-align: center;
+}
+
+.detail-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.detail-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.project-minerals {
+  margin-bottom: 20px;
+}
+
+.minerals-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.mineral-tag {
+  background: #E0E7FF;
+  color: #3730A3;
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 500;
-  text-transform: uppercase;
 }
-.status-badge.active {
-  background: #e6f7f8;
-  color: #008C8E;
+
+.project-current-status,
+.project-risks {
+  margin-bottom: 16px;
 }
-.status-badge.review {
-  background: #fff3cd;
-  color: #856404;
-}
-.status-badge.pending {
-  background: #f8d7da;
-  color: #721c24;
-}
-.suggestion-icon {
-  width: 40px;
-  height: 40px;
-  background: #f7f9fc;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #008C8E;
-  flex-shrink: 0;
-}
-.suggestion-icon svg {
-  width: 20px;
-  height: 20px;
-}
-.suggestion-content {
-  flex: 1;
-}
-.suggestion-text {
-  font-weight: 500;
-  color: #1a1a1a;
-  margin: 0 0 4px 0;
-}
-.project-ref {
+
+.status-text,
+.risks-text {
+  color: #4B5563;
+  line-height: 1.5;
+  margin: 8px 0 0 0;
   font-size: 0.9rem;
-  color: #888;
 }
-.view-btn {
-  background: #008C8E;
+
+.view-project-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #008C8E, #006D6F);
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  margin-top: 16px;
 }
-.view-btn:hover {
-  background: #009688;
+
+.view-project-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 140, 142, 0.3);
 }
 </style>

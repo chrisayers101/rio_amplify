@@ -1,0 +1,92 @@
+[
+  {
+    "project": "Simandou (Blocks 3&4)",
+    "country_region": "Guinea",
+    "key_minerals": [
+      "High‑grade iron ore"
+    ],
+    "capital_cost_usd_billion": 11.6,
+    "npv_usd_billion": null,
+    "post_tax_irr_percent": "11–13",
+    "workforce_construction_ops": null,
+    "current_status": "Pre-sanction; early works under way, first ore targeted 2025",
+    "key_issues_risks": "JV and Chinese / Guinean approvals still outstanding; 600 km rail and port mega‑scope",
+    "summary": "The world’s largest untapped high‑grade iron‑ore deposit now edging toward full sanction."
+  },
+  {
+    "project": "Jadar Lithium–Borates",
+    "country_region": "Serbia",
+    "key_minerals": [
+      "Lithium carbonate",
+      "Boric acid"
+    ],
+    "capital_cost_usd_billion": 2.4,
+    "npv_usd_billion": null,
+    "post_tax_irr_percent": null,
+    "workforce_construction_ops": "2,100 / 1,000",
+    "current_status": "Licences revoked 2022; re‑designated an EU “strategic project” 2025, still awaiting permits",
+    "key_issues_risks": "Strong local opposition over water & land, pending parliamentary vote on lithium ban",
+    "summary": "Europe’s potential flagship lithium source but politically the company’s most controversial green‑field project."
+  },
+  {
+    "project": "Rincon Lithium Brine",
+    "country_region": "Argentina (Salta)",
+    "key_minerals": [
+      "Lithium carbonate"
+    ],
+    "capital_cost_usd_billion": 2.5,
+    "npv_usd_billion": null,
+    "post_tax_irr_percent": null,
+    "workforce_construction_ops": null,
+    "current_status": "3 kt starter plant produced first lithium Nov 2024; expansion earthworks start mid‑2025",
+    "key_issues_risks": "Permitting, water use, ramp‑up execution in a high‑altitude salar",
+    "summary": "Rio Tinto’s first full‑scale lithium asset, using direct‑lithium‑extraction to halve water draw."
+  },
+  {
+    "project": "Winu Copper‑Gold",
+    "country_region": "Western Australia (Great Sandy Desert)",
+    "key_minerals": [
+      "Copper",
+      "Gold",
+      "Silver"
+    ],
+    "capital_cost_usd_billion": null,
+    "npv_usd_billion": null,
+    "post_tax_irr_percent": null,
+    "workforce_construction_ops": null,
+    "current_status": "PFS in progress; Sumitomo JV signed 2024",
+    "key_issues_risks": "Threatened‑species “night‑parrot” habitat triggered redesign; heritage approvals ongoing",
+    "summary": "Early‑stage Pilbara copper hub aimed at ~25 yr life; now partnered with Sumitomo Metal Mining."
+  },
+  {
+    "project": "Gudai‑Darri Iron Ore",
+    "country_region": "Pilbara, Australia",
+    "key_minerals": [
+      "Iron ore"
+    ],
+    "capital_cost_usd_billion": 3.1,
+    "npv_usd_billion": null,
+    "post_tax_irr_percent": null,
+    "workforce_construction_ops": "3,000 / ~600",
+    "current_status": "First ore Jun 2022, ramped to 43 Mtpa; de‑bottleneck to 50 Mtpa under study",
+    "key_issues_risks": "Capital over‑runs (COVID labour & supply chain), incremental expansion capex, heritage management",
+    "summary": "Rio’s most automated iron‑ore mine—autonomous trucks, trains and 34 MW solar farm."
+  },
+  {
+    "project": "Oyu Tolgoi Underground",
+    "country_region": "Mongolia (South Gobi)",
+    "key_minerals": [
+      "Copper",
+      "Gold",
+      "Silver",
+      "Molybdenum"
+    ],
+    "capital_cost_usd_billion": 10.0,
+    "npv_usd_billion": null,
+    "post_tax_irr_percent": null,
+    "workforce_construction_ops": ">20,000 (97 % Mongolian)",
+    "current_status": "Underground production began Mar 2023; ramp‑up to 500 kt Cu / y by 2028",
+    "key_issues_risks": "Wage negotiations, pending Mongolian elections, potential resource‑nationalism",
+    "summary": "World‑scale block‑cave set to be the 4th‑largest copper mine once fully ramped."
+  }
+]
