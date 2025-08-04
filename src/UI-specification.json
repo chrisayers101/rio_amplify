@@ -40,7 +40,7 @@
       "width": 260,
       "collapsedWidth": 72,
       "items": [
-        { "icon": "home", "label": "Home", "route": "/", "subLabel": "Project overview" },
+        { "icon": "home", "label": "Home", "route": "/home" },
         { "icon": "bar-chart-2", "label": "Dashboard", "route": "/dashboard", "subLabel": "Analytics dashboard" },
         {
           "icon": "clipboard-list",

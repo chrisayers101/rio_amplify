@@ -85,7 +85,7 @@ const navItems = [
   {
     icon: HomeIcon,
     label: 'Home',
-    route: '/',
+    route: '/home',
     subLabel: 'Project overview'
   },
   {
@@ -155,6 +155,7 @@ const isActiveSection = (item: any) => {
   left: 0;
   top: 64px;
   z-index: 50;
+  overflow-y: auto;
 }
 .sidebar.collapsed {
   width: 72px;

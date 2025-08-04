@@ -87,6 +87,7 @@ const selectedTab = ref('overview')
 <style scoped>
 .dashboard-layout {
   padding: 24px;
+  padding-top: 32px;
   max-width: 1680px;
   margin: 0 auto;
 }

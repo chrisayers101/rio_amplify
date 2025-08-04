@@ -39,7 +39,9 @@ onUnmounted(() => {
 })
 
 // Show sidebar on authenticated routes (not on auth page)
-const showSidebar = computed(() => route.path !== '/auth')
+const showSidebar = computed(() => {
+  return route.path !== '/auth' && authStore.isAuthenticated
+})
 const showConversationPanel = computed(() => showSidebar.value && conversationOpen.value)
 function toggleConversation() {
   conversationOpen.value = !conversationOpen.value
@@ -49,12 +51,10 @@ function toggleConversation() {
 <template>
   <div id="app">
     <TopNavigation v-if="showSidebar" />
-    <div class="main-layout" v-if="showSidebar">
-      <Sidebar />
-      <main class="main-content">
-        <router-view />
-      </main>
-    </div>
+    <Sidebar v-if="showSidebar" />
+    <main class="main-content" v-if="showSidebar">
+      <router-view />
+    </main>
     <router-view v-else />
     <ConversationPanel v-if="showConversationPanel" :open="conversationOpen" @close="toggleConversation" />
     <ToggleConversationButton v-if="showSidebar" @click="toggleConversation" />
@@ -102,16 +102,13 @@ code, pre, .numeric {
   flex-direction: column;
 }
 
-.main-layout {
-  display: flex;
-  height: calc(100vh - 64px);
-  margin-top: 64px;
-}
-
 .main-content {
-  flex: 1;
+  margin-left: 260px;
+  margin-top: 0;
+  height: calc(100vh - 64px);
   overflow-y: auto;
   background: #f7f9fc;
+  padding: 0;
 }
 
 /* Smooth transitions for layout changes */
