@@ -1,17 +1,11 @@
 <template>
   <div class="project-analytics-layout">
     <div class="project-analytics-content">
-      <!-- Project Selection Header -->
-      <div class="project-selection-header">
+      <!-- Project Header -->
+      <div class="project-header">
         <div class="header-text">
           <h1>Project Analytics</h1>
           <p>Comprehensive analysis and insights for your selected project</p>
-        </div>
-        <div class="project-selector-container">
-          <label class="project-label">Select Project</label>
-          <select class="project-switcher" :value="selectedProject" @change="projectStore.setSelectedProject($event.target.value)">
-            <option v-for="project in projects" :key="project.id" :value="project.id">{{ project.name }}</option>
-          </select>
         </div>
       </div>
 
@@ -121,8 +115,6 @@ import {
 
 const projectStore = useProjectStore()
 
-const selectedProject = computed(() => projectStore.selectedProjectId)
-const projects = computed(() => projectStore.projects)
 const currentProject = computed(() => projectStore.selectedProject)
 
 const formatStatus = (status: string) => {
@@ -149,15 +141,10 @@ const formatStatus = (status: string) => {
   margin-top: 0;
 }
 
-.project-selection-header {
+.project-header {
   margin-bottom: 32px;
   margin-top: 0;
   padding-top: 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 24px;
 }
 
 .header-text h1 {
@@ -173,26 +160,7 @@ const formatStatus = (status: string) => {
   margin: 0;
 }
 
-.project-selector-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
 
-.project-label {
-  font-size: 16px;
-  font-weight: 600;
-  color: #555;
-}
-
-.project-switcher {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  font-size: 14px;
-  background: #fff;
-  min-width: 200px;
-}
 
 .project-facts-section {
   margin-bottom: 32px;
@@ -315,19 +283,6 @@ const formatStatus = (status: string) => {
 
 /* Mobile responsive styles */
 @media (max-width: 768px) {
-  .project-selection-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .project-selector-container {
-    width: 100%;
-  }
-
-  .project-switcher {
-    width: 100%;
-  }
-
   .facts-grid {
     grid-template-columns: 1fr;
   }

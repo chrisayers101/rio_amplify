@@ -12,11 +12,10 @@
       <div class="dashboard-main">
         <div class="dashboard-main-full">
           <div class="section-header">
-            <h3>Rio Tinto Projects</h3>
             <p>Comprehensive view of all mining projects and their current status</p>
           </div>
           <div class="project-cards-grid">
-            <div v-for="project in rioTintoProjects" :key="project.id" class="project-card-detailed">
+            <div v-for="project in rioTintoProjects" :key="project.id" class="project-card-detailed" @click="handleProjectClick(project.id)">
               <div class="project-card-header">
                 <div class="project-icon" :class="`icon-${project.color}`">
                   <component :is="project.icon" />
@@ -79,7 +78,7 @@
                 <p class="risks-text">{{ project.key_issues_risks }}</p>
               </div>
 
-              <button class="view-project-btn">View Full Details</button>
+              <button class="view-project-btn" @click.stop="handleProjectClick(project.id)">View Full Details</button>
             </div>
           </div>
         </div>
@@ -90,10 +89,14 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/authStore'
+import { useProjectStore } from '@/stores/projectStore'
+import { useRouter } from 'vue-router'
 import { rioTintoProjects } from '@/mockdata/mockData'
 import { MapPinIcon } from '@heroicons/vue/24/outline'
 
 const authStore = useAuthStore()
+const projectStore = useProjectStore()
+const router = useRouter()
 
 const formatStatus = (status: string) => {
   const statusMap: Record<string, string> = {
@@ -103,6 +106,11 @@ const formatStatus = (status: string) => {
     'pfs-progress': 'PFS Progress'
   }
   return statusMap[status] || status
+}
+
+const handleProjectClick = (projectId: string) => {
+  projectStore.setSelectedProject(projectId)
+  router.push('/dashboard')
 }
 </script>
 
@@ -170,12 +178,14 @@ const formatStatus = (status: string) => {
   padding: 24px;
   transition: all 0.3s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }
 
 .project-card-detailed:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   border-color: #008C8E;
+  background: #f8fffe;
 }
 
 .project-card-header {
