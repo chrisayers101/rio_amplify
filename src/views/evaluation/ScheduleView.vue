@@ -5,137 +5,158 @@
       <div class="project-header">
         <div class="header-text">
           <h1>Schedule Evaluation</h1>
-          <p>Project timeline, milestones, and schedule risks for {{ currentProject?.name }}</p>
+          <p>Timeline, milestones, and schedule risk assessment for {{ currentProject?.name }}</p>
         </div>
       </div>
 
-      <!-- Project Selection Tabs -->
+      <!-- Evaluation Category Tabs -->
       <div class="tab-navigation">
         <button
-          v-for="project in availableProjects"
-          :key="project.id"
-          @click="setSelectedProject(project.id)"
-          :class="['tab-button', { active: currentProject?.id === project.id }]"
+          v-for="tab in evaluationTabs"
+          :key="tab.id"
+          @click="activeTab = tab.id"
+          :class="['tab-button', { active: activeTab === tab.id }]"
         >
-          {{ project.name }}
+          {{ tab.label }}
         </button>
       </div>
 
-      <!-- Project Content -->
+      <!-- Tab Content -->
       <div v-if="currentProject?.evaluation?.schedule" class="project-content">
-        <div class="evaluation-grid">
-          <!-- Expected First Production -->
+        <!-- Production Timeline Tab -->
+        <div v-if="activeTab === 'production-timeline'" class="tab-panel">
           <div class="evaluation-card">
             <div class="card-header">
-              <h3>Expected First Production</h3>
+              <h3>Production Timeline</h3>
             </div>
             <div class="card-content">
-              <div class="production-section">
-                <div class="production-year">{{ formatYear(currentProject.evaluation.schedule.expected_first_production_year) }}</div>
-                <div class="production-description">
-                  Target year for first commercial production
+              <div class="timeline-display">
+                <div class="timeline-info">
+                  <div class="timeline-item">
+                    <span class="timeline-label">Expected First Production</span>
+                    <span class="timeline-value">{{ formatYear(currentProject.evaluation.schedule.expected_first_production_year) }}</span>
+                  </div>
+                  <div class="timeline-item">
+                    <span class="timeline-label">Time to Production</span>
+                    <span class="timeline-value">{{ getTimeToProduction(currentProject.evaluation.schedule.expected_first_production_year) }}</span>
+                  </div>
+                </div>
+                <div class="timeline-visualization">
+                  <div class="timeline-bar">
+                    <div class="timeline-marker" :style="{ left: getTimelinePosition(currentProject.evaluation.schedule.expected_first_production_year) }"></div>
+                  </div>
+                  <div class="timeline-scale">
+                    <span>2020</span>
+                    <span>2030</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Schedule Risk Index -->
+        <!-- Major Milestones Tab -->
+        <div v-if="activeTab === 'major-milestones'" class="tab-panel">
           <div class="evaluation-card">
             <div class="card-header">
-              <h3>Schedule Risk Index</h3>
+              <h3>Major Milestones</h3>
             </div>
             <div class="card-content">
-              <div class="risk-section">
-                <div class="risk-index" :class="getRiskClass(currentProject.evaluation.schedule.schedule_risk_index)">
-                  {{ currentProject.evaluation.schedule.schedule_risk_index }}
-                </div>
-                <div class="risk-level">{{ getRiskLevel(currentProject.evaluation.schedule.schedule_risk_index) }}</div>
-                <div class="risk-description">
-                  Schedule risk assessment (1=Low, 5=High)
+              <div class="milestones-list">
+                <div
+                  v-for="(milestone, index) in currentProject.evaluation.schedule.major_milestones"
+                  :key="index"
+                  class="milestone-item"
+                >
+                  <div class="milestone-header">
+                    <span class="milestone-name">{{ milestone.name }}</span>
+                    <span :class="['milestone-status', getMilestoneStatus(milestone.date)]">
+                      {{ getMilestoneStatus(milestone.date) }}
+                    </span>
+                  </div>
+                  <div class="milestone-date">{{ formatDate(milestone.date) }}</div>
+                  <div class="milestone-progress">
+                    <div class="progress-bar">
+                      <div
+                        class="progress-fill"
+                        :style="{ width: getMilestoneProgress(milestone.date) }"
+                      ></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Critical Path Issues -->
+        <!-- Critical Path Issues Tab -->
+        <div v-if="activeTab === 'critical-path-issues'" class="tab-panel">
           <div class="evaluation-card">
             <div class="card-header">
               <h3>Critical Path Issues</h3>
             </div>
             <div class="card-content">
-              <p>{{ currentProject.evaluation.schedule.critical_path_issues }}</p>
+              <div class="issues-display">
+                <p>{{ currentProject.evaluation.schedule.critical_path_issues }}</p>
+              </div>
             </div>
           </div>
+        </div>
 
-          <!-- Major Milestones -->
-          <div class="evaluation-card milestones">
+        <!-- Schedule Risk Tab -->
+        <div v-if="activeTab === 'schedule-risk'" class="tab-panel">
+          <div class="evaluation-card">
             <div class="card-header">
-              <h3>Major Milestones</h3>
+              <h3>Schedule Risk Assessment</h3>
             </div>
             <div class="card-content">
-              <div v-if="currentProject.evaluation.schedule.major_milestones && currentProject.evaluation.schedule.major_milestones.length > 0" class="milestones-list">
-                <div v-for="(milestone, index) in currentProject.evaluation.schedule.major_milestones" :key="index" class="milestone-item">
-                  <div class="milestone-header">
-                    <div class="milestone-progress">
-                      <div class="progress-circle" :class="getMilestoneStatus(milestone.date)">
-                        <span class="progress-number">{{ index + 1 }}</span>
-                      </div>
-                    </div>
-                    <div class="milestone-content">
-                      <h4 class="milestone-name">{{ milestone.name }}</h4>
-                      <div class="milestone-date">{{ formatDate(milestone.date) }}</div>
-                    </div>
-                    <div class="milestone-status">
-                      <span class="status-badge" :class="getMilestoneStatus(milestone.date)">
-                        {{ getMilestoneProgress(milestone.date) }}
-                      </span>
-                    </div>
+              <div class="risk-display">
+                <div class="risk-metric">
+                  <span class="risk-label">Schedule Risk Index</span>
+                  <span class="risk-value">{{ currentProject.evaluation.schedule.schedule_risk_index }}</span>
+                </div>
+                <div class="risk-classification">
+                  <span class="classification-label">Risk Level</span>
+                  <span :class="['classification-value', `risk-${getRiskLevel(currentProject.evaluation.schedule.schedule_risk_index)}`]">
+                    {{ getRiskClass(currentProject.evaluation.schedule.schedule_risk_index) }}
+                  </span>
+                </div>
+                <div class="risk-indicator">
+                  <div class="indicator-bar">
+                    <div
+                      class="indicator-fill"
+                      :style="{ width: `${(currentProject.evaluation.schedule.schedule_risk_index / 10) * 100}%` }"
+                    ></div>
+                  </div>
+                  <div class="indicator-scale">
+                    <span>Low Risk</span>
+                    <span>High Risk</span>
                   </div>
                 </div>
               </div>
-              <div v-else class="no-milestones">
-                <p>No major milestones defined</p>
-              </div>
             </div>
           </div>
+        </div>
 
-          <!-- Timeline Overview -->
-          <div class="evaluation-card timeline-overview">
+        <!-- Timeline Overview Tab -->
+        <div v-if="activeTab === 'timeline-overview'" class="tab-panel">
+          <div class="evaluation-card">
             <div class="card-header">
               <h3>Timeline Overview</h3>
             </div>
             <div class="card-content">
-              <div class="timeline-container">
-                <div class="timeline-line"></div>
-                <div v-for="(milestone, index) in currentProject.evaluation.schedule.major_milestones" :key="index" class="timeline-marker" :class="getMilestoneStatus(milestone.date)">
-                  <div class="marker-dot"></div>
-                  <div class="marker-label">{{ milestone.name }}</div>
-                  <div class="marker-date">{{ formatDate(milestone.date) }}</div>
+              <div class="overview-display">
+                <div class="overview-item">
+                  <span class="overview-label">Project Duration</span>
+                  <span class="overview-value">{{ getProjectDuration() }}</span>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Schedule Summary -->
-          <div class="evaluation-card">
-            <div class="card-header">
-              <h3>Schedule Summary</h3>
-            </div>
-            <div class="card-content">
-              <div class="summary-stats">
-                <div class="stat-item">
-                  <span class="stat-label">Total Milestones</span>
-                  <span class="stat-value">{{ currentProject.evaluation.schedule.major_milestones?.length || 0 }}</span>
+                <div class="overview-item">
+                  <span class="overview-label">Milestone Count</span>
+                  <span class="overview-value">{{ currentProject.evaluation.schedule.major_milestones.length }}</span>
                 </div>
-                <div class="stat-item">
-                  <span class="stat-label">Time to Production</span>
-                  <span class="stat-value">{{ getTimeToProduction(currentProject.evaluation.schedule.expected_first_production_year) }}</span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">Risk Level</span>
-                  <span class="stat-value" :class="getRiskClass(currentProject.evaluation.schedule.schedule_risk_index)">
-                    {{ getRiskLevel(currentProject.evaluation.schedule.schedule_risk_index) }}
-                  </span>
+                <div class="overview-item">
+                  <span class="overview-label">Average Milestone Spacing</span>
+                  <span class="overview-value">{{ getAverageMilestoneSpacing() }}</span>
                 </div>
               </div>
             </div>
@@ -156,7 +177,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useProjectStore } from '@/stores/projectStore'
 import { CalendarIcon } from '@heroicons/vue/24/outline'
 
@@ -164,11 +185,15 @@ const projectStore = useProjectStore()
 
 const currentProject = computed(() => projectStore.selectedProject)
 
-const availableProjects = computed(() => projectStore.getAllProjects())
+const activeTab = ref('production-timeline')
 
-const setSelectedProject = (projectId: string) => {
-  projectStore.setSelectedProject(projectId)
-}
+const evaluationTabs = [
+  { id: 'production-timeline', label: 'Production Timeline' },
+  { id: 'major-milestones', label: 'Major Milestones' },
+  { id: 'critical-path-issues', label: 'Critical Path Issues' },
+  { id: 'schedule-risk', label: 'Schedule Risk' },
+  { id: 'timeline-overview', label: 'Timeline Overview' }
+]
 
 const formatYear = (year: number | null): string => {
   if (year === null) return 'TBD'
@@ -176,57 +201,103 @@ const formatYear = (year: number | null): string => {
 }
 
 const formatDate = (dateString: string): string => {
-  // Convert "YYYY-MM" format to "MMM YYYY"
-  const [year, month] = dateString.split('-')
-  const date = new Date(parseInt(year), parseInt(month) - 1)
-  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long'
+  })
 }
 
-const getRiskClass = (riskIndex: number): string => {
-  if (riskIndex <= 1) return 'low'
-  if (riskIndex <= 2) return 'medium-low'
-  if (riskIndex <= 3) return 'medium'
-  if (riskIndex <= 4) return 'medium-high'
-  return 'high'
-}
+const getTimeToProduction = (year: number | null): string => {
+  if (year === null) return 'TBD'
 
-const getRiskLevel = (riskIndex: number): string => {
-  if (riskIndex <= 1) return 'Low'
-  if (riskIndex <= 2) return 'Medium-Low'
-  if (riskIndex <= 3) return 'Medium'
-  if (riskIndex <= 4) return 'Medium-High'
-  return 'High'
-}
-
-const getMilestoneProgress = (dateString: string): string => {
-  const [year, month] = dateString.split('-')
-  const milestoneDate = new Date(parseInt(year), parseInt(month) - 1)
-  const now = new Date()
-
-  if (milestoneDate < now) return 'Completed'
-  if (milestoneDate.getTime() - now.getTime() < 30 * 24 * 60 * 60 * 1000) return 'Due Soon'
-  return 'Upcoming'
-}
-
-const getMilestoneStatus = (dateString: string): string => {
-  const [year, month] = dateString.split('-')
-  const milestoneDate = new Date(parseInt(year), parseInt(month) - 1)
-  const now = new Date()
-
-  if (milestoneDate < now) return 'completed'
-  if (milestoneDate.getTime() - now.getTime() < 30 * 24 * 60 * 60 * 1000) return 'due-soon'
-  return 'upcoming'
-}
-
-const getTimeToProduction = (productionYear: number | null): string => {
-  if (productionYear === null) return 'TBD'
   const now = new Date()
   const currentYear = now.getFullYear()
-  const yearsToProduction = productionYear - currentYear
+  const yearsToProduction = year - currentYear
 
   if (yearsToProduction <= 0) return 'This year'
   if (yearsToProduction === 1) return '1 year'
   return `${yearsToProduction} years`
+}
+
+const getTimelinePosition = (year: number | null): string => {
+  if (year === null) return '50%'
+
+  // Position between 2020-2030 scale
+  const minYear = 2020
+  const maxYear = 2030
+  const position = Math.max(0, Math.min(100, ((year - minYear) / (maxYear - minYear)) * 100))
+  return `${position}%`
+}
+
+const getMilestoneStatus = (dateString: string): string => {
+  const milestoneDate = new Date(dateString)
+  const now = new Date()
+
+  if (milestoneDate < now) return 'Completed'
+  if (milestoneDate.getTime() - now.getTime() < 30 * 24 * 60 * 60 * 1000) return 'Upcoming'
+  return 'Planned'
+}
+
+const getMilestoneProgress = (dateString: string): string => {
+  const milestoneDate = new Date(dateString)
+  const now = new Date()
+
+  if (milestoneDate < now) return '100%'
+
+  // Calculate progress based on project start (assuming 2020)
+  const projectStart = new Date('2020-01-01')
+  const totalDuration = milestoneDate.getTime() - projectStart.getTime()
+  const elapsed = now.getTime() - projectStart.getTime()
+
+  if (elapsed <= 0) return '0%'
+  if (elapsed >= totalDuration) return '100%'
+
+  return `${(elapsed / totalDuration) * 100}%`
+}
+
+const getRiskClass = (index: number): string => {
+  if (index <= 3) return 'Low'
+  if (index <= 6) return 'Medium'
+  return 'High'
+}
+
+const getRiskLevel = (index: number): string => {
+  if (index <= 3) return 'low'
+  if (index <= 6) return 'medium'
+  return 'high'
+}
+
+const getProjectDuration = (): string => {
+  const milestones = currentProject.value?.evaluation?.schedule?.major_milestones
+  if (!milestones || milestones.length < 2) return 'TBD'
+
+  const firstDate = new Date(milestones[0].date)
+  const lastDate = new Date(milestones[milestones.length - 1].date)
+  const durationYears = (lastDate.getFullYear() - firstDate.getFullYear())
+
+  if (durationYears === 1) return '1 year'
+  return `${durationYears} years`
+}
+
+const getAverageMilestoneSpacing = (): string => {
+  const milestones = currentProject.value?.evaluation?.schedule?.major_milestones
+  if (!milestones || milestones.length < 2) return 'TBD'
+
+  const firstDate = new Date(milestones[0].date)
+  const lastDate = new Date(milestones[milestones.length - 1].date)
+  const totalMonths = (lastDate.getFullYear() - firstDate.getFullYear()) * 12 +
+                      (lastDate.getMonth() - firstDate.getMonth())
+  const averageMonths = Math.round(totalMonths / (milestones.length - 1))
+
+  if (averageMonths === 1) return '1 month'
+  if (averageMonths < 12) return `${averageMonths} months`
+
+  const years = Math.floor(averageMonths / 12)
+  const months = averageMonths % 12
+
+  if (months === 0) return `${years} year${years > 1 ? 's' : ''}`
+  return `${years} year${years > 1 ? 's' : ''} ${months} month${months > 1 ? 's' : ''}`
 }
 </script>
 
@@ -312,13 +383,12 @@ const getTimeToProduction = (productionYear: number | null): string => {
   }
 }
 
-/* Evaluation Grid */
-.evaluation-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 24px;
+/* Tab Panel */
+.tab-panel {
+  animation: fadeIn 0.3s ease-in-out;
 }
 
+/* Evaluation Card */
 .evaluation-card {
   background: #fff;
   border: 1px solid #e5e7eb;
@@ -326,6 +396,7 @@ const getTimeToProduction = (productionYear: number | null): string => {
   overflow: hidden;
   transition: all 0.3s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
 .evaluation-card:hover {
@@ -350,266 +421,16 @@ const getTimeToProduction = (productionYear: number | null): string => {
   padding: 24px;
 }
 
-.card-content p {
-  font-size: 14px;
-  color: #666;
-  line-height: 1.6;
-  margin: 0;
-}
-
-/* Production Section */
-.production-section {
+/* Timeline Display */
+.timeline-display {
   text-align: center;
 }
 
-.production-year {
-  font-size: 48px;
-  font-weight: 700;
-  color: #008C8E;
-  margin-bottom: 12px;
+.timeline-info {
+  margin-bottom: 24px;
 }
 
-.production-description {
-  font-size: 14px;
-  color: #666;
-  line-height: 1.4;
-}
-
-/* Risk Section */
-.risk-section {
-  text-align: center;
-}
-
-.risk-index {
-  font-size: 48px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  border-radius: 50%;
-  width: 80px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 12px auto;
-}
-
-.risk-index.low {
-  background: linear-gradient(135deg, #16a34a, #22c55e);
-  color: white;
-}
-
-.risk-index.medium-low {
-  background: linear-gradient(135deg, #d97706, #f59e0b);
-  color: white;
-}
-
-.risk-index.medium {
-  background: linear-gradient(135deg, #d97706, #f59e0b);
-  color: white;
-}
-
-.risk-index.medium-high {
-  background: linear-gradient(135deg, #dc2626, #ef4444);
-  color: white;
-}
-
-.risk-index.high {
-  background: linear-gradient(135deg, #dc2626, #ef4444);
-  color: white;
-}
-
-.risk-level {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 8px;
-}
-
-.risk-description {
-  font-size: 14px;
-  color: #666;
-  line-height: 1.4;
-}
-
-/* Milestones */
-.milestones .card-content {
-  padding: 24px;
-}
-
-.milestones-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.milestone-item {
-  padding: 16px;
-  background: #f7f9fc;
-  border-radius: 8px;
-  border-left: 4px solid #e5e7eb;
-}
-
-.milestone-item .milestone-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.progress-circle {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 14px;
-  color: white;
-  flex-shrink: 0;
-}
-
-.progress-circle.completed {
-  background: linear-gradient(135deg, #16a34a, #22c55e);
-}
-
-.progress-circle.due-soon {
-  background: linear-gradient(135deg, #d97706, #f59e0b);
-}
-
-.progress-circle.upcoming {
-  background: linear-gradient(135deg, #6b7280, #9ca3af);
-}
-
-.progress-number {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.milestone-content {
-  flex: 1;
-}
-
-.milestone-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0 0 4px 0;
-}
-
-.milestone-date {
-  font-size: 14px;
-  color: #666;
-}
-
-.milestone-status {
-  flex-shrink: 0;
-}
-
-.status-badge {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.status-badge.completed {
-  background: #dcfce7;
-  color: #16a34a;
-}
-
-.status-badge.due-soon {
-  background: #fef3c7;
-  color: #d97706;
-}
-
-.status-badge.upcoming {
-  background: #f3f4f6;
-  color: #6b7280;
-}
-
-.no-milestones {
-  text-align: center;
-  color: #666;
-  font-style: italic;
-}
-
-/* Timeline Overview */
-.timeline-overview .card-content {
-  padding: 24px;
-}
-
-.timeline-container {
-  position: relative;
-  padding: 20px 0;
-}
-
-.timeline-line {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: #e5e7eb;
-  transform: translateY(-50%);
-}
-
-.timeline-marker {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.marker-dot {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #e5e7eb;
-  border: 3px solid white;
-  box-shadow: 0 0 0 2px #e5e7eb;
-  z-index: 1;
-}
-
-.timeline-marker.completed .marker-dot {
-  background: #16a34a;
-  box-shadow: 0 0 0 2px #16a34a;
-}
-
-.timeline-marker.due-soon .marker-dot {
-  background: #d97706;
-  box-shadow: 0 0 0 2px #d97706;
-}
-
-.timeline-marker.upcoming .marker-dot {
-  background: #6b7280;
-  box-shadow: 0 0 0 2px #6b7280;
-}
-
-.marker-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #1a1a1a;
-  text-align: center;
-  margin-top: 8px;
-  max-width: 120px;
-}
-
-.marker-date {
-  font-size: 11px;
-  color: #666;
-  text-align: center;
-  margin-top: 4px;
-}
-
-/* Summary Stats */
-.summary-stats {
-  display: grid;
-  gap: 16px;
-}
-
-.stat-item {
+.timeline-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -617,40 +438,245 @@ const getTimeToProduction = (productionYear: number | null): string => {
   border-bottom: 1px solid #f0f0f0;
 }
 
-.stat-item:last-child {
+.timeline-item:last-child {
   border-bottom: none;
 }
 
-.stat-label {
+.timeline-label {
   font-size: 14px;
   color: #666;
   font-weight: 500;
 }
 
-.stat-value {
+.timeline-value {
   font-size: 16px;
   font-weight: 600;
   color: #1a1a1a;
 }
 
-.stat-value.low {
-  color: #16a34a;
+.timeline-visualization {
+  margin-top: 24px;
 }
 
-.stat-value.medium-low {
+.timeline-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.timeline-marker {
+  position: absolute;
+  top: -4px;
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(135deg, #008C8E, #009688);
+  border-radius: 50%;
+  transform: translateX(-50%);
+  transition: left 0.3s ease;
+}
+
+.timeline-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
+}
+
+/* Milestones List */
+.milestones-list {
+  display: grid;
+  gap: 16px;
+}
+
+.milestone-item {
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.milestone-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.milestone-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.milestone-status {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.milestone-status.completed {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.milestone-status.upcoming {
+  background-color: #fffbeb;
   color: #d97706;
 }
 
-.stat-value.medium {
+.milestone-status.planned {
+  background-color: #f0f9ff;
+  color: #2563eb;
+}
+
+.milestone-date {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.milestone-progress {
+  margin-top: 12px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(135deg, #008C8E, #009688);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* Issues Display */
+.issues-display p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Risk Display */
+.risk-display {
+  text-align: center;
+}
+
+.risk-metric {
+  margin-bottom: 24px;
+}
+
+.risk-label {
+  font-size: 14px;
+  color: #666;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.risk-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #008C8E;
+  display: block;
+}
+
+.risk-classification {
+  margin-bottom: 24px;
+}
+
+.classification-label {
+  font-size: 14px;
+  color: #666;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.classification-value {
+  font-size: 16px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.classification-value.risk-low {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.classification-value.risk-medium {
+  background-color: #fffbeb;
   color: #d97706;
 }
 
-.stat-value.medium-high {
+.classification-value.risk-high {
+  background-color: #fef2f2;
   color: #dc2626;
 }
 
-.stat-value.high {
-  color: #dc2626;
+.risk-indicator {
+  margin-top: 24px;
+}
+
+.indicator-bar {
+  width: 100%;
+  height: 12px;
+  background-color: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.indicator-fill {
+  height: 100%;
+  background: linear-gradient(135deg, #008C8E, #009688);
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.indicator-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
+}
+
+/* Overview Display */
+.overview-display {
+  display: grid;
+  gap: 16px;
+}
+
+.overview-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.overview-label {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.overview-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
 }
 
 /* Empty State */
@@ -710,40 +736,18 @@ const getTimeToProduction = (productionYear: number | null): string => {
     font-size: 14px;
   }
 
-  .evaluation-grid {
-    grid-template-columns: 1fr;
-  }
-
   .schedule-evaluation-content {
     padding: 0 16px 16px 16px;
   }
 
-  .production-year {
-    font-size: 36px;
-  }
-
-  .risk-index {
-    width: 60px;
-    height: 60px;
-    font-size: 24px;
+  .risk-value {
+    font-size: 2rem;
   }
 
   .milestone-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
-  }
-
-  .milestone-status {
-    align-self: flex-end;
-  }
-
-  .timeline-container {
-    padding: 10px 0;
-  }
-
-  .marker-label {
-    max-width: 100px;
+    gap: 8px;
   }
 }
 </style>

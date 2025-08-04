@@ -5,26 +5,26 @@
       <div class="project-header">
         <div class="header-text">
           <h1>Technical Evaluation</h1>
-          <p>Design maturity, compliance, and technical risks for {{ currentProject?.name }}</p>
+          <p>Technical requirements, compliance, and design assessment for {{ currentProject?.name }}</p>
         </div>
       </div>
 
-      <!-- Project Selection Tabs -->
+      <!-- Evaluation Category Tabs -->
       <div class="tab-navigation">
         <button
-          v-for="project in availableProjects"
-          :key="project.id"
-          @click="setSelectedProject(project.id)"
-          :class="['tab-button', { active: currentProject?.id === project.id }]"
+          v-for="tab in evaluationTabs"
+          :key="tab.id"
+          @click="activeTab = tab.id"
+          :class="['tab-button', { active: activeTab === tab.id }]"
         >
-          {{ project.name }}
+          {{ tab.label }}
         </button>
       </div>
 
-      <!-- Project Content -->
+      <!-- Tab Content -->
       <div v-if="currentProject?.evaluation?.technical" class="project-content">
-        <div class="evaluation-grid">
-          <!-- Compliance Study Definition Guidelines -->
+        <!-- Compliance Guidelines Tab -->
+        <div v-if="activeTab === 'compliance-guidelines'" class="tab-panel">
           <div class="evaluation-card">
             <div class="card-header">
               <h3>Compliance Study Definition Guidelines</h3>
@@ -33,75 +33,101 @@
               <p>{{ currentProject.evaluation.technical.compliance_study_definition_guidelines }}</p>
             </div>
           </div>
+        </div>
 
-          <!-- Design Maturity -->
+        <!-- Red Flags Tab -->
+        <div v-if="activeTab === 'red-flags'" class="tab-panel">
+          <div class="evaluation-card">
+            <div class="card-header">
+              <h3>Red Flags</h3>
+            </div>
+            <div class="card-content">
+              <div class="red-flags-list">
+                <div
+                  v-for="(flag, index) in currentProject.evaluation.technical.red_flags"
+                  :key="index"
+                  class="red-flag-item"
+                >
+                  <div class="flag-header">
+                    <span class="flag-category">{{ flag.category }}</span>
+                    <span :class="['flag-severity', `severity-${flag.severity.toLowerCase()}`]">
+                      {{ flag.severity }}
+                    </span>
+                  </div>
+                  <p class="flag-description">{{ flag.description }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SME Assessment Tab -->
+        <div v-if="activeTab === 'sme-assessment'" class="tab-panel">
+          <div class="evaluation-card">
+            <div class="card-header">
+              <h3>SME Assessment</h3>
+            </div>
+            <div class="card-content">
+              <div class="sme-grid">
+                <div class="sme-item">
+                  <span class="sme-label">Electrical</span>
+                  <p class="sme-value">{{ currentProject.evaluation.technical.sme.electrical }}</p>
+                </div>
+                <div class="sme-item">
+                  <span class="sme-label">Environmental</span>
+                  <p class="sme-value">{{ currentProject.evaluation.technical.sme.environmental }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Design Maturity Tab -->
+        <div v-if="activeTab === 'design-maturity'" class="tab-panel">
           <div class="evaluation-card">
             <div class="card-header">
               <h3>Design Maturity</h3>
             </div>
             <div class="card-content">
-              <div class="maturity-section">
-                <div class="maturity-header">
-                  <span class="maturity-label">Design Maturity</span>
-                  <span class="maturity-value">{{ currentProject.evaluation.technical.design_maturity_percent }}%</span>
+              <div class="maturity-display">
+                <div class="maturity-percentage">
+                  <span class="percentage-value">{{ currentProject.evaluation.technical.design_maturity_percent }}%</span>
+                  <span class="percentage-label">Complete</span>
                 </div>
                 <div class="progress-bar">
-                  <div class="progress-fill" :style="{ width: `${currentProject.evaluation.technical.design_maturity_percent}%` }"></div>
+                  <div
+                    class="progress-fill"
+                    :style="{ width: `${currentProject.evaluation.technical.design_maturity_percent}%` }"
+                  ></div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Technology Readiness Level -->
+        <!-- Technology Readiness Tab -->
+        <div v-if="activeTab === 'technology-readiness'" class="tab-panel">
           <div class="evaluation-card">
             <div class="card-header">
               <h3>Technology Readiness Level</h3>
             </div>
             <div class="card-content">
-              <div class="trl-section">
-                <div class="trl-value">{{ currentProject.evaluation.technical.technology_readiness_level }}</div>
-                <div class="trl-description">
-                  {{ getTRLDescription(currentProject.evaluation.technical.technology_readiness_level) }}
+              <div class="trl-display">
+                <div class="trl-level">
+                  <span class="level-number">TRL {{ currentProject.evaluation.technical.technology_readiness_level }}</span>
+                  <span class="level-description">{{ getTRLDescription(currentProject.evaluation.technical.technology_readiness_level) }}</span>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Red Flags -->
-          <div class="evaluation-card red-flags">
-            <div class="card-header">
-              <h3>Red Flags</h3>
-            </div>
-            <div class="card-content">
-              <div v-if="currentProject.evaluation.technical.red_flags && currentProject.evaluation.technical.red_flags.length > 0" class="flags-list">
-                <div v-for="(flag, index) in currentProject.evaluation.technical.red_flags" :key="index" class="flag-item" :class="flag.severity.toLowerCase()">
-                  <div class="flag-header">
-                    <span class="flag-category">{{ flag.category }}</span>
-                    <span class="flag-severity" :class="flag.severity.toLowerCase()">{{ flag.severity }}</span>
+                <div class="trl-scale">
+                  <div class="scale-bar">
+                    <div
+                      class="scale-fill"
+                      :style="{ width: `${(currentProject.evaluation.technical.technology_readiness_level / 9) * 100}%` }"
+                    ></div>
                   </div>
-                  <p class="flag-description">{{ flag.description }}</p>
-                </div>
-              </div>
-              <div v-else class="no-flags">
-                <p>No red flags identified</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- SME Assessments -->
-          <div class="evaluation-card">
-            <div class="card-header">
-              <h3>SME Assessments</h3>
-            </div>
-            <div class="card-content">
-              <div class="sme-assessments">
-                <div class="sme-item">
-                  <h4 class="sme-title">Electrical</h4>
-                  <p class="sme-content">{{ currentProject.evaluation.technical.sme.electrical }}</p>
-                </div>
-                <div class="sme-item">
-                  <h4 class="sme-title">Environmental</h4>
-                  <p class="sme-content">{{ currentProject.evaluation.technical.sme.environmental }}</p>
+                  <div class="scale-labels">
+                    <span>TRL 1</span>
+                    <span>TRL 9</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -112,7 +138,7 @@
       <!-- Empty State -->
       <div v-else class="empty-state">
         <div class="empty-icon">
-          <CogIcon />
+          <CpuChipIcon />
         </div>
         <h4>No Technical Data Available</h4>
         <p>Technical evaluation data for this project will be displayed here.</p>
@@ -122,33 +148,37 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useProjectStore } from '@/stores/projectStore'
-import { CogIcon } from '@heroicons/vue/24/outline'
+import { CpuChipIcon } from '@heroicons/vue/24/outline'
 
 const projectStore = useProjectStore()
 
 const currentProject = computed(() => projectStore.selectedProject)
 
-const availableProjects = computed(() => projectStore.getAllProjects())
+const activeTab = ref('compliance-guidelines')
 
-const setSelectedProject = (projectId: string) => {
-  projectStore.setSelectedProject(projectId)
-}
+const evaluationTabs = [
+  { id: 'compliance-guidelines', label: 'Compliance Guidelines' },
+  { id: 'red-flags', label: 'Red Flags' },
+  { id: 'sme-assessment', label: 'SME Assessment' },
+  { id: 'design-maturity', label: 'Design Maturity' },
+  { id: 'technology-readiness', label: 'Technology Readiness' }
+]
 
 const getTRLDescription = (level: number): string => {
-  const descriptions: Record<number, string> = {
-    1: 'Basic principles observed and reported',
-    2: 'Technology concept and/or application formulated',
-    3: 'Analytical and experimental critical function and/or characteristic proof-of-concept',
+  const descriptions: { [key: number]: string } = {
+    1: 'Basic principles observed',
+    2: 'Technology concept formulated',
+    3: 'Analytical and experimental critical function proof-of-concept',
     4: 'Component and/or breadboard validation in laboratory environment',
     5: 'Component and/or breadboard validation in relevant environment',
-    6: 'System/subsystem model or prototype demonstration in a relevant environment',
-    7: 'System prototype demonstration in an operational environment',
+    6: 'System/subsystem model or prototype demonstration in relevant environment',
+    7: 'System prototype demonstration in operational environment',
     8: 'Actual system completed and qualified through test and demonstration',
     9: 'Actual system proven through successful mission operations'
   }
-  return descriptions[level] || 'Level not defined'
+  return descriptions[level] || 'Unknown level'
 }
 </script>
 
@@ -234,13 +264,12 @@ const getTRLDescription = (level: number): string => {
   }
 }
 
-/* Evaluation Grid */
-.evaluation-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 24px;
+/* Tab Panel */
+.tab-panel {
+  animation: fadeIn 0.3s ease-in-out;
 }
 
+/* Evaluation Card */
 .evaluation-card {
   background: #fff;
   border: 1px solid #e5e7eb;
@@ -248,6 +277,7 @@ const getTRLDescription = (level: number): string => {
   overflow: hidden;
   transition: all 0.3s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
 .evaluation-card:hover {
@@ -279,94 +309,17 @@ const getTRLDescription = (level: number): string => {
   margin: 0;
 }
 
-/* Design Maturity */
-.maturity-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.maturity-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.maturity-label {
-  font-size: 14px;
-  color: #666;
-  font-weight: 500;
-}
-
-.maturity-value {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1a1a1a;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 8px;
-  background: #f0f0f0;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(135deg, #008C8E, #009688);
-  border-radius: 4px;
-  transition: width 0.3s ease;
-}
-
-/* Technology Readiness Level */
-.trl-section {
-  text-align: center;
-}
-
-.trl-value {
-  font-size: 48px;
-  font-weight: 700;
-  color: #008C8E;
-  margin-bottom: 12px;
-}
-
-.trl-description {
-  font-size: 14px;
-  color: #666;
-  line-height: 1.4;
-}
-
 /* Red Flags */
-.red-flags .card-content {
-  padding: 24px;
-}
-
-.flags-list {
-  display: flex;
-  flex-direction: column;
+.red-flags-list {
+  display: grid;
   gap: 16px;
 }
 
-.flag-item {
+.red-flag-item {
   padding: 16px;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
-  border-left: 4px solid;
-}
-
-.flag-item.high {
-  background: #fef2f2;
-  border-left-color: #dc2626;
-}
-
-.flag-item.medium {
-  background: #fffbeb;
-  border-left-color: #d97706;
-}
-
-.flag-item.low {
-  background: #f0f9ff;
-  border-left-color: #2563eb;
+  background: #f9fafb;
 }
 
 .flag-header {
@@ -383,66 +336,150 @@ const getTRLDescription = (level: number): string => {
 }
 
 .flag-severity {
-  padding: 4px 8px;
-  border-radius: 4px;
   font-size: 12px;
   font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
   text-transform: uppercase;
 }
 
-.flag-severity.high {
-  background: #dc2626;
-  color: white;
+.flag-severity.severity-high {
+  background-color: #fef2f2;
+  color: #dc2626;
 }
 
-.flag-severity.medium {
-  background: #d97706;
-  color: white;
+.flag-severity.severity-medium {
+  background-color: #fffbeb;
+  color: #d97706;
 }
 
-.flag-severity.low {
-  background: #2563eb;
-  color: white;
+.flag-severity.severity-low {
+  background-color: #ecfdf5;
+  color: #059669;
 }
 
 .flag-description {
   font-size: 14px;
   color: #666;
-  line-height: 1.4;
+  line-height: 1.5;
   margin: 0;
 }
 
-.no-flags {
-  text-align: center;
-  color: #666;
-  font-style: italic;
-}
-
-/* SME Assessments */
-.sme-assessments {
-  display: flex;
-  flex-direction: column;
+/* SME Assessment */
+.sme-grid {
+  display: grid;
   gap: 20px;
 }
 
 .sme-item {
   padding: 16px;
-  background: #f7f9fc;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
+  background: #f9fafb;
 }
 
-.sme-title {
-  font-size: 16px;
+.sme-label {
+  font-size: 14px;
   font-weight: 600;
   color: #1a1a1a;
-  margin: 0 0 8px 0;
+  display: block;
+  margin-bottom: 8px;
 }
 
-.sme-content {
+.sme-value {
   font-size: 14px;
   color: #666;
-  line-height: 1.4;
+  line-height: 1.5;
   margin: 0;
+}
+
+/* Design Maturity */
+.maturity-display {
+  text-align: center;
+}
+
+.maturity-percentage {
+  margin-bottom: 20px;
+}
+
+.percentage-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #008C8E;
+  display: block;
+}
+
+.percentage-label {
+  font-size: 14px;
+  color: #666;
+  display: block;
+  margin-top: 4px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  background-color: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(135deg, #008C8E, #009688);
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+/* Technology Readiness */
+.trl-display {
+  text-align: center;
+}
+
+.trl-level {
+  margin-bottom: 24px;
+}
+
+.level-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #008C8E;
+  display: block;
+}
+
+.level-description {
+  font-size: 14px;
+  color: #666;
+  display: block;
+  margin-top: 8px;
+  line-height: 1.4;
+}
+
+.trl-scale {
+  margin-top: 20px;
+}
+
+.scale-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.scale-fill {
+  height: 100%;
+  background: linear-gradient(135deg, #008C8E, #009688);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.scale-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
 }
 
 /* Empty State */
@@ -502,22 +539,16 @@ const getTRLDescription = (level: number): string => {
     font-size: 14px;
   }
 
-  .evaluation-grid {
-    grid-template-columns: 1fr;
-  }
-
   .technical-evaluation-content {
     padding: 0 16px 16px 16px;
   }
 
-  .trl-value {
-    font-size: 36px;
+  .percentage-value {
+    font-size: 2rem;
   }
 
-  .flag-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+  .level-number {
+    font-size: 1.5rem;
   }
 }
 </style>

@@ -5,26 +5,26 @@
       <div class="project-header">
         <div class="header-text">
           <h1>Health, Safety & Environment Evaluation</h1>
-          <p>HSE standards, compliance, and workforce safety for {{ currentProject?.name }}</p>
+          <p>HSE compliance, standards, and workforce safety for {{ currentProject?.name }}</p>
         </div>
       </div>
 
-      <!-- Project Selection Tabs -->
+      <!-- Evaluation Category Tabs -->
       <div class="tab-navigation">
         <button
-          v-for="project in availableProjects"
-          :key="project.id"
-          @click="setSelectedProject(project.id)"
-          :class="['tab-button', { active: currentProject?.id === project.id }]"
+          v-for="tab in evaluationTabs"
+          :key="tab.id"
+          @click="activeTab = tab.id"
+          :class="['tab-button', { active: activeTab === tab.id }]"
         >
-          {{ project.name }}
+          {{ tab.label }}
         </button>
       </div>
 
-      <!-- Project Content -->
+      <!-- Tab Content -->
       <div v-if="currentProject?.evaluation?.hse" class="project-content">
-        <div class="evaluation-grid">
-          <!-- EIS Status -->
+        <!-- EIS Status Tab -->
+        <div v-if="activeTab === 'eis-status'" class="tab-panel">
           <div class="evaluation-card">
             <div class="card-header">
               <h3>EIS Status</h3>
@@ -33,72 +33,89 @@
               <p>{{ currentProject.evaluation.hse.eis_status }}</p>
             </div>
           </div>
+        </div>
 
-          <!-- Rio Tinto Standards Alignment -->
+        <!-- HSE Standards Tab -->
+        <div v-if="activeTab === 'hse-standards'" class="tab-panel">
           <div class="evaluation-card">
             <div class="card-header">
               <h3>Rio Tinto Standards Alignment</h3>
             </div>
             <div class="card-content">
-              <div class="alignment-status" :class="{ aligned: currentProject.evaluation.hse.rio_tinto_standards_aligned }">
-                <span class="status-indicator"></span>
-                <span class="status-text">
-                  {{ currentProject.evaluation.hse.rio_tinto_standards_aligned ? 'Aligned' : 'Not Aligned' }}
+              <div class="standards-status">
+                <span class="status-label">Standards Aligned:</span>
+                <span :class="['status-value', currentProject.evaluation.hse.rio_tinto_standards_aligned ? 'aligned' : 'not-aligned']">
+                  {{ currentProject.evaluation.hse.rio_tinto_standards_aligned ? 'Yes' : 'No' }}
                 </span>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Key HSE Issues -->
+        <!-- Key Issues Tab -->
+        <div v-if="activeTab === 'key-issues'" class="tab-panel">
           <div class="evaluation-card">
             <div class="card-header">
-              <h3>Key HSE Issues</h3>
+              <h3>Key Issues</h3>
             </div>
             <div class="card-content">
               <p>{{ currentProject.evaluation.hse.key_issues }}</p>
             </div>
           </div>
+        </div>
 
-          <!-- Workforce HSE Statistics -->
+        <!-- Workforce Statistics Tab -->
+        <div v-if="activeTab === 'workforce-statistics'" class="tab-panel">
           <div class="evaluation-card">
             <div class="card-header">
               <h3>Workforce HSE Statistics</h3>
             </div>
             <div class="card-content">
-              <div class="hse-stats">
+              <div class="statistics-grid">
                 <div class="stat-item">
                   <span class="stat-label">LTIFR</span>
-                  <span class="stat-value">{{ formatLTIFR(currentProject.evaluation.hse.workforce_hse_statistics.ltifr) }}</span>
+                  <span class="stat-value">{{ currentProject.evaluation.hse.workforce_hse_statistics.ltifr || 'N/A' }}</span>
                 </div>
                 <div class="stat-item">
                   <span class="stat-label">Fatalities</span>
-                  <span class="stat-value" :class="{ 'zero': currentProject.evaluation.hse.workforce_hse_statistics.fatalities === 0 }">
-                    {{ currentProject.evaluation.hse.workforce_hse_statistics.fatalities }}
-                  </span>
+                  <span class="stat-value">{{ currentProject.evaluation.hse.workforce_hse_statistics.fatalities }}</span>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- LTIF Trend -->
+        <!-- LTIF Trend Tab -->
+        <div v-if="activeTab === 'ltif-trend'" class="tab-panel">
           <div class="evaluation-card">
             <div class="card-header">
               <h3>LTIF Trend (3 Years)</h3>
             </div>
             <div class="card-content">
               <div class="trend-chart">
-                <div v-for="(value, index) in currentProject.evaluation.hse.ltif_trend_3yr" :key="index" class="trend-bar">
-                  <div class="bar-label">Year {{ index + 1 }}</div>
-                  <div class="bar-container">
-                    <div class="bar" :style="{ height: getBarHeight(value) }"></div>
+                <div class="trend-bars">
+                  <div
+                    v-for="(value, index) in currentProject.evaluation.hse.ltif_trend_3yr"
+                    :key="index"
+                    class="trend-bar"
+                  >
+                    <div class="bar-label">Year {{ index + 1 }}</div>
+                    <div class="bar-container">
+                      <div
+                        class="bar-fill"
+                        :style="{ height: getBarHeight(value) }"
+                      ></div>
+                    </div>
+                    <div class="bar-value">{{ value || 'N/A' }}</div>
                   </div>
-                  <div class="bar-value">{{ formatLTIFR(value) }}</div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Fatality Prevention Controls -->
+        <!-- Fatality Prevention Tab -->
+        <div v-if="activeTab === 'fatality-prevention'" class="tab-panel">
           <div class="evaluation-card">
             <div class="card-header">
               <h3>Fatality Prevention Controls</h3>
@@ -116,14 +133,14 @@
           <ShieldCheckIcon />
         </div>
         <h4>No HSE Data Available</h4>
-        <p>Health, Safety & Environment evaluation data for this project will be displayed here.</p>
+        <p>HSE evaluation data for this project will be displayed here.</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useProjectStore } from '@/stores/projectStore'
 import { ShieldCheckIcon } from '@heroicons/vue/24/outline'
 
@@ -131,21 +148,21 @@ const projectStore = useProjectStore()
 
 const currentProject = computed(() => projectStore.selectedProject)
 
-const availableProjects = computed(() => projectStore.getAllProjects())
+const activeTab = ref('eis-status')
 
-const setSelectedProject = (projectId: string) => {
-  projectStore.setSelectedProject(projectId)
-}
-
-const formatLTIFR = (value: number | null): string => {
-  if (value === null || value === undefined) return 'N/A'
-  return value.toFixed(2)
-}
+const evaluationTabs = [
+  { id: 'eis-status', label: 'EIS Status' },
+  { id: 'hse-standards', label: 'HSE Standards' },
+  { id: 'key-issues', label: 'Key Issues' },
+  { id: 'workforce-statistics', label: 'Workforce Statistics' },
+  { id: 'ltif-trend', label: 'LTIF Trend' },
+  { id: 'fatality-prevention', label: 'Fatality Prevention' }
+]
 
 const getBarHeight = (value: number | null): string => {
-  if (value === null || value === undefined) return '0%'
-  // Normalize to a reasonable height (assuming max LTIFR of 5.0)
-  const maxValue = 5.0
+  if (value === null) return '0%'
+  // Normalize to a reasonable height (assuming max LTIFR around 3.0)
+  const maxValue = 3.0
   const height = Math.min((value / maxValue) * 100, 100)
   return `${height}%`
 }
@@ -233,13 +250,12 @@ const getBarHeight = (value: number | null): string => {
   }
 }
 
-/* Evaluation Grid */
-.evaluation-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 24px;
+/* Tab Panel */
+.tab-panel {
+  animation: fadeIn 0.3s ease-in-out;
 }
 
+/* Evaluation Card */
 .evaluation-card {
   background: #fff;
   border: 1px solid #e5e7eb;
@@ -247,6 +263,7 @@ const getBarHeight = (value: number | null): string => {
   overflow: hidden;
   transition: all 0.3s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
 .evaluation-card:hover {
@@ -278,32 +295,39 @@ const getBarHeight = (value: number | null): string => {
   margin: 0;
 }
 
-/* Alignment Status */
-.alignment-status {
+/* Standards Status */
+.standards-status {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  padding: 12px 0;
 }
 
-.status-indicator {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #dc2626;
+.status-label {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
 }
 
-.alignment-status.aligned .status-indicator {
-  background: #16a34a;
-}
-
-.status-text {
+.status-value {
   font-size: 16px;
   font-weight: 600;
-  color: #1a1a1a;
+  padding: 4px 12px;
+  border-radius: 6px;
 }
 
-/* HSE Statistics */
-.hse-stats {
+.status-value.aligned {
+  color: #059669;
+  background-color: #ecfdf5;
+}
+
+.status-value.not-aligned {
+  color: #dc2626;
+  background-color: #fef2f2;
+}
+
+/* Statistics Grid */
+.statistics-grid {
   display: grid;
   gap: 16px;
 }
@@ -332,17 +356,16 @@ const getBarHeight = (value: number | null): string => {
   color: #1a1a1a;
 }
 
-.stat-value.zero {
-  color: #16a34a;
-}
-
 /* Trend Chart */
 .trend-chart {
+  padding: 16px 0;
+}
+
+.trend-bars {
   display: flex;
-  justify-content: space-around;
-  align-items: flex-end;
+  gap: 24px;
+  align-items: end;
   height: 120px;
-  gap: 16px;
 }
 
 .trend-bar {
@@ -359,15 +382,15 @@ const getBarHeight = (value: number | null): string => {
 }
 
 .bar-container {
-  width: 100%;
+  width: 40px;
   height: 80px;
-  background: #f0f0f0;
+  background-color: #f3f4f6;
   border-radius: 4px;
-  position: relative;
   overflow: hidden;
+  position: relative;
 }
 
-.bar {
+.bar-fill {
   position: absolute;
   bottom: 0;
   width: 100%;
@@ -440,20 +463,16 @@ const getBarHeight = (value: number | null): string => {
     font-size: 14px;
   }
 
-  .evaluation-grid {
-    grid-template-columns: 1fr;
-  }
-
   .hse-evaluation-content {
     padding: 0 16px 16px 16px;
   }
 
-  .trend-chart {
-    height: 100px;
+  .trend-bars {
+    gap: 16px;
   }
 
   .bar-container {
-    height: 60px;
+    width: 30px;
   }
 }
-</style> 
+</style>
