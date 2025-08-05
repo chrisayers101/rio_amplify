@@ -4,7 +4,10 @@
       <!-- Project Header -->
       <div class="project-header">
         <div class="header-text">
-          <h1>{{ projectMetadata.name }}</h1>
+          <h1>
+            Feasibility Study Report and Assessment
+            <span class="project-badge">Amrun</span>
+          </h1>
           <div class="project-meta">
             <span class="location">{{ projectMetadata.location }}</span>
             <span class="status">{{ projectMetadata.status }}</span>
@@ -186,6 +189,22 @@ const formatDate = (dateString: string) => {
   font-weight: 700;
   color: #1a1a1a;
   margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.project-badge {
+  background: linear-gradient(135deg, #008C8E, #009688);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .project-meta {
