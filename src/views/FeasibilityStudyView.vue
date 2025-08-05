@@ -33,6 +33,12 @@
         </div>
       </div>
 
+      <!-- Sections Heatmap -->
+      <SectionsHeatmap
+        :sections="sections"
+        @cell-click="handleHeatmapClick"
+      />
+
       <!-- Sections Overview -->
       <div class="sections-container">
         <div class="sections-header">
@@ -80,16 +86,36 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useProjectStore } from '@/stores/projectStore'
 import SectionRollupRow from '@/components/SectionRollupRow.vue'
+import SectionsHeatmap from '@/components/SectionsHeatmap.vue'
 import feasibilityData from '@/data/feasibility_scaffold_full.json'
 
 const router = useRouter()
-const projectStore = useProjectStore()
 
 // Extract data from JSON
 const projectMetadata = feasibilityData.feasibilityStudyView.projectMetadata
 const sections = feasibilityData.feasibilityStudyView.sections
+
+// Define Section interface
+interface Section {
+  sectionId: string
+  sectionName: string
+  percentComplete: number
+  statusOfCompleteness: string
+  qualityRating: string
+  issues: Array<{
+    id: string
+    description: string
+    status: string
+    source: string
+  }>
+  observations: Array<{
+    id: string
+    text: string
+    source: string
+    changeOccurred: boolean
+  }>
+}
 
 // Filter state
 const selectedQuality = ref('')
@@ -117,8 +143,13 @@ const totalObservations = computed(() => {
 })
 
 // Methods
-const handleViewDetails = (section: any) => {
+const handleViewDetails = (section: Section) => {
   // Navigate to section detail view
+  router.push(`/feasibility/section/${section.sectionId}`)
+}
+
+const handleHeatmapClick = (section: Section) => {
+  // Navigate to section detail view when clicking on heatmap cell
   router.push(`/feasibility/section/${section.sectionId}`)
 }
 
@@ -342,4 +373,4 @@ const formatDate = (dateString: string) => {
     grid-template-columns: 1fr;
   }
 }
-</style> 
+</style>
