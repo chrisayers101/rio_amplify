@@ -14,6 +14,10 @@ backend:
         # Install dependencies for Lambda functions
         - cd amplify/functions/chat-orchestrator && npm install --legacy-peer-deps
         - cd ../../..
+        # Verify Lambda function dependencies are installed
+        - ls -la amplify/functions/chat-orchestrator/node_modules/openai
+        - cd amplify/functions/chat-orchestrator && npm list openai
+        - cd ../../..
         # Deploy or update the backend stack that matches the current branch
         - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
 frontend:
