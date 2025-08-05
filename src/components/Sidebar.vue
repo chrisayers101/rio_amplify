@@ -64,7 +64,8 @@ import {
   CalendarIcon,
   ChevronDownIcon,
   ChevronLeftIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  DocumentTextIcon
 } from '@heroicons/vue/24/outline'
 
 const route = useRoute()
@@ -87,6 +88,12 @@ const navItems = [
     label: 'Project Analytics',
     route: '/dashboard',
     subLabel: 'Analytics dashboard'
+  },
+  {
+    icon: DocumentTextIcon,
+    label: 'Feasibility Study Report',
+    route: '/feasibility-study',
+    subLabel: 'Creation & assessment'
   },
   {
     icon: ClipboardDocumentListIcon,

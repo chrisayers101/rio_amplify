@@ -5,6 +5,7 @@ import EntitiesView from '@/views/EntitiesView.vue'
 import FilesView from '@/views/FilesView.vue'
 import HomeView from '@/views/HomeView.vue'
 import ProjectAnalyticsView from '@/views/ProjectAnalyticsView.vue'
+import FeasibilityStudyView from '@/views/FeasibilityStudyView.vue'
 import CommercialView from '@/views/evaluation/CommercialView.vue'
 import HSEView from '@/views/evaluation/HSEView.vue'
 import TechnicalView from '@/views/evaluation/TechnicalView.vue'
@@ -53,6 +54,12 @@ const router = createRouter({
             path: '/dashboard',
             name: 'Project Analytics',
             component: ProjectAnalyticsView,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/feasibility-study',
+            name: 'Feasibility Study Report',
+            component: FeasibilityStudyView,
             meta: { requiresAuth: true }
         },
         {
