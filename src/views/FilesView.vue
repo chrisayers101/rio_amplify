@@ -7,9 +7,47 @@
           Manage your files in S3 storage. Upload, download, and delete files from your cloud storage.
         </p>
 
+        <!-- Bucket Selector -->
+        <div class="mb-6">
+          <h3 class="text-lg font-medium text-theme-primary mb-3">Select Storage Bucket</h3>
+          <div class="flex items-center space-x-4">
+            <button
+              @click="selectBucket('default')"
+              :class="[
+                'px-4 py-2 rounded-lg border transition-all',
+                selectedBucket === 'default'
+                  ? 'bg-theme-blue text-white border-theme-blue'
+                  : 'bg-white text-theme-primary border-gray-300 hover:bg-gray-50'
+              ]"
+            >
+              Default Bucket
+            </button>
+            <button
+              v-for="bucket in existingBuckets"
+              :key="bucket.name"
+              @click="selectBucket(bucket.name)"
+              :class="[
+                'px-4 py-2 rounded-lg border transition-all opacity-50 cursor-not-allowed',
+                selectedBucket === bucket.name
+                  ? 'bg-theme-blue text-white border-theme-blue'
+                  : 'bg-white text-theme-primary border-gray-300'
+              ]"
+              disabled
+              title="Coming soon - CORS configuration required"
+            >
+              {{ bucket.displayName }}
+            </button>
+          </div>
+          <p class="text-sm text-theme-secondary mt-2">
+            Additional buckets require CORS configuration. Default bucket is fully functional.
+          </p>
+        </div>
+
         <!-- S3 Storage Section -->
         <div class="card mb-6">
-          <h2 class="text-xl font-semibold text-theme-primary mb-4">File Storage</h2>
+          <h2 class="text-xl font-semibold text-theme-primary mb-4">
+            File Storage - {{ getCurrentBucketDisplayName() }}
+          </h2>
 
           <!-- Upload Section -->
           <div class="mb-6">
@@ -138,6 +176,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { listObjects, uploadFile, getDownloadUrl, deleteFile as deleteS3File, downloadFolder } from '@/utils/s3';
+import {
+  existingBuckets,
+  listObjectsFromExistingBucket,
+  uploadFileToExistingBucket,
+  getDownloadUrlFromExistingBucket,
+  deleteFileFromExistingBucket,
+  downloadFolderFromExistingBucket
+} from '@/utils/existingBuckets';
 import type { S3Object } from '@/interfaces/s3';
 
 // Reactive state for files
@@ -147,11 +193,38 @@ const loading = ref(false);
 const uploading = ref(false);
 const downloadingAll = ref(false);
 const fileInput = ref<HTMLInputElement>();
+const selectedBucket = ref('default');
 
 // Load data on component mount
 onMounted(async () => {
   refreshFiles();
 });
+
+// Bucket functions
+function selectBucket(bucketName: string) {
+  // Only allow default bucket for now
+  if (bucketName !== 'default') {
+    console.log('Existing buckets are not yet available due to CORS configuration');
+    return;
+  }
+  selectedBucket.value = bucketName;
+  refreshFiles();
+}
+
+function getCurrentBucketDisplayName(): string {
+  if (selectedBucket.value === 'default') {
+    return 'Default Bucket';
+  }
+  const bucket = existingBuckets.find(b => b.name === selectedBucket.value);
+  return bucket?.displayName || 'Unknown Bucket';
+}
+
+function getCurrentBucketConfig() {
+  if (selectedBucket.value === 'default') {
+    return null;
+  }
+  return existingBuckets.find(b => b.name === selectedBucket.value);
+}
 
 // File functions
 function handleFileSelect(event: Event) {
@@ -166,11 +239,27 @@ async function uploadFiles() {
 
   uploading.value = true;
   try {
-    console.log('Starting upload of', selectedFiles.value.length, 'files');
-    for (const file of selectedFiles.value) {
-      console.log('Uploading file:', file.name);
-      const result = await uploadFile(file);
-      console.log('Upload result:', result);
+    console.log('Starting upload of', selectedFiles.value.length, 'files to bucket:', selectedBucket.value);
+
+    if (selectedBucket.value === 'default') {
+      // Use Amplify storage for default bucket
+      for (const file of selectedFiles.value) {
+        console.log('Uploading file:', file.name);
+        const result = await uploadFile(file);
+        console.log('Upload result:', result);
+      }
+    } else {
+      // Use AWS SDK for existing buckets
+      const bucketConfig = getCurrentBucketConfig();
+      if (!bucketConfig) {
+        throw new Error('Invalid bucket configuration');
+      }
+
+      for (const file of selectedFiles.value) {
+        console.log('Uploading file:', file.name);
+        const result = await uploadFileToExistingBucket(file, bucketConfig.bucketName);
+        console.log('Upload result:', result);
+      }
     }
 
     // Clear selected files and refresh the list
@@ -191,10 +280,25 @@ async function uploadFiles() {
 async function refreshFiles() {
   loading.value = true;
   try {
-    console.log('Calling listObjects...');
-    const result = await listObjects();
-    console.log('List objects result:', result);
-    files.value = result;
+    console.log('Calling listObjects for bucket:', selectedBucket.value);
+
+    if (selectedBucket.value === 'default') {
+      // Use Amplify storage for default bucket
+      const result = await listObjects();
+      console.log('List objects result:', result);
+      files.value = result;
+    } else {
+      // Use AWS SDK for existing buckets
+      const bucketConfig = getCurrentBucketConfig();
+      if (!bucketConfig) {
+        throw new Error('Invalid bucket configuration');
+      }
+
+      const result = await listObjectsFromExistingBucket(bucketConfig.bucketName);
+      console.log('List objects result:', result);
+      files.value = result;
+    }
+
     console.log('Files array updated:', files.value);
   } catch (error) {
     console.error('Error loading files:', error);
@@ -208,8 +312,21 @@ async function downloadAllFiles() {
 
   downloadingAll.value = true;
   try {
-    console.log('Starting download of all files');
-    await downloadFolder('uploads/', 'all-files');
+    console.log('Starting download of all files from bucket:', selectedBucket.value);
+
+    if (selectedBucket.value === 'default') {
+      // Use Amplify storage for default bucket
+      await downloadFolder('uploads/', 'all-files');
+    } else {
+      // Use AWS SDK for existing buckets
+      const bucketConfig = getCurrentBucketConfig();
+      if (!bucketConfig) {
+        throw new Error('Invalid bucket configuration');
+      }
+
+      await downloadFolderFromExistingBucket(bucketConfig.bucketName, 'uploads/', `${bucketConfig.displayName.toLowerCase().replace(/\s+/g, '-')}-files`);
+    }
+
     console.log('All files downloaded successfully');
   } catch (error) {
     console.error('Error downloading all files:', error);
@@ -220,7 +337,21 @@ async function downloadAllFiles() {
 
 async function downloadFile(key: string) {
   try {
-    const url = await getDownloadUrl(key);
+    let url: string;
+
+    if (selectedBucket.value === 'default') {
+      // Use Amplify storage for default bucket
+      url = await getDownloadUrl(key);
+    } else {
+      // Use AWS SDK for existing buckets
+      const bucketConfig = getCurrentBucketConfig();
+      if (!bucketConfig) {
+        throw new Error('Invalid bucket configuration');
+      }
+
+      url = await getDownloadUrlFromExistingBucket(key, bucketConfig.bucketName);
+    }
+
     const link = document.createElement('a');
     link.href = url;
     link.download = key;
@@ -234,7 +365,19 @@ async function downloadFile(key: string) {
 
 async function deleteFile(key: string) {
   try {
-    await deleteS3File(key);
+    if (selectedBucket.value === 'default') {
+      // Use Amplify storage for default bucket
+      await deleteS3File(key);
+    } else {
+      // Use AWS SDK for existing buckets
+      const bucketConfig = getCurrentBucketConfig();
+      if (!bucketConfig) {
+        throw new Error('Invalid bucket configuration');
+      }
+
+      await deleteFileFromExistingBucket(key, bucketConfig.bucketName);
+    }
+
     await refreshFiles();
   } catch (error) {
     console.error('Error deleting file:', error);
