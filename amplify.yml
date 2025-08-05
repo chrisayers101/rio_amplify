@@ -11,6 +11,9 @@ backend:
       commands:
         - export AMPLIFY_LOG_LEVEL=debug
         - npm install --legacy-peer-deps --cache .npm --prefer-offline
+        # Install dependencies for Lambda functions
+        - cd amplify/functions/chat-orchestrator && npm install --legacy-peer-deps
+        - cd ../../..
         # Deploy or update the backend stack that matches the current branch
         - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
 frontend:
