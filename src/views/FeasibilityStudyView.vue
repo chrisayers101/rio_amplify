@@ -4,32 +4,73 @@
       <!-- Project Header -->
       <div class="project-header">
         <div class="header-text">
-          <h1>Feasibility Study Report</h1>
-          <p>Creation and assessment of feasibility studies for {{ currentProject?.name }}</p>
+          <h1>{{ projectMetadata.name }}</h1>
+          <div class="project-meta">
+            <span class="location">{{ projectMetadata.location }}</span>
+            <span class="status">{{ projectMetadata.status }}</span>
+            <span class="last-updated">Last updated: {{ formatDate(projectMetadata.lastUpdated) }}</span>
+          </div>
         </div>
       </div>
 
-      <!-- Placeholder Card -->
-      <div class="placeholder-card">
-        <div class="card-header">
-          <h3>Feasibility Study Report</h3>
+      <!-- Summary Bar -->
+      <div class="summary-bar">
+        <div class="summary-item">
+          <span class="summary-label">Total Sections</span>
+          <span class="summary-value">{{ sections.length }}</span>
         </div>
-        <div class="card-content">
-          <div class="placeholder-content">
-            <div class="placeholder-icon">
-              <DocumentTextIcon />
+        <div class="summary-item">
+          <span class="summary-label">Average Completion</span>
+          <span class="summary-value">{{ averageCompletion }}%</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Total Issues</span>
+          <span class="summary-value">{{ totalIssues }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Total Observations</span>
+          <span class="summary-value">{{ totalObservations }}</span>
+        </div>
+      </div>
+
+      <!-- Sections Overview -->
+      <div class="sections-container">
+        <div class="sections-header">
+          <h2>Feasibility Study Sections</h2>
+          <div class="header-actions">
+            <div class="filter-controls">
+              <select v-model="selectedQuality" class="filter-select">
+                <option value="">All Quality Levels</option>
+                <option value="High">High Quality</option>
+                <option value="Good">Good Quality</option>
+                <option value="Moderate">Moderate Quality</option>
+                <option value="Low">Low Quality</option>
+              </select>
             </div>
-            <h4>Feasibility Study Report</h4>
-            <p>This section will contain the creation and assessment tools for feasibility study reports.</p>
-            <p>Features coming soon:</p>
-            <ul class="feature-list">
-              <li>Report creation wizard</li>
-              <li>Assessment criteria</li>
-              <li>Risk evaluation</li>
-              <li>Financial modeling</li>
-              <li>Technical analysis</li>
-            </ul>
           </div>
+        </div>
+
+        <!-- Column Headers -->
+        <div class="column-headers">
+          <div class="header-section">Section</div>
+          <div class="header-progress">Progress</div>
+          <div class="header-metrics">Quality & Metrics</div>
+          <div class="header-actions">Actions</div>
+        </div>
+
+        <!-- Sections List -->
+        <div class="sections-list">
+          <SectionRollupRow
+            v-for="section in filteredSections"
+            :key="section.sectionId"
+            :section="section"
+            @view-details="handleViewDetails"
+          />
+        </div>
+
+        <!-- No Results -->
+        <div v-if="filteredSections.length === 0" class="no-results">
+          <p>No sections match the current filter criteria.</p>
         </div>
       </div>
     </div>
@@ -37,13 +78,57 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useProjectStore } from '@/stores/projectStore'
-import { DocumentTextIcon } from '@heroicons/vue/24/outline'
+import SectionRollupRow from '@/components/SectionRollupRow.vue'
+import feasibilityData from '@/data/feasibility_scaffold_full.json'
 
+const router = useRouter()
 const projectStore = useProjectStore()
 
-const currentProject = computed(() => projectStore.selectedProject)
+// Extract data from JSON
+const projectMetadata = feasibilityData.feasibilityStudyView.projectMetadata
+const sections = feasibilityData.feasibilityStudyView.sections
+
+// Filter state
+const selectedQuality = ref('')
+
+// Computed properties
+const filteredSections = computed(() => {
+  if (!selectedQuality.value) {
+    return sections
+  }
+  return sections.filter(section => section.qualityRating === selectedQuality.value)
+})
+
+const averageCompletion = computed(() => {
+  if (sections.length === 0) return 0
+  const total = sections.reduce((sum, section) => sum + section.percentComplete, 0)
+  return Math.round(total / sections.length)
+})
+
+const totalIssues = computed(() => {
+  return sections.reduce((sum, section) => sum + section.issues.length, 0)
+})
+
+const totalObservations = computed(() => {
+  return sections.reduce((sum, section) => sum + section.observations.length, 0)
+})
+
+// Methods
+const handleViewDetails = (section: any) => {
+  // Navigate to section detail view
+  router.push(`/feasibility/section/${section.sectionId}`)
+}
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+}
 </script>
 
 <style scoped>
@@ -72,105 +157,152 @@ const currentProject = computed(() => projectStore.selectedProject)
   margin-bottom: 8px;
 }
 
-.header-text p {
-  font-size: 1.1rem;
+.project-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 14px;
   color: #666;
-  margin: 0;
 }
 
-/* Placeholder Card */
-.placeholder-card {
-  background: #fff;
+.project-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.location::before {
+  content: "📍";
+}
+
+.status::before {
+  content: "●";
+  color: #10b981;
+}
+
+.last-updated::before {
+  content: "🕒";
+}
+
+/* Summary Bar */
+.summary-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.summary-label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.summary-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* Sections Container */
+.sections-container {
+  background: white;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   overflow: hidden;
-  transition: all 0.3s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
 }
 
-.placeholder-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-color: #008C8E;
-}
-
-.card-header {
+.sections-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
   background: linear-gradient(135deg, #008C8E, #009688);
   color: white;
-  padding: 20px 24px;
 }
 
-.card-header h3 {
-  font-size: 18px;
+.sections-header h2 {
+  font-size: 20px;
   font-weight: 600;
   margin: 0;
 }
 
-.card-content {
-  padding: 40px 24px;
+.header-actions {
+  display: flex;
+  gap: 12px;
 }
 
-.placeholder-content {
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 14px;
+}
+
+.filter-select option {
+  background: white;
+  color: #1a1a1a;
+}
+
+/* Column Headers */
+.column-headers {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 16px;
+  padding: 16px 24px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 600;
+  font-size: 14px;
+  color: #374151;
+}
+
+.header-section {
+  grid-column: 1;
+}
+
+.header-progress {
+  grid-column: 2;
   text-align: center;
 }
 
-.placeholder-icon {
-  width: 80px;
-  height: 80px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #008C8E, #009688);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 24px auto;
+.header-metrics {
+  grid-column: 3;
+  text-align: center;
 }
 
-.placeholder-icon svg {
-  width: 40px;
-  height: 40px;
-  color: white;
+.header-actions {
+  grid-column: 4;
+  text-align: center;
 }
 
-.placeholder-content h4 {
-  font-size: 20px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0 0 16px 0;
+/* Sections List */
+.sections-list {
+  padding: 0 24px 24px 24px;
 }
 
-.placeholder-content p {
-  font-size: 16px;
+.no-results {
+  text-align: center;
+  padding: 48px 24px;
   color: #666;
-  line-height: 1.6;
-  margin: 0 0 24px 0;
-}
-
-.feature-list {
-  text-align: left;
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 0;
-  list-style: none;
-}
-
-.feature-list li {
-  font-size: 14px;
-  color: #666;
-  line-height: 1.6;
-  margin-bottom: 8px;
-  padding-left: 20px;
-  position: relative;
-}
-
-.feature-list li::before {
-  content: "•";
-  color: #008C8E;
-  font-weight: bold;
-  position: absolute;
-  left: 0;
 }
 
 /* Mobile responsive styles */
@@ -179,26 +311,35 @@ const currentProject = computed(() => projectStore.selectedProject)
     padding: 0 16px 16px 16px;
   }
 
-  .card-content {
-    padding: 24px 16px;
+  .project-meta {
+    flex-direction: column;
+    gap: 8px;
   }
 
-  .placeholder-icon {
-    width: 60px;
-    height: 60px;
+  .summary-bar {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 16px;
   }
 
-  .placeholder-icon svg {
-    width: 30px;
-    height: 30px;
+  .sections-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
   }
 
-  .placeholder-content h4 {
-    font-size: 18px;
+  .column-headers {
+    display: none;
   }
 
-  .placeholder-content p {
-    font-size: 14px;
+  .sections-list {
+    padding: 0 16px 16px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .summary-bar {
+    grid-template-columns: 1fr;
   }
 }
 </style> 

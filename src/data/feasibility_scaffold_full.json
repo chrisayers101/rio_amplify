@@ -1,0 +1,699 @@
+{
+  "feasibilityStudyView": {
+    "projectMetadata": {
+      "name": "Amrun Bauxite Project",
+      "location": "Cape York Peninsula, Queensland, Australia",
+      "status": "Operational",
+      "version": "1.0",
+      "lastUpdated": "2025-08-01"
+    },
+    "sections": [
+      {
+        "sectionId": "01",
+        "sectionName": "01 - Summary and Recommendations",
+        "percentComplete": 83,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "High",
+        "issues": [
+          {
+            "id": "01-I1",
+            "description": "Mock issue for Summary and Recommendations",
+            "status": "Resolved",
+            "source": "Summary and Recommendations Report 2024"
+          }
+        ],
+        "observations": [
+          {
+            "id": "01-O1",
+            "text": "Key observation about Summary and Recommendations on AMRUN.",
+            "source": "Summary and Recommendations Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": [
+          {
+            "subSectionId": "1.1",
+            "subSectionTitle": "1.1 Executive summary",
+            "percentComplete": 81,
+            "assessment": {
+              "quality": "High",
+              "consistency": "High",
+              "contradictions": "Minor",
+              "gaps": "Seasonal data missing",
+              "guidelineReference": "Section 1.1"
+            },
+            "observations": [
+              {
+                "note": "Observation for 1.1 Executive summary on AMRUN.",
+                "source": "Amrun Report 1.1",
+                "changeDetected": true
+              }
+            ],
+            "decisions": [
+              {
+                "date": "2024-06-15",
+                "original": "Original decision text",
+                "revised": "Updated decision text",
+                "reason": "Updated based on new data",
+                "source": "Meeting Notes 1.1"
+              }
+            ]
+          },
+          {
+            "subSectionId": "1.2",
+            "subSectionTitle": "1.2 Capital costs",
+            "percentComplete": 94,
+            "assessment": {
+              "quality": "Good",
+              "consistency": "Moderate",
+              "contradictions": "None",
+              "gaps": "Partial",
+              "guidelineReference": "Section 1.2"
+            },
+            "observations": [
+              {
+                "note": "Observation for 1.2 Capital costs on AMRUN.",
+                "source": "Amrun Report 1.2",
+                "changeDetected": true
+              }
+            ],
+            "decisions": [
+              {
+                "date": "2024-06-15",
+                "original": "Original decision text",
+                "revised": "Updated decision text",
+                "reason": "Updated based on new data",
+                "source": "Meeting Notes 1.2"
+              }
+            ]
+          },
+          {
+            "subSectionId": "1.3",
+            "subSectionTitle": "1.3 Economic valuation",
+            "percentComplete": 95,
+            "assessment": {
+              "quality": "High",
+              "consistency": "Moderate",
+              "contradictions": "None",
+              "gaps": "Partial",
+              "guidelineReference": "Section 1.3"
+            },
+            "observations": [
+              {
+                "note": "Observation for 1.3 Economic valuation on AMRUN.",
+                "source": "Amrun Report 1.3",
+                "changeDetected": true
+              }
+            ],
+            "decisions": [
+              {
+                "date": "2024-06-15",
+                "original": "Original decision text",
+                "revised": "Updated decision text",
+                "reason": "Updated based on new data",
+                "source": "Meeting Notes 1.3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sectionId": "02",
+        "sectionName": "02 - Business Strategy",
+        "percentComplete": 78,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "Good",
+        "issues": [
+          {
+            "id": "02-I1",
+            "description": "Mock issue for Business Strategy",
+            "status": "Open",
+            "source": "Business Strategy Report 2024"
+          }
+        ],
+        "observations": [
+          {
+            "id": "02-O1",
+            "text": "Key observation about Business Strategy on AMRUN.",
+            "source": "Business Strategy Summary Document",
+            "changeOccurred": true
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "03",
+        "sectionName": "03 - Marketing",
+        "percentComplete": 85,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "High",
+        "issues": [],
+        "observations": [
+          {
+            "id": "03-O1",
+            "text": "Key observation about Marketing on AMRUN.",
+            "source": "Marketing Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "04",
+        "sectionName": "04 - Country and Regional Settings",
+        "percentComplete": 92,
+        "statusOfCompleteness": "Complete",
+        "qualityRating": "High",
+        "issues": [],
+        "observations": [
+          {
+            "id": "04-O1",
+            "text": "Key observation about Country and Regional Settings on AMRUN.",
+            "source": "Country and Regional Settings Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "05",
+        "sectionName": "05 - Security",
+        "percentComplete": 76,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "Good",
+        "issues": [
+          {
+            "id": "05-I1",
+            "description": "Mock issue for Security",
+            "status": "In Progress",
+            "source": "Security Report 2024"
+          }
+        ],
+        "observations": [
+          {
+            "id": "05-O1",
+            "text": "Key observation about Security on AMRUN.",
+            "source": "Security Summary Document",
+            "changeOccurred": true
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "06",
+        "sectionName": "06 - Government, Stakeholders and Communication",
+        "percentComplete": 88,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "High",
+        "issues": [],
+        "observations": [
+          {
+            "id": "06-O1",
+            "text": "Key observation about Government, Stakeholders and Communication on AMRUN.",
+            "source": "Government, Stakeholders and Communication Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "07",
+        "sectionName": "07 - Communities and Social Performance (CSP)",
+        "percentComplete": 82,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "Good",
+        "issues": [
+          {
+            "id": "07-I1",
+            "description": "Mock issue for Communities and Social Performance",
+            "status": "Resolved",
+            "source": "CSP Report 2024"
+          }
+        ],
+        "observations": [
+          {
+            "id": "07-O1",
+            "text": "Key observation about Communities and Social Performance on AMRUN.",
+            "source": "CSP Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "08",
+        "sectionName": "08 - Human Resources and Industrial Relations",
+        "percentComplete": 79,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "Good",
+        "issues": [
+          {
+            "id": "08-I1",
+            "description": "Mock issue for Human Resources and Industrial Relations",
+            "status": "Open",
+            "source": "HR/IR Report 2024"
+          }
+        ],
+        "observations": [
+          {
+            "id": "08-O1",
+            "text": "Key observation about Human Resources and Industrial Relations on AMRUN.",
+            "source": "HR/IR Summary Document",
+            "changeOccurred": true
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "09",
+        "sectionName": "09 - Tax, Legal and Commercial",
+        "percentComplete": 91,
+        "statusOfCompleteness": "Complete",
+        "qualityRating": "High",
+        "issues": [],
+        "observations": [
+          {
+            "id": "09-O1",
+            "text": "Key observation about Tax, Legal and Commercial on AMRUN.",
+            "source": "Tax, Legal and Commercial Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "10",
+        "sectionName": "10 - Permits and Approvals",
+        "percentComplete": 87,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "High",
+        "issues": [],
+        "observations": [
+          {
+            "id": "10-O1",
+            "text": "Key observation about Permits and Approvals on AMRUN.",
+            "source": "Permits and Approvals Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "11",
+        "sectionName": "11 - Health and Safety",
+        "percentComplete": 94,
+        "statusOfCompleteness": "Complete",
+        "qualityRating": "High",
+        "issues": [],
+        "observations": [
+          {
+            "id": "11-O1",
+            "text": "Key observation about Health and Safety on AMRUN.",
+            "source": "Health and Safety Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "12",
+        "sectionName": "12 - Environment",
+        "percentComplete": 89,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "High",
+        "issues": [],
+        "observations": [
+          {
+            "id": "12-O1",
+            "text": "Key observation about Environment on AMRUN.",
+            "source": "Environment Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "13",
+        "sectionName": "13 - Energy and Climate Change",
+        "percentComplete": 81,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "Good",
+        "issues": [
+          {
+            "id": "13-I1",
+            "description": "Mock issue for Energy and Climate Change",
+            "status": "In Progress",
+            "source": "Energy and Climate Change Report 2024"
+          }
+        ],
+        "observations": [
+          {
+            "id": "13-O1",
+            "text": "Key observation about Energy and Climate Change on AMRUN.",
+            "source": "Energy and Climate Change Summary Document",
+            "changeOccurred": true
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "14",
+        "sectionName": "14 - Geology",
+        "percentComplete": 96,
+        "statusOfCompleteness": "Complete",
+        "qualityRating": "High",
+        "issues": [],
+        "observations": [
+          {
+            "id": "14-O1",
+            "text": "Key observation about Geology on AMRUN.",
+            "source": "Geology Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "15",
+        "sectionName": "15 - Geotechnical",
+        "percentComplete": 84,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "Good",
+        "issues": [
+          {
+            "id": "15-I1",
+            "description": "Mock issue for Geotechnical",
+            "status": "Resolved",
+            "source": "Geotechnical Report 2024"
+          }
+        ],
+        "observations": [
+          {
+            "id": "15-O1",
+            "text": "Key observation about Geotechnical on AMRUN.",
+            "source": "Geotechnical Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "16",
+        "sectionName": "16 - Hydrology and Hydrogeology",
+        "percentComplete": 86,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "High",
+        "issues": [],
+        "observations": [
+          {
+            "id": "16-O1",
+            "text": "Key observation about Hydrology and Hydrogeology on AMRUN.",
+            "source": "Hydrology and Hydrogeology Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "17",
+        "sectionName": "17 - Mining",
+        "percentComplete": 93,
+        "statusOfCompleteness": "Complete",
+        "qualityRating": "High",
+        "issues": [],
+        "observations": [
+          {
+            "id": "17-O1",
+            "text": "Key observation about Mining on AMRUN.",
+            "source": "Mining Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "18",
+        "sectionName": "18 - Process",
+        "percentComplete": 90,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "High",
+        "issues": [],
+        "observations": [
+          {
+            "id": "18-O1",
+            "text": "Key observation about Process on AMRUN.",
+            "source": "Process Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "19",
+        "sectionName": "19 - Process Plant",
+        "percentComplete": 88,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "High",
+        "issues": [],
+        "observations": [
+          {
+            "id": "19-O1",
+            "text": "Key observation about Process Plant on AMRUN.",
+            "source": "Process Plant Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "20",
+        "sectionName": "20 - Infrastructure and Services",
+        "percentComplete": 85,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "Good",
+        "issues": [
+          {
+            "id": "20-I1",
+            "description": "Mock issue for Infrastructure and Services",
+            "status": "Open",
+            "source": "Infrastructure and Services Report 2024"
+          }
+        ],
+        "observations": [
+          {
+            "id": "20-O1",
+            "text": "Key observation about Infrastructure and Services on AMRUN.",
+            "source": "Infrastructure and Services Summary Document",
+            "changeOccurred": true
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "21",
+        "sectionName": "21 - Tailings and Water Facilities",
+        "percentComplete": 82,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "Good",
+        "issues": [
+          {
+            "id": "21-I1",
+            "description": "Mock issue for Tailings and Water Facilities",
+            "status": "Resolved",
+            "source": "Tailings and Water Facilities Report 2024"
+          }
+        ],
+        "observations": [
+          {
+            "id": "21-O1",
+            "text": "Key observation about Tailings and Water Facilities on AMRUN.",
+            "source": "Tailings and Water Facilities Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "22",
+        "sectionName": "22 - New Technologies",
+        "percentComplete": 77,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "Good",
+        "issues": [
+          {
+            "id": "22-I1",
+            "description": "Mock issue for New Technologies",
+            "status": "In Progress",
+            "source": "New Technologies Report 2024"
+          }
+        ],
+        "observations": [
+          {
+            "id": "22-O1",
+            "text": "Key observation about New Technologies on AMRUN.",
+            "source": "New Technologies Summary Document",
+            "changeOccurred": true
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "23",
+        "sectionName": "23 - Project Execution Planning",
+        "percentComplete": 89,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "High",
+        "issues": [],
+        "observations": [
+          {
+            "id": "23-O1",
+            "text": "Key observation about Project Execution Planning on AMRUN.",
+            "source": "Project Execution Planning Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "24",
+        "sectionName": "24 - Construction Management",
+        "percentComplete": 86,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "High",
+        "issues": [],
+        "observations": [
+          {
+            "id": "24-O1",
+            "text": "Key observation about Construction Management on AMRUN.",
+            "source": "Construction Management Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "25",
+        "sectionName": "25 - Operations Readiness",
+        "percentComplete": 83,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "Good",
+        "issues": [
+          {
+            "id": "25-I1",
+            "description": "Mock issue for Operations Readiness",
+            "status": "Open",
+            "source": "Operations Readiness Report 2024"
+          }
+        ],
+        "observations": [
+          {
+            "id": "25-O1",
+            "text": "Key observation about Operations Readiness on AMRUN.",
+            "source": "Operations Readiness Summary Document",
+            "changeOccurred": true
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "26",
+        "sectionName": "26 - Closure",
+        "percentComplete": 78,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "Good",
+        "issues": [
+          {
+            "id": "26-I1",
+            "description": "Mock issue for Closure",
+            "status": "In Progress",
+            "source": "Closure Report 2024"
+          }
+        ],
+        "observations": [
+          {
+            "id": "26-O1",
+            "text": "Key observation about Closure on AMRUN.",
+            "source": "Closure Summary Document",
+            "changeOccurred": true
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "27",
+        "sectionName": "27 - Cost Estimation",
+        "percentComplete": 91,
+        "statusOfCompleteness": "Complete",
+        "qualityRating": "High",
+        "issues": [],
+        "observations": [
+          {
+            "id": "27-O1",
+            "text": "Key observation about Cost Estimation on AMRUN.",
+            "source": "Cost Estimation Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "28",
+        "sectionName": "28 - Project Risk",
+        "percentComplete": 87,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "High",
+        "issues": [],
+        "observations": [
+          {
+            "id": "28-O1",
+            "text": "Key observation about Project Risk on AMRUN.",
+            "source": "Project Risk Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "29",
+        "sectionName": "29 - Business Analysis",
+        "percentComplete": 90,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "High",
+        "issues": [],
+        "observations": [
+          {
+            "id": "29-O1",
+            "text": "Key observation about Business Analysis on AMRUN.",
+            "source": "Business Analysis Summary Document",
+            "changeOccurred": false
+          }
+        ],
+        "subSections": []
+      },
+      {
+        "sectionId": "30",
+        "sectionName": "30 - Next Study Stage Execution Planning",
+        "percentComplete": 75,
+        "statusOfCompleteness": "Mostly Complete",
+        "qualityRating": "Good",
+        "issues": [
+          {
+            "id": "30-I1",
+            "description": "Mock issue for Next Study Stage Execution Planning",
+            "status": "Open",
+            "source": "Next Study Stage Execution Planning Report 2024"
+          }
+        ],
+        "observations": [
+          {
+            "id": "30-O1",
+            "text": "Key observation about Next Study Stage Execution Planning on AMRUN.",
+            "source": "Next Study Stage Execution Planning Summary Document",
+            "changeOccurred": true
+          }
+        ],
+        "subSections": []
+      }
+    ]
+  }
+}

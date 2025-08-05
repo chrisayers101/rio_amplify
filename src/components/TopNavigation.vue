@@ -21,12 +21,12 @@
       </div>
     </div>
     <div class="top-nav-right">
-      <button class="nav-btn" @click="navigateToFiles" title="Files">
+      <!-- <button class="nav-btn" @click="navigateToFiles" title="Files">
         <DocumentIcon class="icon" />
       </button>
       <button class="nav-btn" @click="navigateToEntities" title="Entities">
         <ServerIcon class="icon" />
-      </button>
+      </button> -->
       <button class="user-btn" @click="signOut" title="Logout">
         <span class="user-email">{{ user.email }}</span>
         <ArrowLeftStartOnRectangleIcon class="icon" />
