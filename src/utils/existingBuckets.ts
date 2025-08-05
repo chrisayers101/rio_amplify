@@ -1,4 +1,11 @@
 import type { S3Object } from '@/interfaces/s3';
+import {
+  listObjectsFromExistingBucket as listObjectsFromProxy,
+  uploadFileToExistingBucket as uploadFileToProxy,
+  generateDownloadUrlForExistingBucket,
+  deleteFileFromExistingBucket as deleteFileFromProxy,
+  downloadFolderFromExistingBucket as downloadFolderFromProxy
+} from './s3Proxy';
 
 export interface ExistingBucketConfig {
   name: string;
@@ -19,36 +26,72 @@ export const existingBuckets: ExistingBucketConfig[] = [
   }
 ];
 
-// Placeholder functions that throw errors to indicate the buckets are not yet available
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function listObjectsFromExistingBucket(_bucketName: string, _prefix: string = 'uploads/'): Promise<S3Object[]> {
-  throw new Error('Existing buckets are not yet available. CORS configuration required.');
+/**
+ * List objects in an existing S3 bucket using the proxy
+ */
+export async function listObjectsFromExistingBucket(bucketName: string, prefix: string = ''): Promise<S3Object[]> {
+  try {
+    const response = await listObjectsFromProxy(bucketName, prefix);
+    return response.objects;
+  } catch (error) {
+    console.error('Error listing objects from existing bucket:', error);
+    throw error;
+  }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+/**
+ * Upload a file to an existing S3 bucket using the proxy
+ */
 export async function uploadFileToExistingBucket(
-  _file: File,
-  _bucketName: string,
-  _key?: string
+  file: File,
+  bucketName: string,
+  key?: string
 ): Promise<string> {
-  throw new Error('Existing buckets are not yet available. CORS configuration required.');
+  try {
+    return await uploadFileToProxy(file, bucketName, key);
+  } catch (error) {
+    console.error('Error uploading file to existing bucket:', error);
+    throw error;
+  }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function getDownloadUrlFromExistingBucket(_key: string, _bucketName: string): Promise<string> {
-  throw new Error('Existing buckets are not yet available. CORS configuration required.');
+/**
+ * Get a download URL for a file from an existing S3 bucket using the proxy
+ */
+export async function getDownloadUrlFromExistingBucket(key: string, bucketName: string): Promise<string> {
+  try {
+    const response = await generateDownloadUrlForExistingBucket(bucketName, key);
+    return response.downloadUrl;
+  } catch (error) {
+    console.error('Error getting download URL from existing bucket:', error);
+    throw error;
+  }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function deleteFileFromExistingBucket(_key: string, _bucketName: string): Promise<void> {
-  throw new Error('Existing buckets are not yet available. CORS configuration required.');
+/**
+ * Delete a file from an existing S3 bucket using the proxy
+ */
+export async function deleteFileFromExistingBucket(key: string, bucketName: string): Promise<void> {
+  try {
+    await deleteFileFromProxy(bucketName, key);
+  } catch (error) {
+    console.error('Error deleting file from existing bucket:', error);
+    throw error;
+  }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+/**
+ * Download an entire folder as a zip file from an existing S3 bucket using the proxy
+ */
 export async function downloadFolderFromExistingBucket(
-  _bucketName: string,
-  _folderPath: string = 'uploads/',
-  _folderName?: string
+  bucketName: string,
+  folderPath: string = '',
+  folderName?: string
 ): Promise<void> {
-  throw new Error('Existing buckets are not yet available. CORS configuration required.');
+  try {
+    await downloadFolderFromProxy(bucketName, folderPath, folderName);
+  } catch (error) {
+    console.error('Error downloading folder from existing bucket:', error);
+    throw error;
+  }
 }

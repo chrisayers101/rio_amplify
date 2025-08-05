@@ -27,19 +27,17 @@
               :key="bucket.name"
               @click="selectBucket(bucket.name)"
               :class="[
-                'px-4 py-2 rounded-lg border transition-all opacity-50 cursor-not-allowed',
+                'px-4 py-2 rounded-lg border transition-all',
                 selectedBucket === bucket.name
                   ? 'bg-theme-blue text-white border-theme-blue'
-                  : 'bg-white text-theme-primary border-gray-300'
+                  : 'bg-white text-theme-primary border-gray-300 hover:bg-gray-50'
               ]"
-              disabled
-              title="Coming soon - CORS configuration required"
             >
               {{ bucket.displayName }}
             </button>
           </div>
           <p class="text-sm text-theme-secondary mt-2">
-            Additional buckets require CORS configuration. Default bucket is fully functional.
+            All buckets are now available through the S3 proxy function.
           </p>
         </div>
 
@@ -202,11 +200,6 @@ onMounted(async () => {
 
 // Bucket functions
 function selectBucket(bucketName: string) {
-  // Only allow default bucket for now
-  if (bucketName !== 'default') {
-    console.log('Existing buckets are not yet available due to CORS configuration');
-    return;
-  }
   selectedBucket.value = bucketName;
   refreshFiles();
 }
@@ -324,7 +317,7 @@ async function downloadAllFiles() {
         throw new Error('Invalid bucket configuration');
       }
 
-      await downloadFolderFromExistingBucket(bucketConfig.bucketName, 'uploads/', `${bucketConfig.displayName.toLowerCase().replace(/\s+/g, '-')}-files`);
+      await downloadFolderFromExistingBucket(bucketConfig.bucketName, '', `${bucketConfig.displayName.toLowerCase().replace(/\s+/g, '-')}-files`);
     }
 
     console.log('All files downloaded successfully');
@@ -393,13 +386,23 @@ function formatFileSize(bytes: number): string {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-function formatDate(date: Date): string {
+function formatDate(date: Date | string | undefined): string {
+  if (!date) return 'Unknown';
+
+  // Convert string to Date if needed
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+
+  // Check if the date is valid
+  if (isNaN(dateObj.getTime())) {
+    return 'Invalid Date';
+  }
+
   return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-  }).format(date);
+  }).format(dateObj);
 }
 </script>

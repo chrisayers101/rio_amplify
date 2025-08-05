@@ -1,5 +1,6 @@
 import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
 import { chatOrchestratorFunction } from '../functions/chat-orchestrator/resource';
+import { s3ProxyFunction } from '../functions/s3-proxy/resource';
 
 const schema = a.schema({
   defaultDynamoTable: a
@@ -22,6 +23,24 @@ const schema = a.schema({
     .returns(a.string())
     .authorization(allow => [allow.authenticated()])
     .handler(a.handler.function(chatOrchestratorFunction)),
+
+  // Add S3 proxy function as a query
+  s3Proxy: a
+    .query()
+    .arguments({
+      operation: a.string(),
+      bucketName: a.string(),
+      key: a.string(),
+      prefix: a.string(),
+      maxKeys: a.integer(),
+      continuationToken: a.string(),
+      contentType: a.string(),
+      contentLength: a.integer(),
+      expiresIn: a.integer(),
+    })
+    .returns(a.string())
+    .authorization(allow => [allow.authenticated()])
+    .handler(a.handler.function(s3ProxyFunction)),
 });
 
 export type Schema = ClientSchema<typeof schema>;
