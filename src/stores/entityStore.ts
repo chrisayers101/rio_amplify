@@ -3,9 +3,22 @@ import { ref, computed, readonly } from 'vue'
 import { generateClient } from 'aws-amplify/data'
 import { getCurrentUser } from 'aws-amplify/auth'
 
-// Initialize Amplify Data client without schema typing
+// Lazy initialization of Amplify Data client
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const client = generateClient() as any
+let client: any = null
+
+const getClient = () => {
+  if (!client) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      client = generateClient() as any
+    } catch (error) {
+      console.error('Failed to initialize Amplify client:', error)
+      throw new Error('Amplify has not been configured. Please call Amplify.configure() before using this service.')
+    }
+  }
+  return client
+}
 
 // Type for our entity
 export interface Entity {
@@ -53,7 +66,7 @@ export const useEntityStore = defineStore('entity', () => {
 
     try {
       console.log('Fetching entities...')
-      const { data: entitiesList, errors } = await client.models.defaultDynamoTable.list({})
+      const { data: entitiesList, errors } = await getClient().models.defaultDynamoTable.list({})
 
       if (errors) {
         console.error('Errors fetching entities:', errors)
@@ -84,7 +97,7 @@ export const useEntityStore = defineStore('entity', () => {
 
     try {
       console.log('Creating entity:', { name, data })
-      const { data: newEntity, errors } = await client.models.defaultDynamoTable.create({
+      const { data: newEntity, errors } = await getClient().models.defaultDynamoTable.create({
         name: name.trim(),
         data: data.trim(),
       })
@@ -128,7 +141,7 @@ export const useEntityStore = defineStore('entity', () => {
 
     try {
       console.log('Updating entity:', id, { name, data })
-      const { data: updatedEntity, errors } = await client.models.defaultDynamoTable.update({
+      const { data: updatedEntity, errors } = await getClient().models.defaultDynamoTable.update({
         id,
         name: name.trim(),
         data: data.trim(),
@@ -171,7 +184,7 @@ export const useEntityStore = defineStore('entity', () => {
 
     try {
       console.log('Deleting entity:', id)
-      const { errors } = await client.models.defaultDynamoTable.delete({ id })
+      const { errors } = await getClient().models.defaultDynamoTable.delete({ id })
 
       if (errors) {
         console.error('Errors deleting entity:', errors)

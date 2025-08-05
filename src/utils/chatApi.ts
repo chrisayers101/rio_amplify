@@ -19,7 +19,19 @@ interface ChatResponse {
 }
 
 export class ChatApi {
-  private client = generateClient<Schema>();
+  private client: any = null;
+
+  private getClient() {
+    if (!this.client) {
+      try {
+        this.client = generateClient<Schema>();
+      } catch (error) {
+        console.error('Failed to initialize Amplify client:', error)
+        throw new Error('Amplify has not been configured. Please call Amplify.configure() before using this service.')
+      }
+    }
+    return this.client;
+  }
 
   async streamChat(
     request: ChatRequest,
@@ -29,7 +41,7 @@ export class ChatApi {
   ): Promise<void> {
     try {
       // Use the Data client to invoke the function as a query
-      const result = await this.client.queries.chatOrchestrator({
+      const result = await this.getClient().queries.chatOrchestrator({
         message: request.message,
         threadId: request.threadId || 'default',
         context: JSON.stringify(request.context || {}),
