@@ -100,7 +100,8 @@ const router = useRouter()
 // Get all projects from the project store instead of mock data
 const rioTintoProjects = projectStore.getAllProjects()
 
-const formatStatus = (status: string) => {
+const formatStatus = (status: string | undefined) => {
+  if (!status) return 'Unknown'
   const statusMap: Record<string, string> = {
     'pre-sanction': 'Pre-Sanction',
     'licence-revoked': 'Licence Revoked',
