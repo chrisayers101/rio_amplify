@@ -11,15 +11,3 @@ export const storage = defineStorage({
     ],
   })
 });
-
-export const airisStorage = defineStorage({
-  name: 'airis-analytica-workspace-sharepoint-data-962000089409',
-  access: (allow) => ({
-    'uploads/*': [
-      allow.authenticated.to(['read', 'write', 'delete'])
-    ],
-    'private/*': [
-      allow.authenticated.to(['read', 'write', 'delete'])
-    ],
-  })
-});

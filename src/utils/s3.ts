@@ -6,9 +6,10 @@ import type { S3Object } from '@/interfaces/s3';
  */
 export async function listObjects(): Promise<S3Object[]> {
   try {
-    console.log('Calling list with path: uploads/');
+    const path = 'uploads/';
+    console.log('Calling list with path:', path);
     const result = await list({
-      path: 'uploads/',
+      path: path,
       options: {
         listAll: true,
       },
@@ -63,8 +64,9 @@ export async function listObjectsInFolder(folderPath: string): Promise<S3Object[
 export async function uploadFile(file: File, key?: string): Promise<string> {
   try {
     const fileName = key || file.name;
+    const path = `uploads/${fileName}`;
     const result = await uploadData({
-      path: `uploads/${fileName}`,
+      path: path,
       data: file,
     }).result;
 
@@ -115,10 +117,10 @@ export async function deleteFile(key: string): Promise<void> {
 export async function downloadFolder(folderPath: string, folderName?: string): Promise<void> {
   try {
     console.log('Starting folder download for:', folderPath);
-    
+
     // List all objects in the folder
     const objects = await listObjectsInFolder(folderPath);
-    
+
     if (objects.length === 0) {
       console.log('No files found in folder');
       return;
@@ -135,11 +137,11 @@ export async function downloadFolder(folderPath: string, folderName?: string): P
         const url = await getDownloadUrl(obj.key);
         const response = await fetch(url);
         const blob = await response.blob();
-        
+
         // Extract filename from path for cleaner zip structure
         const fileName = obj.key.replace(folderPath, '').replace(/^\/+/, '');
         zip.file(fileName, blob);
-        
+
         console.log('Added to zip:', fileName);
       } catch (error) {
         console.error('Error downloading file for zip:', obj.key, error);
@@ -150,17 +152,17 @@ export async function downloadFolder(folderPath: string, folderName?: string): P
     // Generate and download the zip file
     const zipBlob = await zip.generateAsync({ type: 'blob' });
     const zipUrl = URL.createObjectURL(zipBlob);
-    
+
     const link = document.createElement('a');
     link.href = zipUrl;
     link.download = `${folderName || folderPath.replace(/[\/\\]/g, '_')}.zip`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     // Clean up the URL object
     URL.revokeObjectURL(zipUrl);
-    
+
     console.log('Folder download completed');
   } catch (error) {
     console.error('Error downloading folder:', error);
