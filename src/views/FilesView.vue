@@ -53,13 +53,23 @@
           <div>
             <div class="flex items-center justify-between mb-3">
               <h3 class="text-lg font-medium text-theme-primary">Your Files</h3>
-              <button
-                @click="refreshFiles"
-                :disabled="loading"
-                class="btn-secondary text-sm disabled:opacity-50"
-              >
-                {{ loading ? 'Loading...' : 'Refresh' }}
-              </button>
+              <div class="flex items-center space-x-2">
+                <button
+                  v-if="files.length > 0"
+                  @click="downloadAllFiles"
+                  :disabled="downloadingAll"
+                  class="btn-secondary text-sm disabled:opacity-50"
+                >
+                  {{ downloadingAll ? 'Downloading...' : 'Download All' }}
+                </button>
+                <button
+                  @click="refreshFiles"
+                  :disabled="loading"
+                  class="btn-secondary text-sm disabled:opacity-50"
+                >
+                  {{ loading ? 'Loading...' : 'Refresh' }}
+                </button>
+              </div>
             </div>
 
             <!-- Loading State -->
@@ -127,7 +137,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { listObjects, uploadFile, getDownloadUrl, deleteFile as deleteS3File } from '@/utils/s3';
+import { listObjects, uploadFile, getDownloadUrl, deleteFile as deleteS3File, downloadFolder } from '@/utils/s3';
 import type { S3Object } from '@/interfaces/s3';
 
 // Reactive state for files
@@ -135,6 +145,7 @@ const files = ref<S3Object[]>([]);
 const selectedFiles = ref<File[]>([]);
 const loading = ref(false);
 const uploading = ref(false);
+const downloadingAll = ref(false);
 const fileInput = ref<HTMLInputElement>();
 
 // Load data on component mount
@@ -189,6 +200,21 @@ async function refreshFiles() {
     console.error('Error loading files:', error);
   } finally {
     loading.value = false;
+  }
+}
+
+async function downloadAllFiles() {
+  if (files.value.length === 0) return;
+
+  downloadingAll.value = true;
+  try {
+    console.log('Starting download of all files');
+    await downloadFolder('uploads/', 'all-files');
+    console.log('All files downloaded successfully');
+  } catch (error) {
+    console.error('Error downloading all files:', error);
+  } finally {
+    downloadingAll.value = false;
   }
 }
 

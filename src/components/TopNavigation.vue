@@ -21,6 +21,12 @@
       </div>
     </div>
     <div class="top-nav-right">
+      <button class="nav-btn" @click="navigateToFiles" title="Files">
+        <DocumentIcon class="icon" />
+      </button>
+      <button class="nav-btn" @click="navigateToEntities" title="Entities">
+        <ServerIcon class="icon" />
+      </button>
       <button class="user-btn" @click="signOut" title="Logout">
         <span class="user-email">{{ user.email }}</span>
         <ArrowLeftStartOnRectangleIcon class="icon" />
@@ -31,11 +37,13 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import { useProjectStore } from '@/stores/projectStore'
 import RioLogo from '@/assets/RioLogo.svg'
-import { ArrowLeftStartOnRectangleIcon, ChevronDownIcon } from '@heroicons/vue/24/outline'
+import { ArrowLeftStartOnRectangleIcon, ChevronDownIcon, DocumentIcon, ServerIcon } from '@heroicons/vue/24/outline'
 
+const router = useRouter()
 const authStore = useAuthStore()
 const projectStore = useProjectStore()
 const showProjectDropdown = ref(false)
@@ -54,6 +62,15 @@ const selectProject = (projectId: string) => {
   projectStore.setSelectedProject(projectId)
   showProjectDropdown.value = false
 }
+
+const navigateToFiles = () => {
+  router.push('/files')
+}
+
+const navigateToEntities = () => {
+  router.push('/entities')
+}
+
 async function signOut() {
   await authStore.signOut()
   window.location.href = '/'
@@ -160,11 +177,28 @@ async function signOut() {
 .top-nav-right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 .icon {
   width: 20px;
   height: 20px;
+}
+.nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7f9fc;
+  border: 1px solid #eee;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  color: #333;
+}
+.nav-btn:hover {
+  background: #e6e8eb;
+  border-color: #ddd;
+  color: #008C8E;
 }
 .user-btn {
   display: flex;

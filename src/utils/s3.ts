@@ -30,6 +30,34 @@ export async function listObjects(): Promise<S3Object[]> {
 }
 
 /**
+ * List all objects in a specific folder
+ */
+export async function listObjectsInFolder(folderPath: string): Promise<S3Object[]> {
+  try {
+    console.log('Calling list with path:', folderPath);
+    const result = await list({
+      path: folderPath,
+      options: {
+        listAll: true,
+      },
+    });
+
+    console.log('Raw list result:', result);
+    console.log('All items:', result.items);
+
+    return result.items.map((item) => ({
+      key: item.path,
+      size: item.size,
+      lastModified: item.lastModified,
+      eTag: item.eTag,
+    }));
+  } catch (error) {
+    console.error('Error listing objects in folder:', error);
+    throw error;
+  }
+}
+
+/**
  * Upload a file to S3
  */
 export async function uploadFile(file: File, key?: string): Promise<string> {
@@ -77,6 +105,65 @@ export async function deleteFile(key: string): Promise<void> {
     console.log('File deleted successfully');
   } catch (error) {
     console.error('Error deleting file:', error);
+    throw error;
+  }
+}
+
+/**
+ * Download an entire folder as a zip file
+ */
+export async function downloadFolder(folderPath: string, folderName?: string): Promise<void> {
+  try {
+    console.log('Starting folder download for:', folderPath);
+    
+    // List all objects in the folder
+    const objects = await listObjectsInFolder(folderPath);
+    
+    if (objects.length === 0) {
+      console.log('No files found in folder');
+      return;
+    }
+
+    // Import JSZip dynamically to avoid bundle size issues
+    const JSZip = (await import('jszip')).default;
+    const zip = new JSZip();
+
+    // Download each file and add to zip
+    for (const obj of objects) {
+      try {
+        console.log('Downloading file:', obj.key);
+        const url = await getDownloadUrl(obj.key);
+        const response = await fetch(url);
+        const blob = await response.blob();
+        
+        // Extract filename from path for cleaner zip structure
+        const fileName = obj.key.replace(folderPath, '').replace(/^\/+/, '');
+        zip.file(fileName, blob);
+        
+        console.log('Added to zip:', fileName);
+      } catch (error) {
+        console.error('Error downloading file for zip:', obj.key, error);
+        // Continue with other files even if one fails
+      }
+    }
+
+    // Generate and download the zip file
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const zipUrl = URL.createObjectURL(zipBlob);
+    
+    const link = document.createElement('a');
+    link.href = zipUrl;
+    link.download = `${folderName || folderPath.replace(/[\/\\]/g, '_')}.zip`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Clean up the URL object
+    URL.revokeObjectURL(zipUrl);
+    
+    console.log('Folder download completed');
+  } catch (error) {
+    console.error('Error downloading folder:', error);
     throw error;
   }
 }
