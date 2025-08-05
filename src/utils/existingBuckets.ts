@@ -1,6 +1,7 @@
 import type { S3Object } from '@/interfaces/s3';
 import {
   listObjectsFromExistingBucket as listObjectsFromProxy,
+  listAllObjectsFromExistingBucket as listAllObjectsFromProxy,
   uploadFileToExistingBucket as uploadFileToProxy,
   generateDownloadUrlForExistingBucket,
   deleteFileFromExistingBucket as deleteFileFromProxy,
@@ -35,6 +36,19 @@ export async function listObjectsFromExistingBucket(bucketName: string, prefix: 
     return response.objects;
   } catch (error) {
     console.error('Error listing objects from existing bucket:', error);
+    throw error;
+  }
+}
+
+/**
+ * List ALL objects in an existing S3 bucket with automatic pagination
+ * This function handles pagination automatically to retrieve all files
+ */
+export async function listAllObjectsFromExistingBucket(bucketName: string, prefix: string = ''): Promise<S3Object[]> {
+  try {
+    return await listAllObjectsFromProxy(bucketName, prefix);
+  } catch (error) {
+    console.error('Error listing all objects from existing bucket:', error);
     throw error;
   }
 }

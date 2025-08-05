@@ -33,7 +33,7 @@ export interface S3ProxyDeleteResponse {
 }
 
 /**
- * List objects in an existing S3 bucket
+ * List objects in an existing S3 bucket with automatic pagination
  */
 export async function listObjectsFromExistingBucket(
   bucketName: string,
@@ -68,6 +68,46 @@ export async function listObjectsFromExistingBucket(
     console.error('Error listing objects from existing bucket:', error);
     throw error;
   }
+}
+
+/**
+ * List ALL objects in an existing S3 bucket with automatic pagination
+ * This function handles pagination automatically to retrieve all files
+ */
+export async function listAllObjectsFromExistingBucket(
+  bucketName: string,
+  prefix: string = ''
+): Promise<S3Object[]> {
+  const allObjects: S3Object[] = [];
+  let continuationToken: string | undefined = undefined;
+  let hasMoreObjects = true;
+
+  console.log(`Starting to list all objects in bucket: ${bucketName}, prefix: "${prefix}"`);
+
+  while (hasMoreObjects) {
+    try {
+      const response = await listObjectsFromExistingBucket(bucketName, prefix, 1000, continuationToken);
+
+      // Add objects from this batch
+      allObjects.push(...response.objects);
+
+      console.log(`Retrieved ${response.objects.length} objects. Total so far: ${allObjects.length}`);
+
+      // Check if there are more objects to retrieve
+      if (response.isTruncated && response.nextContinuationToken) {
+        continuationToken = response.nextContinuationToken;
+        hasMoreObjects = true;
+      } else {
+        hasMoreObjects = false;
+      }
+    } catch (error) {
+      console.error('Error during pagination:', error);
+      throw error;
+    }
+  }
+
+  console.log(`Completed listing all objects. Total objects: ${allObjects.length}`);
+  return allObjects;
 }
 
 /**
@@ -297,9 +337,8 @@ export async function downloadFolderFromExistingBucket(
   try {
     console.log('Starting folder download for:', folderPath);
 
-    // List all objects in the folder
-    const listResponse = await listObjectsFromExistingBucket(bucketName, folderPath);
-    const objects = listResponse.objects;
+    // List all objects in the folder with pagination
+    const objects = await listAllObjectsFromExistingBucket(bucketName, folderPath);
 
     if (objects.length === 0) {
       console.log('No files found in folder');

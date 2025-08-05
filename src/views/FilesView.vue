@@ -85,28 +85,57 @@
             </div>
           </div>
 
-          <!-- Files List -->
-          <div>
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="text-lg font-medium text-theme-primary">Your Files</h3>
-              <div class="flex items-center space-x-2">
-                <button
-                  v-if="files.length > 0"
-                  @click="downloadAllFiles"
-                  :disabled="downloadingAll"
-                  class="btn-secondary text-sm disabled:opacity-50"
-                >
-                  {{ downloadingAll ? 'Downloading...' : 'Download All' }}
-                </button>
-                <button
-                  @click="refreshFiles"
-                  :disabled="loading"
-                  class="btn-secondary text-sm disabled:opacity-50"
-                >
-                  {{ loading ? 'Loading...' : 'Refresh' }}
-                </button>
+                      <!-- Files List -->
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-lg font-medium text-theme-primary">Your Files</h3>
+                <div class="flex items-center space-x-2">
+                  <button
+                    v-if="files.length > 0"
+                    @click="downloadAllFiles"
+                    :disabled="downloadingAll"
+                    class="btn-secondary text-sm disabled:opacity-50"
+                  >
+                    {{ downloadingAll ? 'Downloading...' : 'Download All' }}
+                  </button>
+                  <button
+                    @click="refreshFiles"
+                    :disabled="loading"
+                    class="btn-secondary text-sm disabled:opacity-50"
+                  >
+                    {{ loading ? 'Loading...' : 'Refresh' }}
+                  </button>
+                </div>
               </div>
-            </div>
+
+              <!-- Search Bar -->
+              <div class="mb-4">
+                <div class="relative">
+                  <input
+                    v-model="searchQuery"
+                    type="text"
+                    placeholder="Search files by name..."
+                    class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-theme-blue focus:border-transparent"
+                  />
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                  <button
+                    v-if="searchQuery"
+                    @click="clearSearch"
+                    class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  >
+                    <svg class="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <div v-if="searchQuery" class="mt-2 text-sm text-theme-secondary">
+                  Showing {{ filteredFiles.length }} of {{ files.length }} files
+                </div>
+              </div>
 
             <!-- Loading State -->
             <div v-if="loading" class="text-center py-8">
@@ -115,20 +144,24 @@
             </div>
 
             <!-- Empty State -->
-            <div v-else-if="files.length === 0" class="text-center py-8">
+            <div v-else-if="filteredFiles.length === 0" class="text-center py-8">
               <div class="text-theme-tertiary mb-2">
                 <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
               </div>
-              <p class="text-theme-secondary">No files uploaded yet</p>
-              <p class="text-sm text-theme-tertiary mt-1">Upload your first file to get started</p>
+              <p class="text-theme-secondary">
+                {{ searchQuery ? 'No files match your search' : 'No files uploaded yet' }}
+              </p>
+              <p class="text-sm text-theme-tertiary mt-1">
+                {{ searchQuery ? 'Try a different search term' : 'Upload your first file to get started' }}
+              </p>
             </div>
 
             <!-- Files List -->
             <div v-else class="space-y-2">
               <div
-                v-for="file in files"
+                v-for="file in filteredFiles"
                 :key="file.key"
                 class="flex items-center justify-between p-3 bg-theme-secondary rounded-lg hover:bg-gray-100 transition-colors"
               >
@@ -172,11 +205,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { listObjects, uploadFile, getDownloadUrl, deleteFile as deleteS3File, downloadFolder } from '@/utils/s3';
 import {
   existingBuckets,
-  listObjectsFromExistingBucket,
+  listAllObjectsFromExistingBucket,
   uploadFileToExistingBucket,
   getDownloadUrlFromExistingBucket,
   deleteFileFromExistingBucket,
@@ -192,6 +225,24 @@ const uploading = ref(false);
 const downloadingAll = ref(false);
 const fileInput = ref<HTMLInputElement>();
 const selectedBucket = ref('default');
+const searchQuery = ref('');
+
+// Computed properties
+const filteredFiles = computed(() => {
+  if (!searchQuery.value) {
+    return files.value;
+  }
+
+  const query = searchQuery.value.toLowerCase();
+  return files.value.filter(file =>
+    file.key.toLowerCase().includes(query)
+  );
+});
+
+// Search functions
+function clearSearch() {
+  searchQuery.value = '';
+}
 
 // Load data on component mount
 onMounted(async () => {
@@ -287,7 +338,7 @@ async function refreshFiles() {
         throw new Error('Invalid bucket configuration');
       }
 
-      const result = await listObjectsFromExistingBucket(bucketConfig.bucketName);
+      const result = await listAllObjectsFromExistingBucket(bucketConfig.bucketName);
       console.log('List objects result:', result);
       files.value = result;
     }
