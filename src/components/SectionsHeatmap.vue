@@ -4,20 +4,20 @@
       <h3>Feasibility Study Progress Heatmap</h3>
       <div class="heatmap-legend">
         <div class="legend-item">
-          <span class="legend-color progress-high"></span>
-          <span>80%+ Complete</span>
+          <span class="legend-color quality-high"></span>
+          <span>High Quality</span>
         </div>
         <div class="legend-item">
-          <span class="legend-color progress-medium"></span>
-          <span>60-79% Complete</span>
+          <span class="legend-color quality-good"></span>
+          <span>Good Quality</span>
         </div>
         <div class="legend-item">
-          <span class="legend-color progress-low"></span>
-          <span>40-59% Complete</span>
+          <span class="legend-color quality-moderate"></span>
+          <span>Moderate Quality</span>
         </div>
         <div class="legend-item">
-          <span class="legend-color progress-critical"></span>
-          <span>&lt;40% Complete</span>
+          <span class="legend-color quality-low"></span>
+          <span>Low Quality</span>
         </div>
       </div>
     </div>
@@ -27,18 +27,24 @@
         v-for="section in sections"
         :key="section.sectionId"
         class="heatmap-cell"
-        :class="getProgressClass(section.percentComplete)"
+        :class="getQualityClass(section.qualityRating)"
         @click="handleCellClick(section)"
       >
         <div class="cell-header">
           <span class="section-id">{{ section.sectionId }}</span>
-          <span class="quality-indicator" :class="getQualityClass(section.qualityRating)">
-            {{ section.qualityRating.charAt(0) }}
-          </span>
+          <div class="progress-bar-container">
+            <div class="progress-bar">
+              <div
+                class="progress-fill"
+                :style="{ width: `${section.percentComplete}%` }"
+              ></div>
+              <span class="progress-text">{{ section.percentComplete }}%</span>
+            </div>
+          </div>
         </div>
         <div class="cell-content">
           <div class="section-name">{{ getShortName(section.sectionName) }}</div>
-          <div class="progress-percentage">{{ section.percentComplete }}%</div>
+          <div class="status-text">{{ section.statusOfCompleteness }}</div>
         </div>
         <div class="cell-footer">
           <span class="issues-count" v-if="section.issues.length > 0">
@@ -60,15 +66,25 @@ interface Section {
   percentComplete: number
   statusOfCompleteness: string
   qualityRating: string
-  issues: any[]
-  observations: any[]
+  issues: Array<{
+    id: string
+    description: string
+    status: string
+    source: string
+  }>
+  observations: Array<{
+    id: string
+    text: string
+    source: string
+    changeOccurred: boolean
+  }>
 }
 
 interface Props {
   sections: Section[]
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 
 const emit = defineEmits<{
   cellClick: [section: Section]
@@ -76,13 +92,6 @@ const emit = defineEmits<{
 
 const handleCellClick = (section: Section) => {
   emit('cellClick', section)
-}
-
-const getProgressClass = (percent: number) => {
-  if (percent >= 80) return 'progress-high'
-  if (percent >= 60) return 'progress-medium'
-  if (percent >= 40) return 'progress-low'
-  return 'progress-critical'
 }
 
 const getQualityClass = (quality: string) => {
@@ -155,20 +164,24 @@ const getShortName = (fullName: string) => {
   border-radius: 2px;
 }
 
-.progress-high {
+.quality-high {
   background: linear-gradient(135deg, #10b981, #059669);
 }
 
-.progress-medium {
+.quality-good {
   background: linear-gradient(135deg, #f59e0b, #d97706);
 }
 
-.progress-low {
-  background: linear-gradient(135deg, #f97316, #ea580c);
+.quality-moderate {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
 }
 
-.progress-critical {
+.quality-low {
   background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.quality-unknown {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
 }
 
 .heatmap-grid {
@@ -179,14 +192,14 @@ const getShortName = (fullName: string) => {
 }
 
 .heatmap-cell {
-  background: white;
-  border: 1px solid #e5e7eb;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   padding: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+  color: white;
 }
 
 .heatmap-cell::before {
@@ -196,13 +209,13 @@ const getShortName = (fullName: string) => {
   left: 0;
   right: 0;
   height: 3px;
-  background: inherit;
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .heatmap-cell:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-color: #008C8E;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .cell-header {
@@ -215,40 +228,42 @@ const getShortName = (fullName: string) => {
 .section-id {
   font-size: 12px;
   font-weight: 600;
-  color: #666;
+  color: rgba(255, 255, 255, 0.9);
 }
 
-.quality-indicator {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.progress-bar-container {
+  width: 80px;
+  height: 20px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(4px);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffffff, #f0f0f0);
+  border-radius: 10px;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   font-size: 10px;
   font-weight: 700;
-  color: white;
-  text-transform: uppercase;
-}
-
-.quality-high {
-  background: #10b981;
-}
-
-.quality-good {
-  background: #f59e0b;
-}
-
-.quality-moderate {
-  background: #f59e0b;
-}
-
-.quality-low {
-  background: #ef4444;
-}
-
-.quality-unknown {
-  background: #6b7280;
+  color: #1a1a1a;
+  z-index: 1;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
 }
 
 .cell-content {
@@ -258,7 +273,7 @@ const getShortName = (fullName: string) => {
 .section-name {
   font-size: 13px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: white;
   line-height: 1.3;
   margin-bottom: 4px;
   display: -webkit-box;
@@ -267,25 +282,26 @@ const getShortName = (fullName: string) => {
   overflow: hidden;
 }
 
-.progress-percentage {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1a1a1a;
+.status-text {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
 }
 
 .cell-footer {
   display: flex;
   gap: 8px;
   font-size: 10px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .issues-count,
 .observations-count {
   padding: 2px 6px;
-  background: #f3f4f6;
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 4px;
   font-weight: 500;
+  backdrop-filter: blur(4px);
 }
 
 /* Mobile responsive */
@@ -316,8 +332,13 @@ const getShortName = (fullName: string) => {
     font-size: 12px;
   }
 
-  .progress-percentage {
-    font-size: 14px;
+  .progress-bar-container {
+    width: 60px;
+    height: 16px;
+  }
+
+  .progress-text {
+    font-size: 9px;
   }
 }
 
