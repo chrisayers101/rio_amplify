@@ -8,6 +8,7 @@
     </div>
 
     <div v-if="section" class="detail-content">
+      <!-- Section Summary -->
       <div class="section-summary">
         <div class="summary-card">
           <h3>Section Summary</h3>
@@ -26,40 +27,132 @@
                 {{ section.qualityRating }}
               </span>
             </div>
+            <div class="summary-item">
+              <span class="label">Issues:</span>
+              <span class="value">{{ section.issues.length }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Observations:</span>
+              <span class="value">{{ section.observations.length }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Sub-sections:</span>
+              <span class="value">{{ section.subSections?.length || 0 }}</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="section-sections">
-        <div class="section">
-          <h3>Issues ({{ section.issues.length }})</h3>
-          <div class="issues-list">
-            <div v-for="issue in section.issues" :key="issue.id" class="issue-item">
-              <div class="issue-header">
-                <span class="issue-id">{{ issue.id }}</span>
-                <span class="issue-status" :class="getStatusClass(issue.status)">
-                  {{ issue.status }}
+      <!-- Sub-sections -->
+      <div v-if="section.subSections && section.subSections.length > 0" class="sub-sections">
+        <h3>Sub-sections ({{ section.subSections.length }})</h3>
+        <div class="sub-sections-grid">
+          <div v-for="subSection in section.subSections" :key="subSection.subSectionId" class="sub-section-card">
+            <div class="sub-section-header">
+              <h4>{{ subSection.subSectionTitle }}</h4>
+              <div class="sub-section-meta">
+                <span class="completion">{{ subSection.percentComplete }}%</span>
+                <span class="quality-badge" :class="getQualityClass(subSection.assessment.quality)">
+                  {{ subSection.assessment.quality }}
                 </span>
               </div>
-              <p class="issue-description">{{ issue.description }}</p>
-              <p class="issue-source">Source: {{ issue.source }}</p>
+            </div>
+            
+            <!-- Assessment Details -->
+            <div class="assessment-details">
+              <div class="assessment-grid">
+                <div class="assessment-item">
+                  <span class="label">Consistency:</span>
+                  <span class="value">{{ subSection.assessment.consistency }}</span>
+                </div>
+                <div class="assessment-item">
+                  <span class="label">Contradictions:</span>
+                  <span class="value">{{ subSection.assessment.contradictions }}</span>
+                </div>
+                <div class="assessment-item">
+                  <span class="label">Gaps:</span>
+                  <span class="value">{{ subSection.assessment.gaps }}</span>
+                </div>
+                <div class="assessment-item">
+                  <span class="label">Guideline:</span>
+                  <span class="value">{{ subSection.assessment.guidelineReference }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sub-section Observations -->
+            <div v-if="subSection.observations && subSection.observations.length > 0" class="sub-observations">
+              <h5>Observations ({{ subSection.observations.length }})</h5>
+              <div class="observations-list">
+                <div v-for="(observation, index) in subSection.observations" :key="index" class="observation-item">
+                  <div class="observation-header">
+                    <span class="observation-change" :class="{ 'changed': observation.changeDetected }">
+                      {{ observation.changeDetected ? 'Changed' : 'No Change' }}
+                    </span>
+                  </div>
+                  <p class="observation-text">{{ observation.note }}</p>
+                  <p class="observation-source">Source: {{ observation.source }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sub-section Decisions -->
+            <div v-if="subSection.decisions && subSection.decisions.length > 0" class="sub-decisions">
+              <h5>Decisions ({{ subSection.decisions.length }})</h5>
+              <div class="decisions-list">
+                <div v-for="(decision, index) in subSection.decisions" :key="index" class="decision-item">
+                  <div class="decision-header">
+                    <span class="decision-date">{{ formatDate(decision.date) }}</span>
+                  </div>
+                  <div class="decision-content">
+                    <div class="decision-original">
+                      <strong>Original:</strong> {{ decision.original }}
+                    </div>
+                    <div class="decision-revised">
+                      <strong>Revised:</strong> {{ decision.revised }}
+                    </div>
+                    <div class="decision-reason">
+                      <strong>Reason:</strong> {{ decision.reason }}
+                    </div>
+                  </div>
+                  <p class="decision-source">Source: {{ decision.source }}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="section">
-          <h3>Observations ({{ section.observations.length }})</h3>
-          <div class="observations-list">
-            <div v-for="observation in section.observations" :key="observation.id" class="observation-item">
-              <div class="observation-header">
-                <span class="observation-id">{{ observation.id }}</span>
-                <span class="observation-change" :class="{ 'changed': observation.changeOccurred }">
-                  {{ observation.changeOccurred ? 'Changed' : 'No Change' }}
-                </span>
-              </div>
-              <p class="observation-text">{{ observation.text }}</p>
-              <p class="observation-source">Source: {{ observation.source }}</p>
+      <!-- Main Section Issues -->
+      <div v-if="section.issues && section.issues.length > 0" class="section-issues">
+        <h3>Issues ({{ section.issues.length }})</h3>
+        <div class="issues-list">
+          <div v-for="issue in section.issues" :key="issue.id" class="issue-item">
+            <div class="issue-header">
+              <span class="issue-id">{{ issue.id }}</span>
+              <span class="issue-status" :class="getStatusClass(issue.status)">
+                {{ issue.status }}
+              </span>
             </div>
+            <p class="issue-description">{{ issue.description }}</p>
+            <p class="issue-source">Source: {{ issue.source }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Section Observations -->
+      <div v-if="section.observations && section.observations.length > 0" class="section-observations">
+        <h3>Observations ({{ section.observations.length }})</h3>
+        <div class="observations-list">
+          <div v-for="observation in section.observations" :key="observation.id" class="observation-item">
+            <div class="observation-header">
+              <span class="observation-id">{{ observation.id }}</span>
+              <span class="observation-change" :class="{ 'changed': observation.changeOccurred }">
+                {{ observation.changeOccurred ? 'Changed' : 'No Change' }}
+              </span>
+            </div>
+            <p class="observation-text">{{ observation.text }}</p>
+            <p class="observation-source">Source: {{ observation.source }}</p>
           </div>
         </div>
       </div>
@@ -74,6 +167,32 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import feasibilityData from '@/data/feasibility_scaffold_full.json'
+
+interface SubSection {
+  subSectionId: string
+  subSectionTitle: string
+  percentComplete: number
+  assessment: {
+    quality: string
+    consistency: string
+    contradictions: string
+    gaps: string
+    guidelineReference: string
+  }
+  observations: Array<{
+    note: string
+    source: string
+    changeDetected: boolean
+  }>
+  decisions: Array<{
+    date: string
+    original: string
+    revised: string
+    reason: string
+    source: string
+  }>
+}
 
 interface Section {
   sectionId: string
@@ -81,29 +200,37 @@ interface Section {
   percentComplete: number
   statusOfCompleteness: string
   qualityRating: string
-  issues: any[]
-  observations: any[]
+  issues: Array<{
+    id: string
+    description: string
+    status: string
+    source: string
+  }>
+  observations: Array<{
+    id: string
+    text: string
+    source: string
+    changeOccurred: boolean
+  }>
+  subSections?: SubSection[]
 }
 
 const route = useRoute()
 const section = ref<Section | null>(null)
 
 onMounted(() => {
-  // In a real app, you'd fetch the section data based on the route params
-  // For now, we'll simulate loading the section data
   const sectionId = route.params.sectionId as string
   console.log('Loading section:', sectionId)
 
-  // TODO: Fetch section data from API or store
-  // For now, we'll set a placeholder
-  section.value = {
-    sectionId: sectionId,
-    sectionName: `Section ${sectionId}`,
-    percentComplete: 75,
-    statusOfCompleteness: 'Mostly Complete',
-    qualityRating: 'High',
-    issues: [],
-    observations: []
+  // Load section data from the JSON file
+  const sections = feasibilityData.feasibilityStudyView.sections
+  const foundSection = sections.find(s => s.sectionId === sectionId)
+  
+  if (foundSection) {
+    section.value = foundSection
+    console.log('Loaded section:', foundSection)
+  } else {
+    console.error('Section not found:', sectionId)
   }
 })
 
@@ -128,11 +255,19 @@ const getStatusClass = (status: string) => {
       return 'status-resolved'
     case 'open':
       return 'status-open'
-    case 'in-progress':
+    case 'in progress':
       return 'status-in-progress'
     default:
       return 'status-unknown'
   }
+}
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
 }
 </script>
 
@@ -203,23 +338,22 @@ const getStatusClass = (status: string) => {
   border-radius: 6px;
 }
 
-.label {
+.summary-item .label {
   font-weight: 500;
-  color: #666;
+  color: #6b7280;
 }
 
-.value {
+.summary-item .value {
   font-weight: 600;
   color: #1a1a1a;
 }
 
 .quality-badge {
   padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 11px;
+  border-radius: 4px;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .quality-high {
@@ -244,46 +378,131 @@ const getStatusClass = (status: string) => {
 
 .quality-unknown {
   background: #f3f4f6;
-  color: #374151;
+  color: #6b7280;
 }
 
-.section-sections {
+/* Sub-sections */
+.sub-sections {
+  margin-bottom: 32px;
+}
+
+.sub-sections h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 16px;
+}
+
+.sub-sections-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 20px;
 }
 
-.section {
+.sub-section-card {
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  padding: 24px;
+  padding: 20px;
 }
 
-.section h3 {
-  margin: 0 0 16px 0;
-  font-size: 18px;
+.sub-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.sub-section-header h4 {
+  margin: 0;
+  font-size: 16px;
   font-weight: 600;
   color: #1a1a1a;
 }
 
+.sub-section-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.sub-section-meta .completion {
+  font-weight: 600;
+  color: #059669;
+}
+
+.assessment-details {
+  margin-bottom: 16px;
+}
+
+.assessment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.assessment-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.assessment-item .label {
+  color: #6b7280;
+}
+
+.assessment-item .value {
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.sub-observations,
+.sub-decisions {
+  margin-top: 16px;
+}
+
+.sub-observations h5,
+.sub-decisions h5 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+/* Issues and Observations */
+.section-issues,
+.section-observations {
+  margin-bottom: 32px;
+}
+
+.section-issues h3,
+.section-observations h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 16px;
+}
+
 .issues-list,
-.observations-list {
+.observations-list,
+.decisions-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .issue-item,
-.observation-item {
-  padding: 16px;
+.observation-item,
+.decision-item {
+  background: white;
   border: 1px solid #e5e7eb;
   border-radius: 6px;
-  background: #f9fafb;
+  padding: 16px;
 }
 
 .issue-header,
-.observation-header {
+.observation-header,
+.decision-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -293,15 +512,15 @@ const getStatusClass = (status: string) => {
 .issue-id,
 .observation-id {
   font-weight: 600;
-  color: #1a1a1a;
+  color: #059669;
   font-size: 14px;
 }
 
 .issue-status,
 .observation-change {
   padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 11px;
+  border-radius: 4px;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -323,32 +542,63 @@ const getStatusClass = (status: string) => {
 
 .status-unknown {
   background: #f3f4f6;
-  color: #374151;
+  color: #6b7280;
 }
 
 .observation-change.changed {
-  background: #fef3c7;
-  color: #92400e;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.observation-change:not(.changed) {
+  background: #dcfce7;
+  color: #166534;
 }
 
 .issue-description,
 .observation-text {
   margin: 8px 0;
-  color: #374151;
+  color: #1a1a1a;
   line-height: 1.5;
 }
 
 .issue-source,
-.observation-source {
+.observation-source,
+.decision-source {
   font-size: 12px;
-  color: #666;
+  color: #6b7280;
   margin: 0;
+}
+
+/* Decision specific styles */
+.decision-date {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.decision-content {
+  margin: 8px 0;
+}
+
+.decision-original,
+.decision-revised,
+.decision-reason {
+  margin: 4px 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.decision-original strong,
+.decision-revised strong,
+.decision-reason strong {
+  color: #374151;
 }
 
 .loading {
   text-align: center;
-  padding: 48px;
-  color: #666;
+  padding: 40px;
+  color: #6b7280;
 }
 
 /* Mobile responsive */
@@ -356,18 +606,22 @@ const getStatusClass = (status: string) => {
   .section-detail-view {
     padding: 16px;
   }
-
+  
   .detail-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-
-  .section-sections {
+  
+  .summary-grid {
     grid-template-columns: 1fr;
   }
-
-  .summary-grid {
+  
+  .sub-sections-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .assessment-grid {
     grid-template-columns: 1fr;
   }
 }
