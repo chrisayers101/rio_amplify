@@ -566,7 +566,21 @@
                     <strong>Cost Assumptions:</strong> {{ subSection.content.costAssumptions }}
                   </div>
                   <div v-if="subSection.content.sensitivityAnalysis" class="cost-item">
-                    <strong>Sensitivity Analysis:</strong> {{ subSection.content.sensitivityAnalysis }}
+                    <strong>Sensitivity Analysis:</strong>
+                    <div v-if="typeof subSection.content.sensitivityAnalysis === 'string'">
+                      {{ subSection.content.sensitivityAnalysis }}
+                    </div>
+                    <div v-else class="sensitivity-details">
+                      <div v-if="subSection.content.sensitivityAnalysis.bauxitePrice" class="sensitivity-item">
+                        <strong>Bauxite Price:</strong> {{ subSection.content.sensitivityAnalysis.bauxitePrice }}
+                      </div>
+                      <div v-if="subSection.content.sensitivityAnalysis.operatingCosts" class="sensitivity-item">
+                        <strong>Operating Costs:</strong> {{ subSection.content.sensitivityAnalysis.operatingCosts }}
+                      </div>
+                      <div v-if="subSection.content.sensitivityAnalysis.capitalCosts" class="sensitivity-item">
+                        <strong>Capital Costs:</strong> {{ subSection.content.sensitivityAnalysis.capitalCosts }}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -723,7 +737,11 @@ interface SubSection {
     costBreakdown?: Record<string, string>
     fundingStructure?: string
     costAssumptions?: string
-    sensitivityAnalysis?: string
+    sensitivityAnalysis?: string | {
+      bauxitePrice?: string
+      operatingCosts?: string
+      capitalCosts?: string
+    }
     financialMetrics?: Record<string, string>
     cashFlowProjection?: string
     marketAssumptions?: string
