@@ -15,11 +15,6 @@ import ScheduleView from '@/views/evaluation/ScheduleView.vue'
 
 import { useAuthStore } from '@/stores/authStore'
 
-async function isAuthenticated() {
-  const authStore = useAuthStore()
-  return await authStore.checkAuthState()
-}
-
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
@@ -110,15 +105,19 @@ router.beforeEach(async (to) => {
     return
   }
 
-  const authenticated = await isAuthenticated()
-
-  // If route requires auth and user not signed in, redirect to auth
-  if (to.meta.requiresAuth && !authenticated) {
-    return { name: 'Auth' }
+  const authStore = useAuthStore()
+  
+  // Use cached auth state first for faster navigation
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    // Only perform async check if cached state shows not authenticated
+    const authenticated = await authStore.checkAuthState()
+    if (!authenticated) {
+      return { name: 'Auth' }
+    }
   }
 
   // If user is authenticated and trying to access landing or auth, redirect to home
-  if (authenticated && (to.name === 'LandingPage' || to.name === 'Auth')) {
+  if (authStore.isAuthenticated && (to.name === 'LandingPage' || to.name === 'Auth')) {
     return { name: 'Home' }
   }
 })

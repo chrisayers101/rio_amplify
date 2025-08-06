@@ -14,6 +14,17 @@
         "percentComplete": 83,
         "statusOfCompleteness": "Mostly Complete",
         "qualityRating": "High",
+        "content": {
+          "executiveSummary": "The Amrun Bauxite Project represents a significant investment in Queensland's mining sector, with an estimated capital expenditure of AUD 1.9 billion. The project demonstrates strong economic viability with a projected internal rate of return (IRR) of 18.5% and a net present value (NPV) of AUD 2.3 billion at a 10% discount rate. The project is expected to generate approximately 1,200 direct jobs during construction and 600 permanent positions during operations.",
+          "keyRecommendations": [
+            "Proceed with project development following the recommended timeline",
+            "Implement comprehensive environmental management plans",
+            "Establish strong community engagement programs",
+            "Develop robust risk mitigation strategies"
+          ],
+          "economicHighlights": "The project shows strong financial metrics with a payback period of 6.2 years and positive cash flows throughout the 25-year mine life. Sensitivity analysis indicates the project remains viable under various market conditions.",
+          "riskAssessment": "Key risks include commodity price volatility, regulatory changes, and environmental compliance requirements. Mitigation strategies have been developed for each identified risk."
+        },
         "issues": [
           {
             "id": "01-I1",
@@ -35,6 +46,13 @@
             "subSectionId": "1.1",
             "subSectionTitle": "1.1 Executive summary",
             "percentComplete": 81,
+            "content": {
+              "overview": "The Amrun Bauxite Project is a world-class mining development located in the Cape York Peninsula of Queensland, Australia. The project aims to extract and process high-quality bauxite ore for export to global alumina refineries.",
+              "projectScope": "The project encompasses the development of an open-pit mine with an annual production capacity of 22.8 million tonnes of bauxite ore. The mine life is estimated at 25 years with potential for extension based on additional resource definition.",
+              "economicSummary": "Total capital expenditure is estimated at AUD 1,900 million, with operating costs of AUD 15.50 per tonne of bauxite. The project generates strong returns with an IRR of 18.5% and NPV of AUD 2.3 billion.",
+              "timeline": "Construction is planned to commence in Q2 2025 with first production expected in Q4 2026. Full production capacity will be achieved by Q2 2027.",
+              "stakeholderBenefits": "The project will create significant employment opportunities and contribute to regional economic development while maintaining high environmental and social standards."
+            },
             "assessment": {
               "quality": "High",
               "consistency": "High",
@@ -63,6 +81,21 @@
             "subSectionId": "1.2",
             "subSectionTitle": "1.2 Capital costs",
             "percentComplete": 94,
+            "content": {
+              "totalCapitalCost": "AUD 1,900 million",
+              "costBreakdown": {
+                "miningInfrastructure": "AUD 450 million (23.7%)",
+                "processingPlant": "AUD 380 million (20.0%)",
+                "infrastructure": "AUD 320 million (16.8%)",
+                "portFacilities": "AUD 280 million (14.7%)",
+                "environmental": "AUD 150 million (7.9%)",
+                "contingency": "AUD 190 million (10.0%)",
+                "workingCapital": "AUD 130 million (6.9%)"
+              },
+              "fundingStructure": "The project will be funded through a combination of equity (40%) and debt (60%). Debt financing will be sourced from a consortium of international banks.",
+              "costAssumptions": "All costs are based on 2024 price levels with appropriate escalation factors applied. Contingency has been set at 10% of base costs to account for potential variations.",
+              "sensitivityAnalysis": "Capital cost sensitivity analysis shows that a 10% increase in capital costs would reduce the IRR to 16.2% and NPV to AUD 1.9 billion."
+            },
             "assessment": {
               "quality": "Good",
               "consistency": "Moderate",
@@ -91,6 +124,22 @@
             "subSectionId": "1.3",
             "subSectionTitle": "1.3 Economic valuation",
             "percentComplete": 95,
+            "content": {
+              "financialMetrics": {
+                "irr": "18.5%",
+                "npv": "AUD 2.3 billion (10% discount rate)",
+                "paybackPeriod": "6.2 years",
+                "profitabilityIndex": "1.85"
+              },
+              "cashFlowProjection": "The project generates positive cash flows from year 3 onwards, with peak cash flow of AUD 450 million in year 8. Total cumulative cash flow over the mine life is AUD 8.2 billion.",
+              "sensitivityAnalysis": {
+                "bauxitePrice": "IRR ranges from 12.3% (-20% price) to 24.7% (+20% price)",
+                "operatingCosts": "IRR ranges from 20.1% (-10% costs) to 16.9% (+10% costs)",
+                "capitalCosts": "IRR ranges from 20.8% (-10% costs) to 16.2% (+10% costs)"
+              },
+              "marketAssumptions": "Bauxite price assumptions are based on long-term market projections with an average price of AUD 45 per tonne over the mine life.",
+              "economicConclusion": "The project demonstrates strong economic viability across all sensitivity scenarios and provides robust returns to shareholders while contributing to regional economic development."
+            },
             "assessment": {
               "quality": "High",
               "consistency": "Moderate",
@@ -123,6 +172,21 @@
         "percentComplete": 78,
         "statusOfCompleteness": "Mostly Complete",
         "qualityRating": "Moderate",
+        "content": {
+          "strategicOverview": "The Amrun Bauxite Project aligns with Rio Tinto's strategic objectives of maintaining a strong position in the global bauxite market while delivering sustainable value to stakeholders. The project supports the company's commitment to responsible mining practices and community development.",
+          "marketPositioning": "The project will establish Rio Tinto as a leading supplier of high-quality bauxite to the Asia-Pacific region, complementing existing operations and strengthening the company's global supply chain.",
+          "competitiveAdvantages": [
+            "High-quality bauxite ore with low impurities",
+            "Strategic location with access to major shipping routes",
+            "Established infrastructure and logistics capabilities",
+            "Strong environmental and social performance track record"
+          ],
+          "valueProposition": "The project delivers value through consistent, high-quality bauxite supply, competitive pricing, and reliable delivery to customers in the Asia-Pacific region. The strategic location provides logistical advantages and reduces transportation costs.",
+          "stakeholderEngagement": "Comprehensive stakeholder engagement programs will be implemented to ensure transparent communication and address community concerns. Regular consultation with Traditional Owners and local communities will be maintained throughout the project lifecycle.",
+          "sustainabilityStrategy": "The project incorporates Rio Tinto's sustainability framework, focusing on environmental protection, social responsibility, and economic development. Key initiatives include carbon reduction programs, biodiversity conservation, and community investment.",
+          "riskManagement": "A comprehensive risk management framework has been developed to identify, assess, and mitigate potential risks. Regular risk reviews will be conducted to ensure effective risk management throughout the project lifecycle.",
+          "performanceMetrics": "Key performance indicators include production targets, safety performance, environmental compliance, and community satisfaction. Regular monitoring and reporting will ensure transparency and accountability."
+        },
         "issues": [
           {
             "id": "02-I1",
@@ -147,6 +211,52 @@
         "percentComplete": 85,
         "statusOfCompleteness": "Mostly Complete",
         "qualityRating": "High",
+        "content": {
+          "marketOverview": "The global bauxite market is experiencing steady growth driven by increasing aluminum production, particularly in Asia. The market is characterized by strong demand from China, India, and other developing economies.",
+          "demandAnalysis": {
+            "globalDemand": "Global bauxite demand is projected to grow at 3.2% annually, reaching 450 million tonnes by 2030",
+            "regionalDemand": "Asia-Pacific accounts for 75% of global bauxite consumption, with China being the largest consumer",
+            "growthDrivers": "Urbanization, infrastructure development, and automotive industry growth are key demand drivers"
+          },
+          "supplyAnalysis": {
+            "globalSupply": "Global bauxite production is concentrated in Australia, Guinea, and Brazil",
+            "supplyConstraints": "Limited new supply coming online, with most existing mines operating at capacity",
+            "qualityFactors": "High-quality, low-impurity bauxite is increasingly sought after by alumina refineries"
+          },
+          "customerSegmentation": {
+            "primaryCustomers": "Large alumina refineries in Asia-Pacific region",
+            "secondaryCustomers": "Mid-sized refineries in Europe and Americas",
+            "customerRequirements": "Consistent quality, reliable supply, competitive pricing, and environmental compliance"
+          },
+          "pricingStrategy": {
+            "basePrice": "AUD 45 per tonne FOB (Free On Board)",
+            "qualityPremiums": "Premium pricing for low-impurity bauxite",
+            "volumeDiscounts": "Discounts for long-term contracts and large volumes",
+            "priceEscalation": "Annual price reviews linked to market indices"
+          },
+          "salesStrategy": {
+            "distributionChannels": "Direct sales to major customers, with some sales through trading partners",
+            "contractTerms": "Long-term supply agreements (5-10 years) with annual price reviews",
+            "customerService": "Dedicated customer service team and technical support",
+            "logistics": "Efficient port operations and shipping arrangements"
+          },
+          "competitiveAnalysis": {
+            "majorCompetitors": "Alcoa, Rusal, Norsk Hydro, and other major mining companies",
+            "competitivePosition": "Strong position based on quality, reliability, and strategic location",
+            "differentiation": "High-quality ore, environmental leadership, and community engagement"
+          },
+          "marketRisks": {
+            "demandRisks": "Economic slowdown in key markets, substitution by alternative materials",
+            "supplyRisks": "New supply coming online, changes in trade policies",
+            "priceRisks": "Commodity price volatility, currency fluctuations"
+          },
+          "marketingPlan": {
+            "targetMarkets": "Primary focus on Asia-Pacific alumina refineries",
+            "promotionalActivities": "Technical presentations, customer visits, industry conferences",
+            "brandPositioning": "Reliable, high-quality, sustainable bauxite supplier",
+            "customerRetention": "Long-term relationships, technical support, quality assurance"
+          }
+        },
         "issues": [],
         "observations": [
           {

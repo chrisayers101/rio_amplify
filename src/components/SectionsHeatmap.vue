@@ -165,23 +165,23 @@ const getShortName = (fullName: string) => {
 }
 
 .quality-high {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, #86efac, #4ade80);
 }
 
 .quality-good {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: linear-gradient(135deg, #fcd34d, #fbbf24);
 }
 
 .quality-moderate {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  background: linear-gradient(135deg, #c4b5fd, #a78bfa);
 }
 
 .quality-low {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: linear-gradient(135deg, #fca5a5, #f87171);
 }
 
 .quality-unknown {
-  background: linear-gradient(135deg, #6b7280, #4b5563);
+  background: linear-gradient(135deg, #d1d5db, #9ca3af);
 }
 
 .heatmap-grid {
@@ -199,7 +199,7 @@ const getShortName = (fullName: string) => {
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
-  color: white;
+  color: #1a1a1a;
 }
 
 .heatmap-cell::before {
@@ -228,7 +228,7 @@ const getShortName = (fullName: string) => {
 .section-id {
   font-size: 12px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(26, 26, 26, 0.8);
 }
 
 .progress-bar-container {
@@ -263,7 +263,7 @@ const getShortName = (fullName: string) => {
   font-weight: 700;
   color: #1a1a1a;
   z-index: 1;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
 }
 
 .cell-content {
@@ -273,7 +273,7 @@ const getShortName = (fullName: string) => {
 .section-name {
   font-size: 13px;
   font-weight: 600;
-  color: white;
+  color: #1a1a1a;
   line-height: 1.3;
   margin-bottom: 4px;
   display: -webkit-box;
@@ -284,7 +284,7 @@ const getShortName = (fullName: string) => {
 
 .status-text {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(26, 26, 26, 0.7);
   font-weight: 500;
 }
 
@@ -292,13 +292,13 @@ const getShortName = (fullName: string) => {
   display: flex;
   gap: 8px;
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(26, 26, 26, 0.7);
 }
 
 .issues-count,
 .observations-count {
   padding: 2px 6px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(26, 26, 26, 0.1);
   border-radius: 4px;
   font-weight: 500;
   backdrop-filter: blur(4px);
