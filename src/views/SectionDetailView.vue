@@ -57,7 +57,7 @@
                 </span>
               </div>
             </div>
-            
+
             <!-- Assessment Details -->
             <div class="assessment-details">
               <div class="assessment-grid">
@@ -225,7 +225,7 @@ onMounted(() => {
   // Load section data from the JSON file
   const sections = feasibilityData.feasibilityStudyView.sections
   const foundSection = sections.find(s => s.sectionId === sectionId)
-  
+
   if (foundSection) {
     section.value = foundSection
     console.log('Loaded section:', foundSection)
@@ -367,8 +367,8 @@ const formatDate = (dateString: string) => {
 }
 
 .quality-moderate {
-  background: #fef3c7;
-  color: #92400e;
+  background: #ede9fe;
+  color: #5b21b6;
 }
 
 .quality-low {
@@ -606,21 +606,21 @@ const formatDate = (dateString: string) => {
   .section-detail-view {
     padding: 16px;
   }
-  
+
   .detail-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .summary-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .sub-sections-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .assessment-grid {
     grid-template-columns: 1fr;
   }

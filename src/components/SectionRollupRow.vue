@@ -194,8 +194,8 @@ const getQualityClass = (quality: string) => {
 }
 
 .quality-moderate {
-  background: #fef3c7;
-  color: #92400e;
+  background: #ede9fe;
+  color: #5b21b6;
 }
 
 .quality-low {

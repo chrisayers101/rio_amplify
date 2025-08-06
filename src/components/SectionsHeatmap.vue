@@ -173,7 +173,7 @@ const getShortName = (fullName: string) => {
 }
 
 .quality-moderate {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
 }
 
 .quality-low {

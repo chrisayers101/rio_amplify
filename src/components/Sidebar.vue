@@ -118,18 +118,18 @@ const navItems = [
         route: '/evaluation/technical',
         subLabel: 'Technical requirements assessment'
       },
-      {
-        icon: CircleStackIcon,
-        label: 'Asset Management and Lifecycle Costs',
-        route: '/evaluation/asset',
-        subLabel: 'Asset lifecycle cost analysis'
-      },
-      {
-        icon: CalendarIcon,
-        label: 'Schedule',
-        route: '/evaluation/schedule',
-        subLabel: 'Schedule and timeline evaluation'
-      }
+    //   {
+    //     icon: CircleStackIcon,
+    //     label: 'Asset Management and Lifecycle Costs',
+    //     route: '/evaluation/asset',
+    //     subLabel: 'Asset lifecycle cost analysis'
+    //   },
+    //   {
+    //     icon: CalendarIcon,
+    //     label: 'Schedule',
+    //     route: '/evaluation/schedule',
+    //     subLabel: 'Schedule and timeline evaluation'
+    //   }
     ]
   }
 ]

@@ -122,7 +122,7 @@
         "sectionName": "02 - Business Strategy",
         "percentComplete": 78,
         "statusOfCompleteness": "Mostly Complete",
-        "qualityRating": "Good",
+        "qualityRating": "Moderate",
         "issues": [
           {
             "id": "02-I1",
@@ -180,7 +180,7 @@
         "sectionName": "05 - Security",
         "percentComplete": 76,
         "statusOfCompleteness": "Mostly Complete",
-        "qualityRating": "Good",
+        "qualityRating": "Low",
         "issues": [
           {
             "id": "05-I1",
@@ -221,7 +221,7 @@
         "sectionName": "07 - Communities and Social Performance (CSP)",
         "percentComplete": 82,
         "statusOfCompleteness": "Mostly Complete",
-        "qualityRating": "Good",
+        "qualityRating": "Moderate",
         "issues": [
           {
             "id": "07-I1",
@@ -337,7 +337,7 @@
         "sectionName": "13 - Energy and Climate Change",
         "percentComplete": 81,
         "statusOfCompleteness": "Mostly Complete",
-        "qualityRating": "Good",
+        "qualityRating": "Moderate",
         "issues": [
           {
             "id": "13-I1",
@@ -518,7 +518,7 @@
         "sectionName": "22 - New Technologies",
         "percentComplete": 77,
         "statusOfCompleteness": "Mostly Complete",
-        "qualityRating": "Good",
+        "qualityRating": "Low",
         "issues": [
           {
             "id": "22-I1",
@@ -600,7 +600,7 @@
         "sectionName": "26 - Closure",
         "percentComplete": 78,
         "statusOfCompleteness": "Mostly Complete",
-        "qualityRating": "Good",
+        "qualityRating": "Moderate",
         "issues": [
           {
             "id": "26-I1",
@@ -675,7 +675,7 @@
         "sectionName": "30 - Next Study Stage Execution Planning",
         "percentComplete": 75,
         "statusOfCompleteness": "Mostly Complete",
-        "qualityRating": "Good",
+        "qualityRating": "Low",
         "issues": [
           {
             "id": "30-I1",
