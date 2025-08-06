@@ -5,6 +5,9 @@
         ← Back to Overview
       </button>
       <h1>{{ section?.sectionName }}</h1>
+      <button v-if="section" @click="downloadSectionReport" class="download-section-btn">
+        📄 Download Section (Word)
+      </button>
     </div>
 
     <div v-if="section" class="detail-content">
@@ -697,6 +700,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import feasibilityData from '@/data/feasibility_scaffold_full.json'
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx'
 
 interface SubSection {
   subSectionId: string
@@ -872,6 +876,344 @@ const formatDate = (dateString: string) => {
     day: 'numeric'
   })
 }
+
+const downloadSectionReport = async () => {
+  if (!section.value) return
+
+  try {
+    const doc = new Document({
+      sections: [
+        {
+          properties: {},
+          children: [
+            // Title
+            new Paragraph({
+              text: section.value.sectionName,
+              heading: HeadingLevel.TITLE,
+              alignment: AlignmentType.CENTER
+            }),
+            new Paragraph({
+              text: `Generated on ${new Date().toLocaleDateString()}`,
+              alignment: AlignmentType.CENTER
+            }),
+            new Paragraph({ text: '' }), // Spacing
+
+            // Section Summary
+            new Paragraph({
+              text: 'Section Summary',
+              heading: HeadingLevel.HEADING_1
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({ text: 'Completion: ', bold: true }),
+                new TextRun({ text: `${section.value.percentComplete}%` })
+              ]
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({ text: 'Status: ', bold: true }),
+                new TextRun({ text: section.value.statusOfCompleteness })
+              ]
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({ text: 'Quality: ', bold: true }),
+                new TextRun({ text: section.value.qualityRating })
+              ]
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({ text: 'Issues: ', bold: true }),
+                new TextRun({ text: section.value.issues.length.toString() })
+              ]
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({ text: 'Observations: ', bold: true }),
+                new TextRun({ text: section.value.observations.length.toString() })
+              ]
+            }),
+            new Paragraph({ text: '' }), // Spacing
+
+            // Section Content
+            ...(section.value.content ? [
+              new Paragraph({
+                text: 'Section Content',
+                heading: HeadingLevel.HEADING_1
+              }),
+              ...(section.value.content.executiveSummary ? [
+                new Paragraph({
+                  text: 'Executive Summary',
+                  heading: HeadingLevel.HEADING_2
+                }),
+                new Paragraph({
+                  text: section.value.content.executiveSummary,
+                  alignment: AlignmentType.JUSTIFIED
+                })
+              ] : []),
+              ...(section.value.content.keyRecommendations ? [
+                new Paragraph({
+                  text: 'Key Recommendations',
+                  heading: HeadingLevel.HEADING_2
+                }),
+                ...section.value.content.keyRecommendations.map(rec =>
+                  new Paragraph({
+                    text: `• ${rec}`,
+                    alignment: AlignmentType.LEFT
+                  })
+                )
+              ] : []),
+              ...(section.value.content.economicHighlights ? [
+                new Paragraph({
+                  text: 'Economic Highlights',
+                  heading: HeadingLevel.HEADING_2
+                }),
+                new Paragraph({
+                  text: section.value.content.economicHighlights,
+                  alignment: AlignmentType.JUSTIFIED
+                })
+              ] : []),
+              ...(section.value.content.riskAssessment ? [
+                new Paragraph({
+                  text: 'Risk Assessment',
+                  heading: HeadingLevel.HEADING_2
+                }),
+                new Paragraph({
+                  text: section.value.content.riskAssessment,
+                  alignment: AlignmentType.JUSTIFIED
+                })
+              ] : []),
+              ...(section.value.content.strategicOverview ? [
+                new Paragraph({
+                  text: 'Strategic Overview',
+                  heading: HeadingLevel.HEADING_2
+                }),
+                new Paragraph({
+                  text: section.value.content.strategicOverview,
+                  alignment: AlignmentType.JUSTIFIED
+                })
+              ] : []),
+              ...(section.value.content.marketPositioning ? [
+                new Paragraph({
+                  text: 'Market Positioning',
+                  heading: HeadingLevel.HEADING_2
+                }),
+                new Paragraph({
+                  text: section.value.content.marketPositioning,
+                  alignment: AlignmentType.JUSTIFIED
+                })
+              ] : []),
+              ...(section.value.content.valueProposition ? [
+                new Paragraph({
+                  text: 'Value Proposition',
+                  heading: HeadingLevel.HEADING_2
+                }),
+                new Paragraph({
+                  text: section.value.content.valueProposition,
+                  alignment: AlignmentType.JUSTIFIED
+                })
+              ] : []),
+              ...(section.value.content.stakeholderEngagement ? [
+                new Paragraph({
+                  text: 'Stakeholder Engagement',
+                  heading: HeadingLevel.HEADING_2
+                }),
+                new Paragraph({
+                  text: section.value.content.stakeholderEngagement,
+                  alignment: AlignmentType.JUSTIFIED
+                })
+              ] : []),
+              ...(section.value.content.sustainabilityStrategy ? [
+                new Paragraph({
+                  text: 'Sustainability Strategy',
+                  heading: HeadingLevel.HEADING_2
+                }),
+                new Paragraph({
+                  text: section.value.content.sustainabilityStrategy,
+                  alignment: AlignmentType.JUSTIFIED
+                })
+              ] : []),
+              ...(section.value.content.riskManagement ? [
+                new Paragraph({
+                  text: 'Risk Management',
+                  heading: HeadingLevel.HEADING_2
+                }),
+                new Paragraph({
+                  text: section.value.content.riskManagement,
+                  alignment: AlignmentType.JUSTIFIED
+                })
+              ] : []),
+              ...(section.value.content.performanceMetrics ? [
+                new Paragraph({
+                  text: 'Performance Metrics',
+                  heading: HeadingLevel.HEADING_2
+                }),
+                new Paragraph({
+                  text: section.value.content.performanceMetrics,
+                  alignment: AlignmentType.JUSTIFIED
+                })
+              ] : []),
+              ...(section.value.content.marketOverview ? [
+                new Paragraph({
+                  text: 'Market Overview',
+                  heading: HeadingLevel.HEADING_2
+                }),
+                new Paragraph({
+                  text: section.value.content.marketOverview,
+                  alignment: AlignmentType.JUSTIFIED
+                })
+              ] : []),
+            ] : []),
+
+            // Sub-sections
+            ...(section.value.subSections && section.value.subSections.length > 0 ? [
+              new Paragraph({
+                text: 'Sub-sections',
+                heading: HeadingLevel.HEADING_1
+              }),
+              ...section.value.subSections.map(subSection => [
+                new Paragraph({
+                  text: subSection.subSectionTitle,
+                  heading: HeadingLevel.HEADING_2
+                }),
+                new Paragraph({
+                  children: [
+                    new TextRun({ text: 'Completion: ', bold: true }),
+                    new TextRun({ text: `${subSection.percentComplete}%` })
+                  ]
+                }),
+                new Paragraph({
+                  children: [
+                    new TextRun({ text: 'Quality: ', bold: true }),
+                    new TextRun({ text: subSection.assessment.quality })
+                  ]
+                }),
+                ...(subSection.content?.overview ? [
+                  new Paragraph({
+                    text: 'Overview',
+                    heading: HeadingLevel.HEADING_3
+                  }),
+                  new Paragraph({
+                    text: subSection.content.overview,
+                    alignment: AlignmentType.JUSTIFIED
+                  })
+                ] : []),
+                ...(subSection.content?.projectScope ? [
+                  new Paragraph({
+                    text: 'Project Scope',
+                    heading: HeadingLevel.HEADING_3
+                  }),
+                  new Paragraph({
+                    text: subSection.content.projectScope,
+                    alignment: AlignmentType.JUSTIFIED
+                  })
+                ] : []),
+                ...(subSection.content?.economicSummary ? [
+                  new Paragraph({
+                    text: 'Economic Summary',
+                    heading: HeadingLevel.HEADING_3
+                  }),
+                  new Paragraph({
+                    text: subSection.content.economicSummary,
+                    alignment: AlignmentType.JUSTIFIED
+                  })
+                ] : []),
+                ...(subSection.content?.timeline ? [
+                  new Paragraph({
+                    text: 'Timeline',
+                    heading: HeadingLevel.HEADING_3
+                  }),
+                  new Paragraph({
+                    text: subSection.content.timeline,
+                    alignment: AlignmentType.JUSTIFIED
+                  })
+                ] : []),
+                ...(subSection.content?.stakeholderBenefits ? [
+                  new Paragraph({
+                    text: 'Stakeholder Benefits',
+                    heading: HeadingLevel.HEADING_3
+                  }),
+                  new Paragraph({
+                    text: subSection.content.stakeholderBenefits,
+                    alignment: AlignmentType.JUSTIFIED
+                  })
+                ] : []),
+                new Paragraph({ text: '' }), // Spacing between sub-sections
+              ]).flat()
+            ] : []),
+
+            // Issues
+            ...(section.value.issues && section.value.issues.length > 0 ? [
+              new Paragraph({
+                text: 'Issues',
+                heading: HeadingLevel.HEADING_1
+              }),
+              ...section.value.issues.map(issue => [
+                new Paragraph({
+                  children: [
+                    new TextRun({ text: `${issue.id}: `, bold: true }),
+                    new TextRun({ text: issue.status })
+                  ]
+                }),
+                new Paragraph({
+                  text: issue.description,
+                  alignment: AlignmentType.JUSTIFIED
+                }),
+                new Paragraph({
+                  children: [
+                    new TextRun({ text: 'Source: ', bold: true }),
+                    new TextRun({ text: issue.source })
+                  ]
+                }),
+                new Paragraph({ text: '' }), // Spacing between issues
+              ]).flat()
+            ] : []),
+
+            // Observations
+            ...(section.value.observations && section.value.observations.length > 0 ? [
+              new Paragraph({
+                text: 'Observations',
+                heading: HeadingLevel.HEADING_1
+              }),
+              ...section.value.observations.map(observation => [
+                new Paragraph({
+                  children: [
+                    new TextRun({ text: `${observation.id}: `, bold: true }),
+                    new TextRun({ text: observation.changeOccurred ? 'Changed' : 'No Change' })
+                  ]
+                }),
+                new Paragraph({
+                  text: observation.text,
+                  alignment: AlignmentType.JUSTIFIED
+                }),
+                new Paragraph({
+                  children: [
+                    new TextRun({ text: 'Source: ', bold: true }),
+                    new TextRun({ text: observation.source })
+                  ]
+                }),
+                new Paragraph({ text: '' }), // Spacing between observations
+              ]).flat()
+            ] : [])
+          ]
+        }
+      ]
+    })
+
+    const blob = await Packer.toBlob(doc)
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${section.value.sectionName.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.docx`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+  } catch (error) {
+    console.error('Error generating Word document:', error)
+    alert('Error generating Word document. Please try again.')
+  }
+}
 </script>
 
 <style scoped>
@@ -906,6 +1248,29 @@ const formatDate = (dateString: string) => {
   font-weight: 700;
   color: #1a1a1a;
   margin: 0;
+}
+
+.download-section-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-left: auto;
+}
+
+.download-section-btn:hover {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.download-section-btn:active {
+  transform: translateY(0);
 }
 
 .section-summary {

@@ -16,6 +16,13 @@
         </div>
       </div>
 
+
+            <!-- Download Section -->
+      <div class="download-section">
+        <button @click="downloadFullReport" class="download-btn">
+          📄 Download Full Report
+        </button>
+      </div>
       <!-- Summary Bar -->
       <div class="summary-bar">
         <div class="summary-item">
@@ -35,6 +42,8 @@
           <span class="summary-value">{{ totalObservations }}</span>
         </div>
       </div>
+
+
 
       <!-- Sections Heatmap -->
       <SectionsHeatmap
@@ -92,6 +101,7 @@ import { useRouter } from 'vue-router'
 import SectionRollupRow from '@/components/SectionRollupRow.vue'
 import SectionsHeatmap from '@/components/SectionsHeatmap.vue'
 import feasibilityData from '@/data/feasibility_scaffold_full.json'
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx'
 
 const router = useRouter()
 
@@ -162,6 +172,179 @@ const formatDate = (dateString: string) => {
     month: 'long',
     day: 'numeric'
   })
+}
+
+const downloadFullReport = async () => {
+  try {
+    const doc = new Document({
+      sections: [
+        {
+          properties: {},
+          children: [
+            // Title Page
+            new Paragraph({
+              text: 'Amrun Bauxite Project - Feasibility Study Report',
+              heading: HeadingLevel.TITLE,
+              alignment: AlignmentType.CENTER
+            }),
+            new Paragraph({
+              text: `Generated on ${new Date().toLocaleDateString()}`,
+              alignment: AlignmentType.CENTER
+            }),
+            new Paragraph({ text: '' }), // Spacing
+
+            // Project Metadata
+            new Paragraph({
+              text: 'Project Information',
+              heading: HeadingLevel.HEADING_1
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({ text: 'Project: ', bold: true }),
+                new TextRun({ text: projectMetadata.name })
+              ]
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({ text: 'Location: ', bold: true }),
+                new TextRun({ text: projectMetadata.location })
+              ]
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({ text: 'Status: ', bold: true }),
+                new TextRun({ text: projectMetadata.status })
+              ]
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({ text: 'Last Updated: ', bold: true }),
+                new TextRun({ text: formatDate(projectMetadata.lastUpdated) })
+              ]
+            }),
+            new Paragraph({ text: '' }), // Spacing
+
+            // Executive Summary
+            new Paragraph({
+              text: 'Executive Summary',
+              heading: HeadingLevel.HEADING_1
+            }),
+            new Paragraph({
+              text: 'This feasibility study report provides a comprehensive assessment of the Amrun Bauxite Project, including economic analysis, market assessment, and strategic recommendations.',
+              alignment: AlignmentType.JUSTIFIED
+            }),
+            new Paragraph({ text: '' }), // Spacing
+
+            // Sections Overview
+            new Paragraph({
+              text: 'Sections Overview',
+              heading: HeadingLevel.HEADING_1
+            }),
+            new Paragraph({
+              text: `Total Sections: ${sections.length}`,
+              alignment: AlignmentType.LEFT
+            }),
+            new Paragraph({
+              text: `Average Completion: ${averageCompletion.value}%`,
+              alignment: AlignmentType.LEFT
+            }),
+            new Paragraph({
+              text: `Total Issues: ${totalIssues.value}`,
+              alignment: AlignmentType.LEFT
+            }),
+            new Paragraph({
+              text: `Total Observations: ${totalObservations.value}`,
+              alignment: AlignmentType.LEFT
+            }),
+            new Paragraph({ text: '' }), // Spacing
+
+            // Individual Sections
+            ...sections.map(section => [
+              new Paragraph({
+                text: section.sectionName,
+                heading: HeadingLevel.HEADING_2
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({ text: 'Completion: ', bold: true }),
+                  new TextRun({ text: `${section.percentComplete}%` })
+                ]
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({ text: 'Status: ', bold: true }),
+                  new TextRun({ text: section.statusOfCompleteness })
+                ]
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({ text: 'Quality: ', bold: true }),
+                  new TextRun({ text: section.qualityRating })
+                ]
+              }),
+              // Add section content if available
+              ...(section.content?.executiveSummary ? [
+                new Paragraph({
+                  text: 'Executive Summary',
+                  heading: HeadingLevel.HEADING_3
+                }),
+                new Paragraph({
+                  text: section.content.executiveSummary,
+                  alignment: AlignmentType.JUSTIFIED
+                })
+              ] : []),
+              ...(section.content?.keyRecommendations ? [
+                new Paragraph({
+                  text: 'Key Recommendations',
+                  heading: HeadingLevel.HEADING_3
+                }),
+                ...section.content.keyRecommendations.map(rec =>
+                  new Paragraph({
+                    text: `• ${rec}`,
+                    alignment: AlignmentType.LEFT
+                  })
+                )
+              ] : []),
+              ...(section.content?.economicHighlights ? [
+                new Paragraph({
+                  text: 'Economic Highlights',
+                  heading: HeadingLevel.HEADING_3
+                }),
+                new Paragraph({
+                  text: section.content.economicHighlights,
+                  alignment: AlignmentType.JUSTIFIED
+                })
+              ] : []),
+              ...(section.content?.riskAssessment ? [
+                new Paragraph({
+                  text: 'Risk Assessment',
+                  heading: HeadingLevel.HEADING_3
+                }),
+                new Paragraph({
+                  text: section.content.riskAssessment,
+                  alignment: AlignmentType.JUSTIFIED
+                })
+              ] : []),
+              new Paragraph({ text: '' }), // Spacing between sections
+            ]).flat()
+          ]
+        }
+      ]
+    })
+
+    const blob = await Packer.toBlob(doc)
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `Amrun_Feasibility_Study_Report_${new Date().toISOString().split('T')[0]}.docx`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+  } catch (error) {
+    console.error('Error generating Word document:', error)
+    alert('Error generating Word document. Please try again.')
+  }
 }
 </script>
 
@@ -268,6 +451,38 @@ const formatDate = (dateString: string) => {
   font-size: 24px;
   font-weight: 700;
   color: #1a1a1a;
+}
+
+.download-section {
+  display: flex;
+  justify-content: center;
+  margin: 24px 0;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.download-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.download-btn:hover {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.download-btn:active {
+  transform: translateY(0);
 }
 
 /* Sections Container */
