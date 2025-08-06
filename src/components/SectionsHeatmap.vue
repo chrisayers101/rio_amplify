@@ -165,23 +165,23 @@ const getShortName = (fullName: string) => {
 }
 
 .quality-high {
-  background: linear-gradient(135deg, #86efac, #4ade80);
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
 }
 
 .quality-good {
-  background: linear-gradient(135deg, #fcd34d, #fbbf24);
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
 }
 
 .quality-moderate {
-  background: linear-gradient(135deg, #c4b5fd, #a78bfa);
+  background: linear-gradient(135deg, #e9d5ff, #d8b4fe);
 }
 
 .quality-low {
-  background: linear-gradient(135deg, #fca5a5, #f87171);
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
 }
 
 .quality-unknown {
-  background: linear-gradient(135deg, #d1d5db, #9ca3af);
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
 }
 
 .heatmap-grid {
