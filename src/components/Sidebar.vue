@@ -65,7 +65,18 @@ import {
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  DocumentTextIcon
+  DocumentTextIcon,
+  EyeIcon,
+  QuestionMarkCircleIcon,
+  UserGroupIcon,
+  CheckCircleIcon,
+  MagnifyingGlassIcon,
+  DocumentChartBarIcon,
+  WrenchScrewdriverIcon,
+  UserIcon,
+  ClipboardDocumentCheckIcon,
+  PresentationChartLineIcon,
+  DocumentMagnifyingGlassIcon
 } from '@heroicons/vue/24/outline'
 
 const route = useRoute()
@@ -94,6 +105,94 @@ const navItems = [
     label: 'Feasibility Study Report',
     route: '/feasibility-study',
     subLabel: 'Creation & assessment'
+  },
+  {
+    icon: EyeIcon,
+    label: 'Show Me',
+    subLabel: 'Product Group -> Project -> Report Type',
+    children: [
+      {
+        icon: DocumentChartBarIcon,
+        label: 'Summary',
+        route: '/show-me/summary',
+        subLabel: 'Project summary overview'
+      },
+      {
+        icon: ChartBarIcon,
+        label: 'Metrics',
+        route: '/show-me/metrics',
+        subLabel: 'Key performance metrics'
+      }
+    ]
+  },
+  {
+    icon: QuestionMarkCircleIcon,
+    label: 'Help Me',
+    subLabel: 'Gap Assessment',
+    children: [
+      {
+        icon: MagnifyingGlassIcon,
+        label: 'Gap Assessment',
+        route: '/help-me/gap-assessment',
+        subLabel: 'Identify project gaps'
+      },
+      {
+        icon: DocumentChartBarIcon,
+        label: 'Compare projects',
+        route: '/help-me/compare-projects',
+        subLabel: 'Project comparison analysis'
+      },
+      {
+        icon: WrenchScrewdriverIcon,
+        label: 'Create workplan',
+        route: '/help-me/create-workplan',
+        subLabel: 'Generate project workplan'
+      }
+    ]
+  },
+  {
+    icon: UserGroupIcon,
+    label: 'Project Team',
+    subLabel: 'Team collaboration',
+    children: [
+      {
+        icon: UserIcon,
+        label: 'Talk to a VSME',
+        route: '/project-team/talk-to-vsme',
+        subLabel: 'Connect with VSME expert'
+      },
+      {
+        icon: ClipboardDocumentCheckIcon,
+        label: 'Assign tasks',
+        route: '/project-team/assign-tasks',
+        subLabel: 'Task assignment and tracking'
+      }
+    ]
+  },
+  {
+    icon: CheckCircleIcon,
+    label: 'Results',
+    subLabel: 'Assurance checks',
+    children: [
+      {
+        icon: ClipboardDocumentCheckIcon,
+        label: 'Assurance checks',
+        route: '/results/assurance-checks',
+        subLabel: 'Quality assurance verification'
+      },
+      {
+        icon: PresentationChartLineIcon,
+        label: 'Stakeholder stress test',
+        route: '/results/stakeholder-stress-test',
+        subLabel: 'Stakeholder impact analysis'
+      },
+      {
+        icon: DocumentMagnifyingGlassIcon,
+        label: 'Report out',
+        route: '/results/report-out',
+        subLabel: 'Final reporting and delivery'
+      }
+    ]
   },
   {
     icon: ClipboardDocumentListIcon,
