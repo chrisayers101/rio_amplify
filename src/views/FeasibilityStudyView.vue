@@ -23,23 +23,87 @@
           📄 Download Full Report
         </button>
       </div>
-      <!-- Summary Bar -->
+
+            <!-- Summary Bar -->
       <div class="summary-bar">
         <div class="summary-item">
-          <span class="summary-label">Total Sections</span>
-          <span class="summary-value">{{ sections.length }}</span>
+          <div class="summary-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10,9 9,9 8,9"/>
+            </svg>
+          </div>
+          <div class="summary-content">
+            <span class="summary-label">Total Sections</span>
+            <span class="summary-value">{{ sections.length }}</span>
+            <div class="metric-tag">
+              <span class="tag-text">Active</span>
+            </div>
+          </div>
         </div>
+
         <div class="summary-item">
-          <span class="summary-label">Average Completion</span>
-          <span class="summary-value">{{ averageCompletion }}%</span>
+          <div class="summary-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 20V10"/>
+              <path d="M12 20V4"/>
+              <path d="M6 20v-6"/>
+            </svg>
+          </div>
+          <div class="summary-content">
+            <span class="summary-label">Average Completion</span>
+            <span class="summary-value">{{ averageCompletion }}%</span>
+            <div class="completion-bar">
+              <div class="bar-fill" :style="{ width: `${averageCompletion}%` }"></div>
+            </div>
+            <span class="completion-status" :class="getCompletionStatus(averageCompletion)">
+              {{ getCompletionText(averageCompletion) }}
+            </span>
+          </div>
         </div>
+
         <div class="summary-item">
-          <span class="summary-label">Total Issues</span>
-          <span class="summary-value">{{ totalIssues }}</span>
+          <div class="summary-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <div class="summary-content">
+            <span class="summary-label">Total Issues</span>
+            <span class="summary-value">{{ totalIssues }}</span>
+            <div class="issues-breakdown">
+              <div class="issue-type">
+                <span class="issue-dot resolved"></span>
+                <span class="issue-count">{{ getResolvedIssues() }}</span>
+              </div>
+              <div class="issue-type">
+                <span class="issue-dot open"></span>
+                <span class="issue-count">{{ getOpenIssues() }}</span>
+              </div>
+            </div>
+          </div>
         </div>
+
         <div class="summary-item">
-          <span class="summary-label">Total Observations</span>
-          <span class="summary-value">{{ totalObservations }}</span>
+          <div class="summary-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+          </div>
+          <div class="summary-content">
+            <span class="summary-label">Total Observations</span>
+            <span class="summary-value">{{ totalObservations }}</span>
+            <div class="observations-chart">
+              <div class="chart-bar" :style="{ height: `${getObservationsPercentage()}%` }"></div>
+              <span class="chart-label">Recent</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -172,6 +236,37 @@ const formatDate = (dateString: string) => {
     month: 'long',
     day: 'numeric'
   })
+}
+
+const getCompletionStatus = (percentage: number) => {
+  if (percentage >= 90) return 'excellent'
+  if (percentage >= 80) return 'good'
+  if (percentage >= 70) return 'moderate'
+  return 'needs-improvement'
+}
+
+const getCompletionText = (percentage: number) => {
+  if (percentage >= 90) return 'Excellent'
+  if (percentage >= 80) return 'Good Progress'
+  if (percentage >= 70) return 'Moderate'
+  return 'Needs Attention'
+}
+
+const getResolvedIssues = () => {
+  return sections.reduce((count, section) =>
+    count + section.issues.filter(issue => issue.status === 'Resolved').length, 0
+  )
+}
+
+const getOpenIssues = () => {
+  return sections.reduce((count, section) =>
+    count + section.issues.filter(issue => issue.status === 'Open').length, 0
+  )
+}
+
+const getObservationsPercentage = () => {
+  // Mock percentage for visual effect
+  return Math.min(100, (totalObservations.value / 50) * 100)
 }
 
 const downloadFullReport = async () => {
@@ -434,10 +529,158 @@ const downloadFullReport = async () => {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 16px;
+  padding: 20px;
   background: white;
-  border-radius: 8px;
+  border-radius: 12px;
   border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.summary-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  color: #475569;
+}
+
+.summary-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.summary-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.metric-tag {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.tag-text {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.completion-bar {
+  width: 100%;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.completion-status {
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.completion-status.excellent {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.completion-status.good {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.completion-status.moderate {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.completion-status.needs-improvement {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.issues-breakdown {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.issue-type {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.issue-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.issue-dot.resolved {
+  background: #10b981;
+}
+
+.issue-dot.open {
+  background: #f59e0b;
+}
+
+.issue-count {
+  font-weight: 600;
+}
+
+.observations-chart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 8px;
+  height: 30px;
+  position: relative;
+}
+
+.chart-bar {
+  width: 20px;
+  background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+  border-radius: 2px;
+  transition: height 0.3s ease;
+}
+
+.chart-label {
+  font-size: 10px;
+  color: #6b7280;
+  margin-top: 2px;
 }
 
 .summary-label {
