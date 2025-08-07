@@ -7,6 +7,7 @@ import ConversationPanel from '@/components/Conversation.vue'
 import ToggleConversationButton from '@/components/ToggleConversationButton.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useSidebarStore } from '@/stores/sidebarStore'
+import { useViewStore } from '@/stores/viewStore'
 import { ViewportHandler } from '@/utils/viewport'
 import './assets/main.css'
 import './assets/mobile-optimizations.css'
@@ -14,6 +15,7 @@ import './assets/mobile-optimizations.css'
 const route = useRoute()
 const authStore = useAuthStore()
 const sidebarStore = useSidebarStore()
+const viewStore = useViewStore()
 const conversationOpen = ref(false)
 let viewportHandler: ViewportHandler | null = null
 
@@ -40,15 +42,17 @@ onUnmounted(() => {
   }
 })
 
-// Show sidebar on authenticated routes (not on auth page)
+// Show sidebar on authenticated routes (not on auth page or workbench)
 const showSidebar = computed(() => {
-  return route.path !== '/auth' && authStore.isAuthenticated
+  return route.path !== '/auth' && route.path !== '/workbench' && authStore.isAuthenticated
 })
+
+// Show conversation panel only when sidebar is shown
 const showConversationPanel = computed(() => showSidebar.value && conversationOpen.value)
 
 // Compute main content margin based on sidebar state
 const mainContentMargin = computed(() => {
-  if (!showSidebar.value) return '0'
+  if (!showSidebar.value || route.path === '/workbench') return '0'
   return sidebarStore.collapsed ? '72px' : '260px'
 })
 
@@ -59,7 +63,7 @@ function toggleConversation() {
 
 <template>
   <div id="app">
-    <TopNavigation v-if="showSidebar" />
+    <TopNavigation v-if="route.path !== '/auth' && authStore.isAuthenticated" />
     <Sidebar v-if="showSidebar" />
     <main class="main-content" v-if="showSidebar" :style="{ marginLeft: mainContentMargin }">
       <router-view />

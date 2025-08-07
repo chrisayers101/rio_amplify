@@ -4,6 +4,28 @@
       <img :src="RioLogo" alt="Rio Tinto" class="logo" />
     </div>
     <div class="top-nav-center">
+      <!-- View Toggle Buttons -->
+      <div class="view-toggle-container">
+        <button
+          class="view-btn"
+          :class="{ active: viewStore.isDashboard() }"
+          @click="switchToDashboard"
+          title="Project Dashboard"
+        >
+          <ChartBarIcon class="view-icon" />
+          <span>Project Dashboard</span>
+        </button>
+        <button
+          class="view-btn"
+          :class="{ active: viewStore.isWorkbench() }"
+          @click="switchToWorkbench"
+          title="Workbench Analytics"
+        >
+          <CpuChipIcon class="view-icon" />
+          <span>Workbench Analytics</span>
+        </button>
+      </div>
+
       <div v-if="projectStore.hasSelectedProject" class="active-project" @click="toggleProjectDropdown">
         <span class="active-project-name">{{ projectStore.selectedProject?.name }}</span>
         <ChevronDownIcon class="dropdown-arrow" />
@@ -36,16 +58,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import { useProjectStore } from '@/stores/projectStore'
+import { useViewStore } from '@/stores/viewStore'
 import RioLogo from '@/assets/RioLogo.svg'
-import { ArrowLeftStartOnRectangleIcon, ChevronDownIcon, DocumentIcon, ServerIcon } from '@heroicons/vue/24/outline'
+import { ArrowLeftStartOnRectangleIcon, ChevronDownIcon, DocumentIcon, ServerIcon, ChartBarIcon, CpuChipIcon } from '@heroicons/vue/24/outline'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const projectStore = useProjectStore()
+const viewStore = useViewStore()
 const showProjectDropdown = ref(false)
 
 const user = {
@@ -62,6 +86,37 @@ const selectProject = (projectId: string) => {
   projectStore.setSelectedProject(projectId)
   showProjectDropdown.value = false
 }
+
+const switchToDashboard = () => {
+  viewStore.setCurrentView('dashboard')
+  router.push('/home')
+}
+
+const switchToWorkbench = () => {
+  viewStore.setCurrentView('workbench')
+  router.push('/workbench')
+}
+
+// Update view store when component mounts to match current route
+const updateViewFromRoute = () => {
+  if (router.currentRoute.value.path === '/workbench') {
+    viewStore.setCurrentView('workbench')
+  } else {
+    viewStore.setCurrentView('dashboard')
+  }
+}
+
+// Call this when component mounts
+updateViewFromRoute()
+
+// Watch for route changes to update view store
+watch(() => router.currentRoute.value.path, (newPath) => {
+  if (newPath === '/workbench') {
+    viewStore.setCurrentView('workbench')
+  } else {
+    viewStore.setCurrentView('dashboard')
+  }
+})
 
 const navigateToFiles = () => {
   router.push('/files')
@@ -220,5 +275,54 @@ async function signOut() {
   font-size: 14px;
   font-weight: 500;
   color: #333;
+}
+
+/* View Toggle Container and Button Styles */
+.view-toggle-container {
+  display: flex;
+  gap: 12px;
+  margin-right: 32px;
+}
+
+.view-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8fafc;
+  border: 2px solid #e5e7eb;
+  cursor: pointer;
+  padding: 12px 20px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  color: #666;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-width: 140px;
+  justify-content: center;
+}
+
+.view-btn:hover {
+  background: #f0f9fa;
+  border-color: #008C8E;
+  color: #008C8E;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 140, 142, 0.15);
+}
+
+.view-btn.active {
+  background: linear-gradient(135deg, #008C8E, #009688);
+  border-color: #008C8E;
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0, 140, 142, 0.25);
+  transform: translateY(-1px);
+}
+
+.view-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 </style>

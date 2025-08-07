@@ -5,6 +5,7 @@ import EntitiesView from '@/views/EntitiesView.vue'
 import FilesView from '@/views/FilesView.vue'
 import HomeView from '@/views/HomeView.vue'
 import ProjectAnalyticsView from '@/views/ProjectAnalyticsView.vue'
+import WorkbenchAnalyticsView from '@/views/WorkbenchAnalyticsView.vue'
 import FeasibilityStudyView from '@/views/FeasibilityStudyView.vue'
 import SectionDetailView from '@/views/SectionDetailView.vue'
 import CommercialView from '@/views/evaluation/CommercialView.vue'
@@ -68,6 +69,12 @@ const router = createRouter({
             path: '/dashboard',
             name: 'Project Analytics',
             component: ProjectAnalyticsView,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/workbench',
+            name: 'Workbench Analytics',
+            component: WorkbenchAnalyticsView,
             meta: { requiresAuth: true }
         },
         {
