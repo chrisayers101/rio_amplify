@@ -8,8 +8,22 @@
 
     <!-- Main Content Area - Split between Canvas and Chat -->
     <div class="workbench-main">
-      <!-- Canvas Section (Left Half) -->
-      <div class="canvas-section">
+      <!-- Chat Section (Left Half) -->
+      <div class="chat-section" :style="{ width: chatWidth + '%' }">
+        <Conversation :open="true" @close="() => {}" />
+      </div>
+
+      <!-- Resizable Divider -->
+      <div
+        class="resize-handle"
+        @mousedown="startResize"
+        @touchstart="startResize"
+      >
+        <div class="resize-icon">⋮</div>
+      </div>
+
+      <!-- Canvas Section (Right Half) -->
+      <div class="canvas-section" :style="{ width: (100 - chatWidth) + '%' }">
         <div class="canvas-header">
           <h2>Collaborative Canvas</h2>
           <p>Work together with AI to create analysis, reports, and insights</p>
@@ -19,7 +33,7 @@
           <div class="canvas-placeholder">
             <div class="canvas-icon">📝</div>
             <h3>Start Your Analysis</h3>
-            <p>Use the chat on the right to begin creating content together. The AI will help you build reports, analyze data, and generate insights for your mining projects.</p>
+            <p>Use the chat on the left to begin creating content together. The AI will help you build reports, analyze data, and generate insights for your mining projects.</p>
 
             <div class="canvas-features">
               <div class="feature-item">
@@ -38,17 +52,12 @@
           </div>
         </div>
       </div>
-
-      <!-- Chat Section (Right Half) -->
-      <div class="chat-section">
-        <Conversation :open="true" @close="() => {}" />
-      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import WorkbenchSidebar from '@/components/WorkbenchSidebar.vue'
 import Conversation from '@/components/Conversation.vue'
 
@@ -74,6 +83,8 @@ interface Section {
 
 const selectedSections = ref<string[]>([])
 const selectedSectionObjects = ref<Section[]>([])
+const chatWidth = ref(50) // Default 50% split
+const isResizing = ref(false)
 
 const handleContextSelected = (sections: Section[]) => {
   selectedSectionObjects.value = sections
@@ -81,6 +92,46 @@ const handleContextSelected = (sections: Section[]) => {
   // Here you would typically send these sections to your chat component
   // or store them in a global state for the chat to access
 }
+
+const startResize = (event: MouseEvent | TouchEvent) => {
+  isResizing.value = true
+  event.preventDefault()
+
+  const handleMouseMove = (e: MouseEvent | TouchEvent) => {
+    if (!isResizing.value) return
+
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
+    const container = document.querySelector('.workbench-main') as HTMLElement
+    if (!container) return
+
+    const containerRect = container.getBoundingClientRect()
+    const newWidth = ((clientX - containerRect.left) / containerRect.width) * 100
+
+    // Constrain width between 20% and 80%
+    chatWidth.value = Math.max(20, Math.min(80, newWidth))
+  }
+
+  const handleMouseUp = () => {
+    isResizing.value = false
+    document.removeEventListener('mousemove', handleMouseMove)
+    document.removeEventListener('mouseup', handleMouseUp)
+    document.removeEventListener('touchmove', handleMouseMove)
+    document.removeEventListener('touchend', handleMouseUp)
+  }
+
+  document.addEventListener('mousemove', handleMouseMove)
+  document.addEventListener('mouseup', handleMouseUp)
+  document.addEventListener('touchmove', handleMouseMove)
+  document.addEventListener('touchend', handleMouseUp)
+}
+
+// Clean up event listeners on component unmount
+onUnmounted(() => {
+  document.removeEventListener('mousemove', () => {})
+  document.removeEventListener('mouseup', () => {})
+  document.removeEventListener('touchmove', () => {})
+  document.removeEventListener('touchend', () => {})
+})
 </script>
 
 <style scoped>
@@ -95,15 +146,56 @@ const handleContextSelected = (sections: Section[]) => {
   flex: 1;
   display: flex;
   overflow: hidden;
+  position: relative;
 }
 
-/* Canvas Section (Left Half) */
+/* Chat Section (Left Half) */
+.chat-section {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  min-width: 0;
+  transition: width 0.1s ease;
+}
+
+/* Resize Handle */
+.resize-handle {
+  width: 8px;
+  background: #f1f5f9;
+  border-left: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: background-color 0.2s ease;
+  user-select: none;
+  touch-action: none;
+}
+
+.resize-handle:hover {
+  background: #e2e8f0;
+}
+
+.resize-handle:active {
+  background: #cbd5e1;
+}
+
+.resize-icon {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: bold;
+  transform: rotate(90deg);
+}
+
+/* Canvas Section (Right Half) */
 .canvas-section {
-  flex: 1;
   display: flex;
   flex-direction: column;
   background: #f8fafc;
-  border-right: 1px solid #e5e7eb;
+  min-width: 0;
+  transition: width 0.1s ease;
 }
 
 .canvas-header {
@@ -201,14 +293,6 @@ const handleContextSelected = (sections: Section[]) => {
   color: #1a1a1a;
 }
 
-/* Chat Section (Right Half) */
-.chat-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: white;
-}
-
 /* Override Conversation component styles for the split layout */
 .chat-section :deep(.conversation-panel) {
   position: relative;
@@ -217,7 +301,7 @@ const handleContextSelected = (sections: Section[]) => {
   width: 100%;
   height: 100%;
   box-shadow: none;
-  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
 }
 
 .chat-section :deep(.conversation-content) {
@@ -235,9 +319,19 @@ const handleContextSelected = (sections: Section[]) => {
     flex-direction: column;
   }
 
+  .chat-section {
+    width: 100% !important;
+    height: 400px;
+  }
+
   .canvas-section {
-    border-right: none;
-    border-bottom: 1px solid #e5e7eb;
+    width: 100% !important;
+    border-left: none;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .resize-handle {
+    display: none;
   }
 
   .canvas-content {
