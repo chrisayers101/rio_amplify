@@ -1,7 +1,10 @@
 <template>
   <div class="workbench-layout">
     <!-- Sidebar Navigation -->
-    <WorkbenchSidebar v-model="activeSection" />
+    <WorkbenchSidebar
+      v-model="selectedSections"
+      @context-selected="handleContextSelected"
+    />
 
     <!-- Main Content Area -->
     <div class="workbench-main">
@@ -10,7 +13,7 @@
         <p>{{ getSectionDescription() }}</p>
       </div>
 
-      <div class="main-content">
+            <div class="main-content">
         <!-- Data Explorer Section -->
         <div v-if="activeSection === 'data-explorer'" class="content-section">
           <div class="placeholder-card">
@@ -217,7 +220,36 @@
 import { ref } from 'vue'
 import WorkbenchSidebar from '@/components/WorkbenchSidebar.vue'
 
+interface Section {
+  sectionId: string
+  sectionName: string
+  percentComplete: number
+  statusOfCompleteness: string
+  qualityRating: string
+  issues: Array<{
+    id: string
+    description: string
+    status: string
+    source: string
+  }>
+  observations: Array<{
+    id: string
+    text: string
+    source: string
+    changeOccurred: boolean
+  }>
+}
+
 const activeSection = ref('data-explorer')
+const selectedSections = ref<string[]>([])
+const selectedSectionObjects = ref<Section[]>([])
+
+const handleContextSelected = (sections: Section[]) => {
+  selectedSectionObjects.value = sections
+  console.log('Selected sections for chat context:', sections)
+  // Here you would typically send these sections to your chat component
+  // or store them in a global state for the chat to access
+}
 
 const getSectionTitle = () => {
   const titles: { [key: string]: string } = {
