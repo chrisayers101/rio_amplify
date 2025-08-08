@@ -54,7 +54,17 @@ export class ChatApi {
       }
 
       // Parse the response
-      const response = JSON.parse(result.data || '{}');
+      console.log('Raw result.data:', result.data);
+      console.log('Result data type:', typeof result.data);
+
+      let response;
+      try {
+        response = JSON.parse(result.data || '{}');
+      } catch (parseError) {
+        console.error('Failed to parse result.data as JSON:', parseError);
+        console.error('Result.data value:', result.data);
+        throw new Error(`Invalid JSON response: ${result.data}`);
+      }
 
       if (response.success && response.chunks && Array.isArray(response.chunks)) {
         // Process streaming chunks

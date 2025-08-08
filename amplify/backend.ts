@@ -52,3 +52,16 @@ backend.s3ProxyFunction.resources.lambda.addToRolePolicy(
     ],
   }),
 );
+
+// Give the chat orchestrator Lambda role the Bedrock rights it needs
+backend.chatOrchestratorFunction.resources.lambda.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: [
+      'bedrock:InvokeModel'
+    ],
+    resources: [
+      'arn:aws:bedrock:ap-southeast-2::foundation-model/anthropic.claude-3-5-sonnet-20241022-v2:0'
+    ],
+  }),
+);
