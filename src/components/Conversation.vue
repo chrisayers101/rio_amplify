@@ -77,16 +77,6 @@ const messages = ref([
     type: 'ai-message',
     content: 'Hello! I\'m your Rio AI Assistant, specialized in mining research and analytics. I can help you with project analysis, geological assessments, financial evaluations, and technical insights for your mining operations. What would you like to know about your projects today?',
     time: '12:30 PM'
-  },
-  {
-    type: 'user-message',
-    content: 'Can you analyze the Hamersley Iron Expansion project for me?',
-    time: '12:32 PM'
-  },
-  {
-    type: 'ai-message',
-    content: 'The Hamersley Iron Expansion project (PROJ-2024-001) shows strong potential with 4 active proposers. Based on initial analysis, this project involves significant infrastructure upgrades and capacity expansion. I can provide detailed technical, financial, and environmental assessments. What specific aspects would you like me to focus on?',
-    time: '12:33 PM'
   }
 ])
 
