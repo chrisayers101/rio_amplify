@@ -232,6 +232,14 @@ const handleSectionsSelected = (sections: readonly any[]) => {
       console.log('Entity type:', typeof sections[0].entity)
       console.log('Is entity object:', typeof sections[0].entity === 'object')
       console.log('Entity stringified:', JSON.stringify(sections[0].entity, null, 2))
+
+      // NEW: Log what getParsedEntity actually returns
+      const parsedEntity = getParsedEntity(sections[0].entity)
+      console.log('=== PARSED ENTITY FOR VUE LOOP ===')
+      console.log('getParsedEntity result:', parsedEntity)
+      console.log('getParsedEntity type:', typeof parsedEntity)
+      console.log('getParsedEntity keys:', Object.keys(parsedEntity || {}))
+      console.log('=== END PARSED ENTITY FOR VUE LOOP ===')
     }
   }
   console.log('=== END CANVAS SECTIONS ===')
@@ -459,9 +467,12 @@ const getParsedEntity = (entity: any): any => {
   // NEW: Handle the case where the entity is an object with numeric keys containing JSON strings
   if (typeof entity === 'object' && entity !== null) {
     const keys = Object.keys(entity)
+    console.log('Entity keys:', keys)
     if (keys.length > 0 && keys.every(key => !isNaN(Number(key)))) {
       console.log('Found object with numeric keys, checking first value...')
       const firstValue = entity[keys[0]]
+      console.log('First value type:', typeof firstValue)
+      console.log('First value:', firstValue)
       if (typeof firstValue === 'string' && firstValue.trim().startsWith('{')) {
         try {
           console.log('Attempting to parse first value as JSON...')
@@ -477,6 +488,7 @@ const getParsedEntity = (entity: any): any => {
   }
 
   console.log('No special format detected, returning entity as-is')
+  console.log('Final return value:', entity)
   console.log('=== END GET PARSED ENTITY ===')
   return entity
 }
