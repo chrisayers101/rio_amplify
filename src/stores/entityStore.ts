@@ -22,7 +22,8 @@ const getClient = () => {
 }
 
 // Type for our feasibility study sections
-export interface FeasibilityStudySectionEntity extends FeasibilityStudySection {
+export interface FeasibilityStudySectionEntity extends Omit<FeasibilityStudySection, 'entity'> {
+  entity: Record<string, unknown> // Changed from string to object
   createdAt?: string | null
   updatedAt?: string | null
 }
@@ -62,19 +63,10 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     return sections.value.find(s => s.projectId === projectId && s.sectionId === sectionId)
   }
 
-  // Get parsed entity for a section
-  const getParsedEntity = (projectId: string, sectionId: string) => {
+  // Get entity for a section (now directly accessible as object)
+  const getEntity = (projectId: string, sectionId: string) => {
     const section = getSection(projectId, sectionId)
-    if (section && section.entity) {
-      try {
-        const firstParse = JSON.parse(section.entity)
-        return typeof firstParse === 'string' ? JSON.parse(firstParse) : firstParse
-      } catch (error) {
-        console.error('Failed to parse entity:', error)
-        return null
-      }
-    }
-    return null
+    return section?.entity || null
   }
 
   // Helper function to check authentication
@@ -119,7 +111,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
       // NEW: Parse and replace entities in the sections array
       console.log('=== PARSING AND REPLACING ENTITIES ===')
-      sections.value = sectionsList.map((section: FeasibilityStudySectionEntity) => {
+      sections.value = sectionsList.map((section: FeasibilityStudySection) => {
         if (section.entity) {
           try {
             const firstParse = JSON.parse(section.entity)
@@ -128,13 +120,13 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
             return {
               ...section,
               entity: parsedEntity  // Replace string with parsed object
-            }
+            } as unknown as FeasibilityStudySectionEntity
           } catch (error) {
             console.error(`Failed to parse entity for section ${section.sectionId}:`, error)
-            return section
+            return section as unknown as FeasibilityStudySectionEntity
           }
         }
-        return section
+        return section as unknown as FeasibilityStudySectionEntity
       })
       console.log('=== ENTITIES PARSED AND REPLACED ===')
 
@@ -422,7 +414,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
     // Getters
     getSection,
-    getParsedEntity,
+    getEntity,
 
     // Actions
     fetchSections,

@@ -83,7 +83,7 @@
                 </div>
 
                 <div class="tab-content">
-                  <div v-if="activeTab && section.entity && ((section.entity as unknown) as Record<string, unknown>)[activeTab]" class="tab-panel">
+                  <div v-if="activeTab && section.entity && section.entity[activeTab]" class="tab-panel">
                     <!-- Edit Mode -->
                     <div v-if="isEditing(activeTab)" class="edit-mode">
                       <div class="edit-controls">
@@ -115,8 +115,8 @@
 
                     <!-- View Mode -->
                     <div v-else class="view-mode">
-                      <div v-if="Array.isArray(getEntityValue(section.entity, activeTab))" class="array-content">
-                        <div v-for="(item, index) in (getEntityValue(section.entity, activeTab) as unknown[])" :key="index" class="array-item">
+                      <div v-if="Array.isArray(section.entity[activeTab])" class="array-content">
+                        <div v-for="(item, index) in section.entity[activeTab]" :key="index" class="array-item">
                           <div v-if="typeof item === 'object' && item !== null" class="object-item">
                             <div v-for="(propValue, propKey) in item" :key="String(propKey)" class="property">
                               <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
@@ -135,8 +135,8 @@
                         </div>
                       </div>
 
-                      <div v-else-if="typeof getEntityValue(section.entity, activeTab) === 'object' && getEntityValue(section.entity, activeTab) !== null" class="object-content">
-                        <div v-for="(propValue, propKey) in (getEntityValue(section.entity, activeTab) as Record<string, unknown>)" :key="String(propKey)" class="property">
+                      <div v-else-if="typeof section.entity[activeTab] === 'object' && section.entity[activeTab] !== null" class="object-content">
+                        <div v-for="(propValue, propKey) in section.entity[activeTab]" :key="String(propKey)" class="property">
                           <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
                           <span class="property-value">
                             <span class="markdown-inline">
@@ -151,7 +151,7 @@
                         <div class="markdown-content">
                           <div
                             class="markdown-body"
-                            v-html="renderMarkdown(String(getEntityValue(section.entity, activeTab) || ''))"
+                            v-html="renderMarkdown(String(section.entity[activeTab] || ''))"
                           ></div>
                         </div>
                       </div>
@@ -176,7 +176,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
 import type { FeasibilityStudySectionEntity } from '@/stores/entityStore'
 import WorkbenchSidebar from '@/components/WorkbenchSidebar.vue'
@@ -319,12 +319,30 @@ const formatPropertyName = (key: string): string => {
 
 
 
-// Helper function to safely access entity properties
-const getEntityValue = (entity: unknown, key: string): unknown => {
-  if (entity && typeof entity === 'object') {
-    return (entity as Record<string, unknown>)[key]
-  }
-  return undefined
+// Helper function to update local section data immediately
+const updateLocalSectionData = (projectId: string, sectionId: string, fieldName: string, newValue: string): void => {
+  console.log('Updating local section data:', { projectId, sectionId, fieldName, newValue })
+
+  // Update the selected sections immediately for instant UI feedback
+  const updatedSections = selectedSectionObjects.value.map(section => {
+    if (section.projectId === projectId && section.sectionId === sectionId) {
+      // Create a new section object with updated entity
+      const updatedEntity = {
+        ...section.entity,
+        [fieldName]: newValue
+      }
+      console.log('Updated entity:', updatedEntity)
+      return {
+        ...section,
+        entity: updatedEntity
+      }
+    }
+    return section
+  })
+
+  // Force Vue reactivity by creating a new array reference
+  selectedSectionObjects.value = [...updatedSections]
+  console.log('Updated selectedSectionObjects:', selectedSectionObjects.value)
 }
 
 // Edit mode methods
@@ -334,7 +352,7 @@ const toggleEditMode = (fieldName: string): void => {
     cancelEdit(fieldName)
   } else {
     // Enter edit mode
-    const currentValue = getEntityValue(selectedSectionObjects.value[0]?.entity, fieldName)
+    const currentValue = selectedSectionObjects.value[0]?.entity?.[fieldName]
     if (currentValue !== undefined) {
       editMode.value[fieldName] = true
       editValues.value[fieldName] = String(currentValue)
@@ -362,19 +380,25 @@ const saveEdit = async (projectId: string, sectionId: string, fieldName: string)
     if (success) {
       // Exit edit mode
       editMode.value[fieldName] = false
+      const savedValue = editValues.value[fieldName]
       delete editValues.value[fieldName]
       delete originalValues.value[fieldName]
 
-      // Refresh the store data
-      await sectionStore.fetchSections()
+      // Update local state immediately for instant UI feedback
+      updateLocalSectionData(projectId, sectionId, fieldName, savedValue)
 
-      // Force UI update by temporarily clearing and restoring the selection
-      const currentSections = [...selectedSectionObjects.value]
-      selectedSectionObjects.value = []
+      // Ensure the active tab is still set and content is visible
+      if (activeTab.value === fieldName) {
+        // Force a reactive update by temporarily clearing and restoring the active tab
+        const currentTab = activeTab.value
+        activeTab.value = ''
+        setTimeout(() => {
+          activeTab.value = currentTab
+        }, 10)
+      }
 
-      nextTick(() => {
-        selectedSectionObjects.value = currentSections
-      })
+      // Refresh the store data in the background
+      sectionStore.fetchSections().catch(console.error)
     } else {
       console.error('Failed to save edit')
     }
