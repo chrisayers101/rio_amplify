@@ -86,6 +86,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   'update:modelValue': [value: string[]]
   'context-selected': [sections: typeof sections.value]
+  'sections-selected': [sections: typeof sections.value]
 }>()
 
 // Use the store
@@ -103,15 +104,29 @@ const selectedSections = ref<string[]>(props.modelValue || [])
 const selectAll = () => {
   selectedSections.value = sections.value.map(section => `${section.projectId}-${section.sectionId}`)
   emit('update:modelValue', selectedSections.value)
+  
+  // Emit the selected sections for the canvas
+  emit('sections-selected', sections.value)
 }
 
 const clearAll = () => {
   selectedSections.value = []
   emit('update:modelValue', selectedSections.value)
+  
+  // Emit empty selection for the canvas
+  emit('sections-selected', [])
 }
 
 const handleSectionToggle = () => {
   emit('update:modelValue', selectedSections.value)
+  
+  // Get the selected section objects
+  const selectedSectionObjects = sections.value.filter(section =>
+    selectedSections.value.includes(`${section.projectId}-${section.sectionId}`)
+  )
+  
+  // Emit the selected sections for the canvas
+  emit('sections-selected', selectedSectionObjects)
 }
 
 const getSectionDisplayName = (section: typeof sections.value[0]): string => {
@@ -155,6 +170,9 @@ const useSelectedAsContext = () => {
     selectedSections.value.includes(`${section.projectId}-${section.sectionId}`)
   )
   emit('context-selected', selectedSectionObjects)
+  
+  // Also emit for canvas display
+  emit('sections-selected', selectedSectionObjects)
 }
 
 const retryLoad = async () => {

@@ -23,6 +23,7 @@
     <WorkbenchSidebar
       v-model="selectedSections"
       @context-selected="handleContextSelected"
+      @sections-selected="handleSectionsSelected"
     />
 
     <!-- Main Content Area - Split between Canvas and Chat -->
@@ -43,29 +44,31 @@
 
       <!-- Canvas Section (Right Half) -->
       <div class="canvas-section" :style="{ width: (100 - chatWidth) + '%' }">
-        <div class="canvas-header">
-          <h2>Collaborative Canvas</h2>
-          <p>Work together with AI to create analysis, reports, and insights</p>
-        </div>
+
 
         <div class="canvas-content">
-          <div class="canvas-placeholder">
-            <div class="canvas-icon">📝</div>
-            <h3>Start Your Analysis</h3>
-            <p>Use the chat on the left to begin creating content together. The AI will help you build reports, analyze data, and generate insights for your mining projects.</p>
+          <div v-if="selectedSectionObjects.length === 0" class="canvas-placeholder">
+            <h3>Select a Feasibility Study Section</h3>
+          </div>
 
-            <div class="canvas-features">
-              <div class="feature-item">
-                <span class="feature-icon">📊</span>
-                <span>Data Analysis</span>
+          <div v-else class="canvas-sections">
+            <div v-for="section in selectedSectionObjects" :key="`${section.projectId}-${section.sectionId}`" class="section-content">
+              <div class="section-header">
+                <h3>{{ getSectionDisplayName(section) }}</h3>
+                <div class="section-meta">
+                  <span class="completion">{{ section.percentComplete || 0 }}% complete</span>
+                  <span class="status" :class="getStatusClass(section.status)">
+                    {{ formatStatus(section.status) }}
+                  </span>
+                </div>
               </div>
-              <div class="feature-item">
-                <span class="feature-icon">📄</span>
-                <span>Report Generation</span>
+
+              <div v-if="section.entity" class="section-entity">
+                <pre class="entity-json">{{ JSON.stringify(section.entity, null, 2) }}</pre>
               </div>
-              <div class="feature-item">
-                <span class="feature-icon">🎯</span>
-                <span>Insights & Recommendations</span>
+
+              <div v-else class="no-entity">
+                <p>No content available for this section.</p>
               </div>
             </div>
           </div>
@@ -87,7 +90,7 @@ const sectionStore = useFeasibilityStudySectionStore()
 
 // State
 const selectedSections = ref<string[]>([])
-const selectedSectionObjects = ref<typeof sectionStore.sections>([])
+const selectedSectionObjects = ref<readonly any[]>([])
 const chatWidth = ref(50) // Default 50% split
 const isResizing = ref(false)
 const isLoading = ref(true)
@@ -113,11 +116,52 @@ const retryLoad = () => {
   loadSections()
 }
 
-const handleContextSelected = (sections: typeof sectionStore.sections) => {
+const handleContextSelected = (sections: readonly any[]) => {
   selectedSectionObjects.value = sections
   console.log('Selected sections for chat context:', sections)
   // Here you would typically send these sections to your chat component
   // or store them in a global state for the chat to access
+}
+
+const handleSectionsSelected = (sections: readonly any[]) => {
+  selectedSectionObjects.value = sections
+  console.log('Sections selected for canvas display:', sections)
+}
+
+const getSectionDisplayName = (section: any): string => {
+  // Try to get section name from entity data if available
+  if (section.entity && typeof section.entity === 'object' && 'sectionName' in section.entity) {
+    return section.entity.sectionName as string
+  }
+
+  // Fallback to section ID if no name available
+  return `Section ${section.sectionId}`
+}
+
+const getStatusClass = (status: string): string => {
+  switch (status) {
+    case 'complete':
+      return 'status-complete'
+    case 'in_progress':
+      return 'status-in-progress'
+    case 'not_started':
+      return 'status-not-started'
+    default:
+      return 'status-unknown'
+  }
+}
+
+const formatStatus = (status: string): string => {
+  switch (status) {
+    case 'complete':
+      return 'Complete'
+    case 'in_progress':
+      return 'In Progress'
+    case 'not_started':
+      return 'Not Started'
+    default:
+      return status
+  }
 }
 
 const startResize = (event: MouseEvent | TouchEvent) => {
@@ -249,18 +293,12 @@ onUnmounted(() => {
 }
 
 .canvas-placeholder {
-  background: white;
-  border: 2px dashed #d1d5db;
-  border-radius: 12px;
   padding: 48px;
   text-align: center;
   transition: all 0.3s ease;
 }
 
-.canvas-placeholder:hover {
-  border-color: #008C8E;
-  background: #f0f9fa;
-}
+
 
 .canvas-icon {
   font-size: 3rem;
@@ -282,6 +320,101 @@ onUnmounted(() => {
   max-width: 500px;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* Canvas Sections Styles */
+.canvas-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.section-content {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.section-header h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.section-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.completion {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.status {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.status-complete {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-in-progress {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-not-started {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-unknown {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.section-entity {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  overflow-x: auto;
+}
+
+.entity-json {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.875rem;
+  color: #374151;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.no-entity {
+  text-align: center;
+  padding: 32px;
+  color: #6b7280;
+  font-style: italic;
 }
 
 .canvas-features {

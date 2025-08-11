@@ -31,6 +31,7 @@ export interface FeasibilityStudySectionState {
   sections: FeasibilityStudySectionEntity[]
   isLoading: boolean
   error: string | null
+  selectedSections: FeasibilityStudySectionEntity[]
 }
 
 export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySection', () => {
@@ -38,10 +39,13 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
   const sections = ref<FeasibilityStudySectionEntity[]>([])
   const isLoading = ref(false)
   const error = ref<string | null>(null)
+  const selectedSections = ref<FeasibilityStudySectionEntity[]>([])
 
   // Computed
   const sectionCount = computed(() => sections.value.length)
   const hasSections = computed(() => sections.value.length > 0)
+  const selectedSectionCount = computed(() => selectedSections.value.length)
+  const hasSelectedSections = computed(() => selectedSections.value.length > 0)
 
   // Get sections by project
   const getSectionsByProject = computed(() => (projectId: string) => {
@@ -271,15 +275,38 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     error.value = null
   }
 
+  const setSelectedSections = (sections: readonly any[]): void => {
+    selectedSections.value = [...sections]
+  }
+
+  const clearSelectedSections = (): void => {
+    selectedSections.value = []
+  }
+
+  const addSelectedSection = (section: FeasibilityStudySectionEntity): void => {
+    if (!selectedSections.value.find(s => s.projectId === section.projectId && s.sectionId === section.sectionId)) {
+      selectedSections.value.push(section)
+    }
+  }
+
+  const removeSelectedSection = (projectId: string, sectionId: string): void => {
+    selectedSections.value = selectedSections.value.filter(s =>
+      !(s.projectId === projectId && s.sectionId === sectionId)
+    )
+  }
+
   return {
     // State
     sections: readonly(sections),
     isLoading: readonly(isLoading),
     error: readonly(error),
+    selectedSections: readonly(selectedSections),
 
     // Computed
     sectionCount,
     hasSections,
+    selectedSectionCount,
+    hasSelectedSections,
     getSectionsByProject,
     getSectionsByStatus,
 
@@ -291,6 +318,10 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     deleteSection,
     getSectionById,
     clearError,
-    clearSections
+    clearSections,
+    setSelectedSections,
+    clearSelectedSections,
+    addSelectedSection,
+    removeSelectedSection
   }
 })
