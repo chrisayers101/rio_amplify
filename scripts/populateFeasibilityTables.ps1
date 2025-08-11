@@ -37,78 +37,45 @@ $ENVIRONMENTS = @{
 # =============================================================================
 # TEST DATA - ONE ENTITY FOR TESTING
 # =============================================================================
-$TEST_ENTITY = @{
-    "projectId" = @{ "S" = "AMRUN" }
-    "sectionId" = @{ "S" = "01" }
-    "percentComplete" = @{ "N" = "83" }
-    "status" = @{ "S" = "in_progress" }
-    "createdAt" = @{ "S" = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ss.fffZ") }
-    "updatedAt" = @{ "S" = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ss.fffZ") }
-    "entity" = @{
-        "M" = @{
-            "sectionName" = @{ "S" = "01 - Summary and Recommendations" }
-            "qualityRating" = @{ "S" = "High" }
-            "content" = @{
-                "M" = @{
-                    "executiveSummary" = @{ "S" = "The Amrun Bauxite Project represents a significant investment in Queensland's mining sector, with an estimated capital expenditure of AUD 1.9 billion." }
-                    "keyRecommendations" = @{
-                        "L" = @(
-                            @{ "S" = "Proceed with project development following the recommended timeline" },
-                            @{ "S" = "Implement comprehensive environmental management plans" },
-                            @{ "S" = "Establish strong community engagement programs" },
-                            @{ "S" = "Develop robust risk mitigation strategies" }
-                        )
-                    }
-                }
+$TEST_ENTITY_JSON = @{
+    "sectionName" = "01 - Summary and Recommendations"
+    "subSections" = @(
+        @{
+            "assessment" = @{
+                "contradictions" = "Minor"
+                "guidelineReference" = "Section 1.1"
+                "gaps" = "Seasonal data missing"
+                "consistency" = "High"
+                "quality" = "High"
             }
-            "issues" = @{
-                "L" = @(
-                    @{
-                        "M" = @{
-                            "id" = @{ "S" = "01-I1" }
-                            "description" = @{ "S" = "Mock issue for Summary and Recommendations" }
-                            "status" = @{ "S" = "Resolved" }
-                            "source" = @{ "S" = "Summary and Recommendations Report 2024" }
-                        }
-                    }
-                )
-            }
-            "observations" = @{
-                "L" = @(
-                    @{
-                        "M" = @{
-                            "id" = @{ "S" = "01-O1" }
-                            "text" = @{ "S" = "Key observation about Summary and Recommendations on AMRUN." }
-                            "source" = @{ "S" = "Summary and Recommendations Summary Document" }
-                            "changeOccurred" = @{ "BOOL" = $false }
-                        }
-                    }
-                )
-            }
-            "subSections" = @{
-                "L" = @(
-                    @{
-                        "M" = @{
-                            "subSectionId" = @{ "S" = "1.1" }
-                            "subSectionTitle" = @{ "S" = "1.1 Executive summary" }
-                            "percentComplete" = @{ "N" = "81" }
-                            "content" = @{ "M" = @{} }
-                            "assessment" = @{
-                                "M" = @{
-                                    "quality" = @{ "S" = "High" }
-                                    "consistency" = @{ "S" = "High" }
-                                    "contradictions" = @{ "S" = "Minor" }
-                                    "gaps" = @{ "S" = "Seasonal data missing" }
-                                    "guidelineReference" = @{ "S" = "Section 1.1" }
-                                }
-                            }
-                            "observations" = @{ "L" = @() }
-                            "decisions" = @{ "L" = @() }
-                        }
-                    }
-                )
-            }
+            "subSectionTitle" = "1.1 Executive summary"
+            "observations" = @()
+            "decisions" = @()
+            "percentComplete" = 81
+            "subSectionId" = "1.1"
+            "content" = @{}
         }
+    )
+    "observations" = @(
+        @{
+            "changeOccurred" = $false
+            "id" = "01-O1"
+            "text" = "Key observation about Summary and Recommendations on AMRUN."
+            "source" = "Summary and Recommendations Summary Document"
+        }
+    )
+    "qualityRating" = "High"
+    "issues" = @(
+        @{
+            "description" = "Mock issue for Summary and Recommendations"
+            "id" = "01-I1"
+            "source" = "Summary and Recommendations Report 2024"
+            "status" = "Resolved"
+        }
+    )
+    "content" = @{
+        "executiveSummary" = "### Executive Summary`n`nThe **Amrun Bauxite Project** represents a significant investment in Queensland's mining sector, with an estimated capital expenditure of **AUD 1.9 billion**."
+        "keyRecommendations" = "- Proceed with project development following the recommended timeline`n- Implement comprehensive environmental management plans`n- Establish strong community engagement programs`n- Develop robust risk mitigation strategies"
     }
 }
 
@@ -187,6 +154,89 @@ function Test-DynamoDBTable {
     }
 }
 
+function Convert-ToDynamoDBFormat {
+    param([hashtable]$Data)
+    
+    $dynamoItem = @{
+        "projectId" = @{ "S" = "AMRUN" }
+        "sectionId" = @{ "S" = "01" }
+        "percentComplete" = @{ "N" = "83" }
+        "status" = @{ "S" = "in_progress" }
+        "createdAt" = @{ "S" = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ss.fffZ") }
+        "updatedAt" = @{ "S" = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ss.fffZ") }
+        "entity" = @{ "M" = @{} }
+    }
+    
+    # Convert sectionName
+    $dynamoItem.entity.M["sectionName"] = @{ "S" = $Data.sectionName }
+    
+    # Convert qualityRating
+    $dynamoItem.entity.M["qualityRating"] = @{ "S" = $Data.qualityRating }
+    
+    # Convert content
+    $dynamoItem.entity.M["content"] = @{
+        "M" = @{
+            "executiveSummary" = @{ "S" = $Data.content.executiveSummary }
+            "keyRecommendations" = @{ "S" = $Data.content.keyRecommendations }
+        }
+    }
+    
+    # Convert issues
+    $issuesList = @()
+    foreach ($issue in $Data.issues) {
+        $issuesList += @{
+            "M" = @{
+                "id" = @{ "S" = $issue.id }
+                "description" = @{ "S" = $issue.description }
+                "status" = @{ "S" = $issue.status }
+                "source" = @{ "S" = $issue.source }
+            }
+        }
+    }
+    $dynamoItem.entity.M["issues"] = @{ "L" = $issuesList }
+    
+    # Convert observations
+    $observationsList = @()
+    foreach ($observation in $Data.observations) {
+        $observationsList += @{
+            "M" = @{
+                "id" = @{ "S" = $observation.id }
+                "text" = @{ "S" = $observation.text }
+                "source" = @{ "S" = $observation.source }
+                "changeOccurred" = @{ "BOOL" = $observation.changeOccurred }
+            }
+        }
+    }
+    $dynamoItem.entity.M["observations"] = @{ "L" = $observationsList }
+    
+    # Convert subSections
+    $subSectionsList = @()
+    foreach ($subSection in $Data.subSections) {
+        $subSectionsList += @{
+            "M" = @{
+                "subSectionId" = @{ "S" = $subSection.subSectionId }
+                "subSectionTitle" = @{ "S" = $subSection.subSectionTitle }
+                "percentComplete" = @{ "N" = $subSection.percentComplete.ToString() }
+                "content" = @{ "M" = $subSection.content }
+                "assessment" = @{
+                    "M" = @{
+                        "quality" = @{ "S" = $subSection.assessment.quality }
+                        "consistency" = @{ "S" = $subSection.assessment.consistency }
+                        "contradictions" = @{ "S" = $subSection.assessment.contradictions }
+                        "gaps" = @{ "S" = $subSection.assessment.gaps }
+                        "guidelineReference" = @{ "S" = $subSection.assessment.guidelineReference }
+                    }
+                }
+                "observations" = @{ "L" = @() }
+                "decisions" = @{ "L" = @() }
+            }
+        }
+    }
+    $dynamoItem.entity.M["subSections"] = @{ "L" = $subSectionsList }
+    
+    return $dynamoItem
+}
+
 function Add-EntityToTable {
     param(
         [string]$EnvironmentName,
@@ -222,8 +272,11 @@ function Add-EntityToTable {
         return $false
     }
     
+    # Convert the JSON data to DynamoDB format
+    $dynamoItem = Convert-ToDynamoDBFormat -Data $EntityData
+    
     # Convert entity data to JSON for AWS CLI
-    $entityJson = $EntityData | ConvertTo-Json -Depth 10
+    $entityJson = $dynamoItem | ConvertTo-Json -Depth 10
     
     try {
         # Add item to DynamoDB table
@@ -282,7 +335,7 @@ foreach ($env in $ENVIRONMENTS.GetEnumerator()) {
         $totalCount++
         Write-ColorOutput "`n🔧 Processing $envName environment..." "Yellow"
         
-        if (Add-EntityToTable -EnvironmentName $envName -EnvironmentConfig $envConfig -EntityData $TEST_ENTITY) {
+        if (Add-EntityToTable -EnvironmentName $envName -EnvironmentConfig $envConfig -EntityData $TEST_ENTITY_JSON) {
             $successCount++
         }
     } else {
