@@ -30,7 +30,7 @@
     <div class="workbench-main">
       <!-- Chat Section (Left Half) -->
       <div class="chat-section" :style="{ width: chatWidth + '%' }">
-        <Conversation :open="true" @close="() => {}" />
+        <Conversation :open="true" :embedded="true" @close="() => {}" />
       </div>
 
       <!-- Resizable Divider -->
@@ -764,19 +764,9 @@ onUnmounted(() => {
   color: #1a1a1a;
 }
 
-/* Override Conversation component styles for the split layout */
-.chat-section :deep(.conversation-panel) {
-  position: relative;
-  top: 0;
-  right: 0;
-  width: 100%;
-  height: 100%;
-  box-shadow: none;
+/* Chat section styling */
+.chat-section {
   border-right: 1px solid #e5e7eb;
-}
-
-.chat-section :deep(.conversation-content) {
-  height: 100%;
 }
 
 /* Loading Overlay */

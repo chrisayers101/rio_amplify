@@ -1,18 +1,9 @@
 <template>
   <transition name="slide-panel">
-    <div v-if="open" class="conversation-panel">
-      <button class="close-btn" @click="$emit('close')">×</button>
+    <div v-if="open" class="conversation-panel" :class="{ 'embedded': embedded }">
+      <button v-if="!embedded" class="close-btn" @click="$emit('close')">×</button>
       <div class="conversation-content">
-        <!-- Conversation Header -->
-        <div class="conversation-header">
-          <div class="ai-avatar">
-            <div class="avatar-icon">🤖</div>
-          </div>
-          <div class="ai-info">
-            <h3 class="ai-name">Rio AI Assistant</h3>
-            <p class="ai-status">Online - Ready to help</p>
-          </div>
-        </div>
+
 
         <!-- Messages Container -->
         <div class="messages-container" ref="messagesContainer">
@@ -61,8 +52,14 @@
 import { defineProps, defineEmits, ref, nextTick, watch } from 'vue'
 import { chatApi } from '@/utils/chatApi'
 
+// Define component name for linting
+defineOptions({
+  name: 'ConversationPanel'
+})
+
 defineProps({
-  open: { type: Boolean, default: false }
+  open: { type: Boolean, default: false },
+  embedded: { type: Boolean, default: false }
 })
 defineEmits(['close'])
 
@@ -175,7 +172,7 @@ watch(messages, () => {
   height: calc(100vh - 64px);
   background: #fff;
   box-shadow: -2px 0 8px rgba(0,0,0,0.08);
-  z-index: 1000;
+  z-index: 999;
   display: flex;
   flex-direction: column;
   transition: transform 0.3s cubic-bezier(.4,0,.2,1);
@@ -398,9 +395,32 @@ watch(messages, () => {
   transform: translateX(0);
 }
 
+/* Embedded mode styles - highest specificity */
+.conversation-panel.embedded {
+  position: relative !important;
+  top: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  box-shadow: none !important;
+  border-right: 1px solid #e5e7eb !important;
+  z-index: auto !important;
+  transform: none !important;
+}
+
+.conversation-panel.embedded .close-btn {
+  display: none !important;
+}
+
+/* Ensure embedded mode overrides all other styles */
+.conversation-panel.embedded,
+.conversation-panel.embedded * {
+  position: relative !important;
+}
+
 /* Mobile responsive styles */
 @media (max-width: 768px) {
-  .conversation-panel {
+  .conversation-panel:not(.embedded) {
     width: 100%;
     top: 64px;
     height: calc(100vh - 64px);
