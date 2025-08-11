@@ -411,6 +411,7 @@ onUnmounted(() => {
   background: #f8fafc;
   min-width: 0;
   transition: width 0.1s ease;
+  height: auto;
 }
 
 .canvas-header {
@@ -435,8 +436,8 @@ onUnmounted(() => {
 .canvas-content {
   flex: 1;
   padding: 24px;
-  overflow-y: auto;
-  max-height: calc(100vh - 64px - 80px); /* Account for top nav + header */
+  height: auto;
+  overflow: visible;
 }
 
 .canvas-placeholder {
@@ -481,7 +482,8 @@ onUnmounted(() => {
   display: flex;
   border-bottom: 1px solid #e5e7eb;
   margin-bottom: 20px;
-  overflow-x: auto;
+  overflow: visible;
+  height: auto;
 }
 
 .tab-header {
@@ -498,6 +500,8 @@ onUnmounted(() => {
   transition: all 0.2s ease;
   white-space: nowrap;
   user-select: none;
+  height: auto;
+  overflow: visible;
 }
 
 .tab-header:hover {
@@ -515,6 +519,8 @@ onUnmounted(() => {
 
 .tab-content {
   min-height: 120px;
+  height: auto;
+  overflow: visible;
 }
 
 .tab-panel {
@@ -561,6 +567,8 @@ onUnmounted(() => {
 .simple-value, .simple-content {
   color: #6b7280;
   font-style: italic;
+  height: auto;
+  overflow: visible;
 }
 
 .no-tab-selected {
@@ -639,7 +647,7 @@ onUnmounted(() => {
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 16px;
-  overflow-x: auto;
+  overflow: visible;
 }
 
 .entity-json {
@@ -838,6 +846,8 @@ onUnmounted(() => {
   background: #f9fafb;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
+  height: auto;
+  overflow: visible;
 }
 
 .markdown-inline {
