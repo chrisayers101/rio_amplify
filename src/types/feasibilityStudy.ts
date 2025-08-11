@@ -51,11 +51,11 @@ export interface SubSection {
 // Main section entity interface (what goes in the 'entity' field)
 export interface FeasibilityStudySectionEntity {
   sectionName: string;
-  qualityRating: string;
-  content: Record<string, any>; // Flexible content structure
-  issues: Issue[];
-  observations: Observation[];
-  subSections: SubSection[];
+  qualityRating?: string;
+  content?: Record<string, any>; // Flexible content structure
+  issues?: Issue[];
+  observations?: Observation[];
+  subSections?: SubSection[];
 }
 
 // Main DynamoDB table record interface

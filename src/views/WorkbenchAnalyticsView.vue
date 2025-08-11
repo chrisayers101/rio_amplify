@@ -65,15 +65,23 @@
               </div>
 
               <div v-if="section.entity" class="section-entity">
+                <!-- Debug info -->
+                <div style="background: #f0f0f0; padding: 10px; margin-bottom: 10px; font-family: monospace; font-size: 12px;">
+                  <strong>DEBUG:</strong> Raw entity type: {{ typeof section.entity }}<br>
+                  <strong>DEBUG:</strong> Raw entity: {{ section.entity }}<br>
+                  <strong>DEBUG:</strong> Parsed entity keys: {{ Object.keys(getParsedEntity(section.entity) || {}) }}<br>
+                  <strong>DEBUG:</strong> Parsed entity: {{ JSON.stringify(getParsedEntity(section.entity), null, 2) }}
+                </div>
+
                 <div class="entity-tabs">
                   <div
-                    v-for="(value, key) in getParsedEntity(section.entity)"
-                    :key="String(key)"
+                    v-for="fieldName in ['sectionName', 'qualityRating', 'assessment', 'observations', 'issues', 'content']"
+                    :key="fieldName"
                     class="tab-header"
-                    :class="{ active: activeTab === String(key) }"
-                    @click="setActiveTab(String(key))"
+                    :class="{ active: activeTab === fieldName }"
+                    @click="setActiveTab(fieldName)"
                   >
-                    {{ formatTabName(String(key)) }}
+                    {{ formatTabName(fieldName) }}
                   </div>
                 </div>
 
@@ -448,7 +456,27 @@ const getParsedEntity = (entity: any): any => {
     return parsed
   }
 
-  console.log('No DynamoDB format detected, returning entity as-is')
+  // NEW: Handle the case where the entity is an object with numeric keys containing JSON strings
+  if (typeof entity === 'object' && entity !== null) {
+    const keys = Object.keys(entity)
+    if (keys.length > 0 && keys.every(key => !isNaN(Number(key)))) {
+      console.log('Found object with numeric keys, checking first value...')
+      const firstValue = entity[keys[0]]
+      if (typeof firstValue === 'string' && firstValue.trim().startsWith('{')) {
+        try {
+          console.log('Attempting to parse first value as JSON...')
+          const parsed = JSON.parse(firstValue)
+          console.log('Successfully parsed nested JSON, result:', parsed)
+          console.log('=== END GET PARSED ENTITY ===')
+          return parsed
+        } catch (parseError) {
+          console.log('Failed to parse nested JSON:', parseError)
+        }
+      }
+    }
+  }
+
+  console.log('No special format detected, returning entity as-is')
   console.log('=== END GET PARSED ENTITY ===')
   return entity
 }
