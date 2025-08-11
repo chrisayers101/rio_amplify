@@ -18,18 +18,18 @@ $ENVIRONMENTS = @{
         "enabled" = $POPULATE_SANDBOX
         "profile" = "aidev"  # Change this to your AWS profile if needed
         "region" = "ap-southeast-2" # Change this to your region
-        "table_name" = "FeasibilityStudySections" # Sandbox table name
+        "table_name" = "" # Will be discovered dynamically
     }
     "dev" = @{
         "enabled" = $POPULATE_DEV
-        "profile" = "aidev"  # Change this to your dev AWS profile
-        "region" = "ap-southeast-2" # Change this to your dev region
+        "profile" = "default"  # Change this to your dev AWS profile
+        "region" = "us-east-1" # Change this to your dev region
         "table_name" = "FeasibilityStudySections-dev" # Dev table name (adjust as needed)
     }
     "main" = @{
         "enabled" = $POPULATE_MAIN
-        "profile" = "aidev"  # Change this to your prod AWS profile
-        "region" = "ap-southeast-2" # Change this to your prod region
+        "profile" = "default"  # Change this to your prod AWS profile
+        "region" = "us-east-1" # Change this to your prod region
         "table_name" = "FeasibilityStudySections-main" # Prod table name (adjust as needed)
     }
 }
@@ -42,6 +42,8 @@ $TEST_ENTITY = @{
     "sectionId" = @{ "S" = "01" }
     "percentComplete" = @{ "N" = "83" }
     "status" = @{ "S" = "in_progress" }
+    "createdAt" = @{ "S" = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ss.fffZ") }
+    "updatedAt" = @{ "S" = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ss.fffZ") }
     "entity" = @{
         "M" = @{
             "sectionName" = @{ "S" = "01 - Summary and Recommendations" }
@@ -133,6 +135,42 @@ function Test-AWSProfile {
     }
 }
 
+function Find-FeasibilityStudySectionsTable {
+    param(
+        [string]$ProfileName,
+        [string]$Region
+    )
+    
+    try {
+        Write-ColorOutput "🔍 Searching for FeasibilityStudySections table..." "Yellow"
+        
+        # Get all tables
+        $tablesJson = aws dynamodb list-tables --profile $ProfileName --region $Region --output json 2>$null
+        
+        if ($LASTEXITCODE -ne 0) {
+            Write-ColorOutput "❌ Failed to list DynamoDB tables" "Red"
+            return $null
+        }
+        
+        $tables = $tablesJson | ConvertFrom-Json
+        
+        # Find table that starts with "FeasibilityStudySections"
+        $targetTable = $tables.TableNames | Where-Object { $_ -like "FeasibilityStudySections*" } | Select-Object -First 1
+        
+        if ($targetTable) {
+            Write-ColorOutput "✅ Found table: $targetTable" "Green"
+            return $targetTable
+        } else {
+            Write-ColorOutput "❌ No FeasibilityStudySections table found" "Red"
+            return $null
+        }
+    }
+    catch {
+        Write-ColorOutput "❌ Error searching for table: $($_.Exception.Message)" "Red"
+        return $null
+    }
+}
+
 function Test-DynamoDBTable {
     param(
         [string]$TableName,
@@ -159,6 +197,17 @@ function Add-EntityToTable {
     Write-ColorOutput "`n=== Adding entity to $EnvironmentName environment ===" "Cyan"
     Write-ColorOutput "Profile: $($EnvironmentConfig.profile)" "Yellow"
     Write-ColorOutput "Region: $($EnvironmentConfig.region)" "Yellow"
+    
+    # For sandbox, discover the table name dynamically
+    if ($EnvironmentName -eq "sandbox" -and [string]::IsNullOrEmpty($EnvironmentConfig.table_name)) {
+        $tableName = Find-FeasibilityStudySectionsTable -ProfileName $EnvironmentConfig.profile -Region $EnvironmentConfig.region
+        if (-not $tableName) {
+            Write-ColorOutput "❌ Could not find FeasibilityStudySections table" "Red"
+            return $false
+        }
+        $EnvironmentConfig.table_name = $tableName
+    }
+    
     Write-ColorOutput "Table: $($EnvironmentConfig.table_name)" "Yellow"
     
     # Test AWS profile

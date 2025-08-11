@@ -65,6 +65,8 @@ export interface FeasibilityStudySection {
   percentComplete: number;
   status: FeasibilityStudySectionStatus;
   entity: FeasibilityStudySectionEntity;
+  createdAt?: string | null;
+  updatedAt?: string | null;
 }
 
 // Project metadata interface
