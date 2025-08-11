@@ -58,9 +58,9 @@
           </label>
         </div>
       </div>
+
+
     </div>
-
-
   </div>
 </template>
 
@@ -91,6 +91,8 @@ const error = computed(() => sectionStore.error)
 
 // Track selected sections (using composite key format: "projectId-sectionId")
 const selectedSections = ref<string[]>(props.modelValue || [])
+
+
 
 // Methods
 const selectAll = () => {
@@ -131,6 +133,8 @@ const getSectionDisplayName = (section: typeof sections.value[0]): string => {
   return `Section ${section.sectionId}`
 }
 
+
+
 const getStatusClass = (status: string): string => {
   switch (status) {
     case 'complete':
@@ -157,15 +161,7 @@ const formatStatus = (status: string): string => {
   }
 }
 
-const useSelectedAsContext = () => {
-  const selectedSectionObjects = sections.value.filter(section =>
-    selectedSections.value.includes(`${section.projectId}-${section.sectionId}`)
-  )
-  emit('context-selected', selectedSectionObjects)
 
-  // Also emit for canvas display
-  emit('sections-selected', selectedSectionObjects)
-}
 
 const retryLoad = async () => {
   if (props.projectId) {
@@ -392,6 +388,8 @@ watch(() => props.modelValue, (newValue) => {
   background: #f3f4f6;
   color: #6b7280;
 }
+
+
 
 .sidebar-footer {
   padding: 16px 24px;

@@ -53,7 +53,7 @@ $TEST_ENTITY_JSON = @{
             "decisions" = @()
             "percentComplete" = 81
             "subSectionId" = "1.1"
-            "content" = @{}
+            "content" = "### Executive Summary`n`nThe **Amrun Bauxite Project** represents a significant investment in Queensland's mining sector, with an estimated capital expenditure of **AUD 1.9 billion**."
         }
     )
     "observations" = @(
@@ -73,10 +73,8 @@ $TEST_ENTITY_JSON = @{
             "status" = "Resolved"
         }
     )
-    "content" = @{
-        "executiveSummary" = "### Executive Summary`n`nThe **Amrun Bauxite Project** represents a significant investment in Queensland's mining sector, with an estimated capital expenditure of **AUD 1.9 billion**."
-        "keyRecommendations" = "- Proceed with project development following the recommended timeline`n- Implement comprehensive environmental management plans`n- Establish strong community engagement programs`n- Develop robust risk mitigation strategies"
-    }
+    "content" = "### Executive Summary`n`nThe **Amrun Bauxite Project** represents a significant investment in Queensland's mining sector, with an estimated capital expenditure of **AUD 1.9 billion**."
+    "keyRecommendations" = "- Proceed with project development following the recommended timeline`n- Implement comprehensive environmental management plans`n- Establish strong community engagement programs`n- Develop robust risk mitigation strategies"
 }
 
 # =============================================================================
@@ -173,13 +171,11 @@ function Convert-ToDynamoDBFormat {
     # Convert qualityRating
     $dynamoItem.entity.M["qualityRating"] = @{ "S" = $Data.qualityRating }
     
-    # Convert content
-    $dynamoItem.entity.M["content"] = @{
-        "M" = @{
-            "executiveSummary" = @{ "S" = $Data.content.executiveSummary }
-            "keyRecommendations" = @{ "S" = $Data.content.keyRecommendations }
-        }
-    }
+    # Convert content (now a simple string)
+    $dynamoItem.entity.M["content"] = @{ "S" = $Data.content }
+    
+    # Convert keyRecommendations (now a top-level field)
+    $dynamoItem.entity.M["keyRecommendations"] = @{ "S" = $Data.keyRecommendations }
     
     # Convert issues
     $issuesList = @()
@@ -217,7 +213,7 @@ function Convert-ToDynamoDBFormat {
                 "subSectionId" = @{ "S" = $subSection.subSectionId }
                 "subSectionTitle" = @{ "S" = $subSection.subSectionTitle }
                 "percentComplete" = @{ "N" = $subSection.percentComplete.ToString() }
-                "content" = @{ "M" = $subSection.content }
+                "content" = @{ "S" = $subSection.content }
                 "assessment" = @{
                     "M" = @{
                         "quality" = @{ "S" = $subSection.assessment.quality }

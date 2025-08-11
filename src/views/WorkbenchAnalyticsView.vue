@@ -101,7 +101,27 @@
                     </div>
 
                     <div v-else class="simple-content">
-                      {{ getParsedEntity(section.entity)[activeTab] }}
+                      <!-- Check if this is content that should be rendered as markdown -->
+                      <div v-if="activeTab === 'content'" class="content-tab-content">
+                        <div class="content-section">
+                          <h4 class="content-section-title">Executive Summary</h4>
+                          <div
+                            class="markdown-body"
+                            v-html="renderMarkdown(String(getParsedEntity(section.entity).content || ''))"
+                          ></div>
+                        </div>
+                        <div class="content-section">
+                          <h4 class="content-section-title">Key Recommendations</h4>
+                          <div
+                            class="markdown-body"
+                            v-html="renderMarkdown(String(getParsedEntity(section.entity).keyRecommendations || ''))"
+                          ></div>
+                        </div>
+                      </div>
+                      <!-- For non-content tabs, display as before -->
+                      <div v-else>
+                        {{ getParsedEntity(section.entity)[activeTab] }}
+                      </div>
                     </div>
                   </div>
 
@@ -125,9 +145,22 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
-import type { FeasibilityStudySectionEntity } from '@/stores/entityStore'
 import WorkbenchSidebar from '@/components/WorkbenchSidebar.vue'
 import Conversation from '@/components/Conversation.vue'
+import { marked } from 'marked'
+import DOMPurify from 'dompurify'
+
+// Configure marked options for v16+
+marked.use({
+  breaks: true,
+  gfm: true
+})
+
+// Configure DOMPurify to allow more HTML elements
+DOMPurify.setConfig({
+  ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'strong', 'b', 'em', 'i', 'ul', 'ol', 'li', 'code', 'pre', 'blockquote'],
+  ALLOWED_ATTR: []
+})
 
 // Use the store
 const sectionStore = useFeasibilityStudySectionStore()
@@ -332,6 +365,43 @@ const parseDynamoDBValue = (value: any): any => {
   // If it's not DynamoDB format, return as is
   console.log('No DynamoDB format detected, returning as-is:', value)
   return value
+}
+
+// Markdown rendering function
+const renderMarkdown = (markdownText: string): string => {
+  if (!markdownText) return ''
+
+  try {
+    console.log('=== RENDER MARKDOWN ===')
+            console.log('Input markdown:', markdownText)
+    console.log('Input markdown length:', markdownText.length)
+    console.log('Input markdown char codes:', Array.from(markdownText).map(c => c.charCodeAt(0)))
+
+    // Convert PowerShell-style newlines to actual newlines
+    const processedMarkdown = markdownText.replace(/`n/g, '\n')
+    console.log('Processed markdown:', processedMarkdown)
+
+    // Parse markdown to HTML using the correct marked v16 API
+    // In v16+, we need to use the marked function directly
+    const html = marked(processedMarkdown)
+    console.log('Raw HTML from marked:', html)
+
+    // Ensure html is a string before sanitizing
+    const htmlString = typeof html === 'string' ? html : String(html)
+    console.log('HTML string:', htmlString)
+
+    // Sanitize HTML to prevent XSS
+    const sanitizedHtml = DOMPurify.sanitize(htmlString)
+    console.log('Sanitized HTML:', sanitizedHtml)
+
+    console.log('=== END RENDER MARKDOWN ===')
+
+    // Return the sanitized HTML
+    return sanitizedHtml
+  } catch (error) {
+    console.error('Error rendering markdown:', error)
+    return markdownText // Fallback to raw text if parsing fails
+  }
 }
 
 // Get parsed entity data for display
@@ -880,6 +950,116 @@ onUnmounted(() => {
 
 .retry-button:hover {
   background-color: #007779;
+}
+
+/* Content Tab Styles */
+.content-tab-content {
+  padding: 0;
+}
+
+.content-section {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.content-section:last-child {
+  margin-bottom: 0;
+}
+
+.content-section-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Markdown Body Styles */
+.markdown-body {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  margin: 16px 0 8px 0;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #1f2937;
+}
+
+.markdown-body h1 { font-size: 1.25rem; }
+.markdown-body h2 { font-size: 1.125rem; }
+.markdown-body h3 { font-size: 1rem; }
+.markdown-body h4 { font-size: 0.875rem; }
+.markdown-body h5 { font-size: 0.875rem; }
+.markdown-body h6 { font-size: 0.875rem; }
+
+.markdown-body p {
+  margin: 0 0 12px 0;
+}
+
+.markdown-body p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  margin: 8px 0 12px 20px;
+  padding: 0;
+}
+
+.markdown-body li {
+  margin-bottom: 4px;
+}
+
+.markdown-body strong,
+.markdown-body b {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.markdown-body em,
+.markdown-body i {
+  font-style: italic;
+}
+
+.markdown-body code {
+  background: #f3f4f6;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.8em;
+}
+
+.markdown-body pre {
+  background: #f3f4f6;
+  padding: 12px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 12px 0;
+}
+
+.markdown-body pre code {
+  background: none;
+  padding: 0;
+}
+
+.markdown-body blockquote {
+  border-left: 4px solid #008C8E;
+  margin: 12px 0;
+  padding-left: 16px;
+  color: #6b7280;
+  font-style: italic;
 }
 
 /* Mobile responsive styles */
