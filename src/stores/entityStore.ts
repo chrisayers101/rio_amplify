@@ -77,7 +77,6 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     error.value = null
 
     try {
-      console.log('Fetching feasibility study sections...')
       const { data: sectionsList, errors } = await getClient().models.FeasibilityStudySections.list({})
 
       if (errors) {
@@ -87,7 +86,16 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       }
 
       sections.value = sectionsList
-      console.log('Sections loaded:', sections.value)
+      console.log('=== ENTITY STORE DATA LOADED ===')
+      console.log('Total sections loaded:', sectionsList.length)
+      console.log('First section:', sectionsList[0])
+      if (sectionsList[0] && sectionsList[0].entity) {
+        console.log('First section entity:', sectionsList[0].entity)
+        console.log('Entity keys:', Object.keys(sectionsList[0].entity))
+        console.log('Entity type:', typeof sectionsList[0].entity)
+      }
+      console.log('All sections:', sectionsList)
+      console.log('=== END ENTITY STORE DATA ===')
     } catch (err) {
       console.error('Error loading sections:', err)
       error.value = err instanceof Error ? err.message : 'Failed to load sections'
