@@ -1,20 +1,27 @@
 import { S3Client, ListObjectsV2Command, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 // Initialize S3 client
 const s3Client = new S3Client({ region: 'ap-southeast-2' });
 
-// Supported bucket configurations
-const BUCKET_CONFIGS = {
-  'airis': {
-    name: 'airis-analytica-workspace-sharepoint-data-962000089408',
-    region: 'ap-southeast-2'
-  },
-  'ak': {
-    name: 'ak-bkt-exp-1',
-    region: 'ap-southeast-2'
-  }
+// Define bucket config type
+interface BucketConfig {
+  name: string;
+  region: string;
+}
+
+// Load bucket configurations from config file
+const loadBucketConfigs = (): Record<string, BucketConfig> => {
+
+    const configPath = join(__dirname, '../../../config/buckets_non_amplify.json');
+    const configData = readFileSync(configPath, 'utf8');
+    return JSON.parse(configData);
+
 };
+
+const BUCKET_CONFIGS = loadBucketConfigs();
 
 // Type definitions
 interface S3ProxyRequest {
@@ -256,15 +263,15 @@ async function getFileContent(bucketName: string, key: string): Promise<S3ProxyR
     });
 
     const response = await s3Client.send(command);
-    
+
     // Convert the stream to base64 for JSON transmission
     const chunks: Uint8Array[] = [];
     const stream = response.Body as any;
-    
+
     for await (const chunk of stream) {
       chunks.push(chunk);
     }
-    
+
     const buffer = Buffer.concat(chunks);
     const base64Content = buffer.toString('base64');
 
