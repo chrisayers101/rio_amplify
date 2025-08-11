@@ -81,11 +81,17 @@
                         <div v-if="typeof item === 'object' && item !== null" class="object-item">
                           <div v-for="(propValue, propKey) in item" :key="String(propKey)" class="property">
                             <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
-                            <span class="property-value">{{ formatPropertyValue(propValue) }}</span>
+                            <span class="property-value">
+                              <span class="markdown-inline">
+                                <span v-html="renderMarkdown(String(propValue))"></span>
+                              </span>
+                            </span>
                           </div>
                         </div>
                         <div v-else class="simple-value">
-                          {{ item }}
+                          <span class="markdown-inline">
+                            <span v-html="renderMarkdown(String(item))"></span>
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -93,31 +99,21 @@
                     <div v-else-if="typeof section.entity[activeTab] === 'object' && section.entity[activeTab] !== null" class="object-content">
                       <div v-for="(propValue, propKey) in section.entity[activeTab]" :key="String(propKey)" class="property">
                         <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
-                        <span class="property-value">{{ formatPropertyValue(propValue) }}</span>
+                        <span class="property-value">
+                          <span class="markdown-inline">
+                            <span v-html="renderMarkdown(String(propValue))"></span>
+                          </span>
+                        </span>
                       </div>
                     </div>
 
                     <div v-else class="simple-content">
-                      <!-- Check if this is content that should be rendered as markdown -->
-                      <div v-if="activeTab === 'content'" class="content-tab-content">
-                        <div class="content-section">
-                          <h4 class="content-section-title">Executive Summary</h4>
-                          <div
-                            class="markdown-body"
-                            v-html="renderMarkdown(String(section.entity.content || ''))"
-                          ></div>
-                        </div>
-                        <div class="content-section">
-                          <h4 class="content-section-title">Key Recommendations</h4>
-                          <div
-                            class="markdown-body"
-                            v-html="renderMarkdown(String(section.entity.keyRecommendations || ''))"
-                          ></div>
-                        </div>
-                      </div>
-                      <!-- For non-content tabs, display as before -->
-                      <div v-else>
-                        {{ section.entity[activeTab] }}
+                      <!-- Render all content as markdown -->
+                      <div class="markdown-content">
+                        <div
+                          class="markdown-body"
+                          v-html="renderMarkdown(String(section.entity[activeTab] || ''))"
+                        ></div>
                       </div>
                     </div>
                   </div>
@@ -283,6 +279,8 @@ const formatPropertyValue = (value: any): string => {
   }
   return String(value)
 }
+
+
 
 // Markdown rendering function
 const renderMarkdown = (markdownText: string): string => {
@@ -832,6 +830,25 @@ onUnmounted(() => {
   margin: 0 0 12px 0;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+/* Markdown Content Styles */
+.markdown-content {
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.markdown-inline {
+  display: inline;
+}
+
+.markdown-inline .markdown-body {
+  display: inline;
+  background: none;
+  padding: 0;
+  margin: 0;
 }
 
 /* Markdown Body Styles */
