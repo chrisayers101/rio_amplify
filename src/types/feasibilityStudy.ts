@@ -42,7 +42,7 @@ export interface SubSection {
   subSectionId: string;
   subSectionTitle: string;
   percentComplete: number;
-  content: Record<string, any>; // Flexible content structure
+  content: Record<string, unknown>; // Flexible content structure
   assessment: SubSectionAssessment;
   observations: SubSectionObservation[];
   decisions: SubSectionDecision[];
@@ -52,9 +52,10 @@ export interface SubSection {
 export interface FeasibilityStudySectionEntity {
   sectionName: string;
   qualityRating?: string;
-  content?: Record<string, any>; // Flexible content structure
-  issues?: Issue[];
-  observations?: Observation[];
+  assessment?: string;  // Markdown string
+  content?: Record<string, unknown>; // Flexible content structure
+  issues?: string;  // Markdown string instead of array
+  observations?: string;  // Markdown string instead of array
   subSections?: SubSection[];
 }
 
@@ -64,7 +65,7 @@ export interface FeasibilityStudySection {
   sectionId: string;
   percentComplete: number;
   status: FeasibilityStudySectionStatus;
-  entity: FeasibilityStudySectionEntity;
+  entity: string;  // JSON string as stored in DynamoDB
   createdAt?: string | null;
   updatedAt?: string | null;
 }

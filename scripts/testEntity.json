@@ -2,7 +2,22 @@
   "sectionName": "01 - Summary and Recommendations",
   "qualityRating": "High",
   "assessment": "### Assessment\n\n- **Contradictions**: Minor\n- **Guideline Reference**: Section 1.1\n- **Gaps**: Seasonal data missing\n- **Consistency**: High\n- **Quality**: High",
-  "observations": "### Observations\n\n| ID      | Text                                                          | Source                                         | Change Occurred |\n|---------|---------------------------------------------------------------|------------------------------------------------|-----------------|\n| 01-O1   | Key observation about Summary and Recommendations on AMRUN. | Summary and Recommendations Summary Document  | false           |",
-  "issues": "### Issues\n\n| ID     | Description                             | Source                                     | Status   |\n|--------|-----------------------------------------|--------------------------------------------|----------|\n| 01-I1  | Mock issue for Summary and Recommendations | Summary and Recommendations Report 2024 | Resolved |",
-  "content": "### Executive Summary\n\nThe **Amrun Bauxite Project** represents a significant investment in Queensland's mining sector, with an estimated capital expenditure of **AUD 1.9 billion**.\n\n### Key Recommendations\n\n- Proceed with project development following the recommended timeline\n- Implement comprehensive environmental management plans\n- Establish strong community engagement programs\n- Develop robust risk mitigation strategies"
+  "observations": [
+    {
+      "id": "01-O1",
+      "text": "Key observation about Summary and Recommendations on AMRUN.",
+      "source": "Summary and Recommendations Summary Document",
+      "changeOccurred": false
+    }
+  ],
+  "issues": [
+    {
+      "id": "01-I1",
+      "description": "Mock issue for Summary and Recommendations",
+      "source": "Summary and Recommendations Report 2024",
+      "status": "Resolved"
+    }
+  ],
+  "content": "### Executive Summary\n\nThe **Amrun Bauxite Project** represents a significant investment in Queensland's mining sector, with an estimated capital expenditure of **AUD 1.9 billion**.\n\n### Key Recommendations\n\n- Proceed with project development following the recommended timeline\n- Implement comprehensive environmental management plans\n- Establish strong community engagement programs\n- Develop robust risk mitigation strategies",
+  "subSections": []
 }

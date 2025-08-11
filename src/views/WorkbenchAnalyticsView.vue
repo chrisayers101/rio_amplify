@@ -69,8 +69,8 @@
                 <div style="background: #f0f0f0; padding: 10px; margin-bottom: 10px; font-family: monospace; font-size: 12px;">
                   <strong>DEBUG:</strong> Raw entity type: {{ typeof section.entity }}<br>
                   <strong>DEBUG:</strong> Raw entity: {{ section.entity }}<br>
-                  <strong>DEBUG:</strong> Parsed entity keys: {{ Object.keys(getParsedEntity(section.entity) || {}) }}<br>
-                  <strong>DEBUG:</strong> Parsed entity: {{ JSON.stringify(getParsedEntity(section.entity), null, 2) }}
+                  <strong>DEBUG:</strong> Parsed entity keys: {{ Object.keys(parsedEntity || {}) }}<br>
+                  <strong>DEBUG:</strong> Parsed entity: {{ JSON.stringify(parsedEntity, null, 2) }}
                 </div>
 
                 <div class="entity-tabs">
@@ -86,9 +86,9 @@
                 </div>
 
                 <div class="tab-content">
-                  <div v-if="activeTab && getParsedEntity(section.entity)[activeTab]" class="tab-panel">
-                    <div v-if="Array.isArray(getParsedEntity(section.entity)[activeTab])" class="array-content">
-                      <div v-for="(item, index) in getParsedEntity(section.entity)[activeTab]" :key="index" class="array-item">
+                  <div v-if="activeTab && parsedEntity && parsedEntity[activeTab]" class="tab-panel">
+                    <div v-if="Array.isArray(parsedEntity[activeTab])" class="array-content">
+                      <div v-for="(item, index) in parsedEntity[activeTab]" :key="index" class="array-item">
                         <div v-if="typeof item === 'object' && item !== null" class="object-item">
                           <div v-for="(propValue, propKey) in item" :key="String(propKey)" class="property">
                             <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
@@ -101,8 +101,8 @@
                       </div>
                     </div>
 
-                    <div v-else-if="typeof getParsedEntity(section.entity)[activeTab] === 'object' && getParsedEntity(section.entity)[activeTab] !== null" class="object-content">
-                      <div v-for="(propValue, propKey) in getParsedEntity(section.entity)[activeTab]" :key="String(propKey)" class="property">
+                    <div v-else-if="typeof parsedEntity[activeTab] === 'object' && parsedEntity[activeTab] !== null" class="object-content">
+                      <div v-for="(propValue, propKey) in parsedEntity[activeTab]" :key="String(propKey)" class="property">
                         <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
                         <span class="property-value">{{ formatPropertyValue(propValue) }}</span>
                       </div>
@@ -115,20 +115,20 @@
                           <h4 class="content-section-title">Executive Summary</h4>
                           <div
                             class="markdown-body"
-                            v-html="renderMarkdown(String(getParsedEntity(section.entity).content || ''))"
+                            v-html="renderMarkdown(String(parsedEntity.content || ''))"
                           ></div>
                         </div>
                         <div class="content-section">
                           <h4 class="content-section-title">Key Recommendations</h4>
                           <div
                             class="markdown-body"
-                            v-html="renderMarkdown(String(getParsedEntity(section.entity).keyRecommendations || ''))"
+                            v-html="renderMarkdown(String(parsedEntity.keyRecommendations || ''))"
                           ></div>
                         </div>
                       </div>
                       <!-- For non-content tabs, display as before -->
                       <div v-else>
-                        {{ getParsedEntity(section.entity)[activeTab] }}
+                        {{ parsedEntity[activeTab] }}
                       </div>
                     </div>
                   </div>
@@ -151,7 +151,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
 import WorkbenchSidebar from '@/components/WorkbenchSidebar.vue'
 import Conversation from '@/components/Conversation.vue'
@@ -181,6 +181,15 @@ const chatWidth = ref(50) // Default 50% split
 const isResizing = ref(false)
 const isLoading = ref(true)
 const hasError = ref(false)
+
+// Computed property to get parsed entity from store
+const parsedEntity = computed(() => {
+  if (selectedSectionObjects.value.length > 0) {
+    const section = selectedSectionObjects.value[0]
+    return sectionStore.getParsedEntity(section.projectId, section.sectionId)
+  }
+  return null
+})
 
 // Load all sections on component mount
 const loadSections = async () => {
@@ -436,7 +445,12 @@ const getParsedEntity = (entity: any): any => {
   if (typeof entity === 'string') {
     try {
       console.log('Entity is a string, attempting to parse as JSON...')
-      const parsed = JSON.parse(entity)
+      const firstParse = JSON.parse(entity)
+      console.log('First parse result:', firstParse)
+      console.log('First parse type:', typeof firstParse)
+
+      // Fix: Parse twice because entity is double-encoded
+      const parsed = typeof firstParse === 'string' ? JSON.parse(firstParse) : firstParse
       console.log('Successfully parsed JSON string, result:', parsed)
       console.log('=== END GET PARSED ENTITY ===')
       return parsed
