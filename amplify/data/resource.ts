@@ -11,6 +11,17 @@ const schema = a.schema({
     })
     .authorization((allow) => [allow.authenticated()]),
 
+  FeasibilityStudySections: a
+    .model({
+      projectId: a.string().required(),   // PK
+      sectionId: a.string().required(),   // SK
+      percentComplete: a.integer(),       // you'll filter/sort on this
+      status: a.enum(['not_started', 'in_progress', 'complete']), // maybe a GSI on this later
+      entity: a.json(),                   // the rest (nested content, issues…)
+    })
+    .identifier(['projectId','sectionId'])
+    .authorization((allow) => [allow.authenticated()]),
+
   // Add chat function as a query
   chatOrchestrator: a
     .query()

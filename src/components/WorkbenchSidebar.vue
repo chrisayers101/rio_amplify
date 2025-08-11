@@ -20,28 +20,38 @@
       </div>
     </div>
 
-    <div class="sections-container">
+    <div v-if="isLoading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Loading sections...</p>
+    </div>
+
+    <div v-else-if="error" class="error-state">
+      <p class="error-message">{{ error }}</p>
+      <button @click="retryLoad" class="retry-btn">Retry</button>
+    </div>
+
+    <div v-else class="sections-container">
       <div class="sections-list">
         <div
           v-for="section in sections"
-          :key="section.sectionId"
+          :key="`${section.projectId}-${section.sectionId}`"
           class="section-item"
         >
           <label class="section-checkbox">
             <input
               type="checkbox"
-              :value="section.sectionId"
+              :value="`${section.projectId}-${section.sectionId}`"
               v-model="selectedSections"
               @change="handleSectionToggle"
               class="checkbox-input"
             />
             <div class="checkbox-custom"></div>
             <div class="section-info">
-              <div class="section-name">{{ section.sectionName }}</div>
+              <div class="section-name">{{ getSectionDisplayName(section) }}</div>
               <div class="section-meta">
-                <span class="completion">{{ section.percentComplete }}% complete</span>
-                <span class="quality" :class="getQualityClass(section.qualityRating)">
-                  {{ section.qualityRating }}
+                <span class="completion">{{ section.percentComplete || 0 }}% complete</span>
+                <span class="status" :class="getStatusClass(section.status)">
+                  {{ formatStatus(section.status) }}
                 </span>
               </div>
             </div>
@@ -63,49 +73,35 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import feasibilityData from '@/data/feasibility_scaffold_full.json'
-
-interface Section {
-  sectionId: string
-  sectionName: string
-  percentComplete: number
-  statusOfCompleteness: string
-  qualityRating: string
-  issues: Array<{
-    id: string
-    description: string
-    status: string
-    source: string
-  }>
-  observations: Array<{
-    id: string
-    text: string
-    source: string
-    changeOccurred: boolean
-  }>
-}
+import { ref, watch, onMounted, computed } from 'vue'
+import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
 
 interface Props {
   modelValue?: string[]
+  projectId?: string // Optional: filter sections by project
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
   'update:modelValue': [value: string[]]
-  'context-selected': [sections: Section[]]
+  'context-selected': [sections: typeof sections.value]
 }>()
 
-// Extract sections from feasibility data
-const sections = feasibilityData.feasibilityStudyView.sections as Section[]
+// Use the store
+const sectionStore = useFeasibilityStudySectionStore()
 
-// Track selected sections
+// Computed properties from store
+const sections = computed(() => sectionStore.sections)
+const isLoading = computed(() => sectionStore.isLoading)
+const error = computed(() => sectionStore.error)
+
+// Track selected sections (using composite key format: "projectId-sectionId")
 const selectedSections = ref<string[]>(props.modelValue || [])
 
 // Methods
 const selectAll = () => {
-  selectedSections.value = sections.map(section => section.sectionId)
+  selectedSections.value = sections.value.map(section => `${section.projectId}-${section.sectionId}`)
   emit('update:modelValue', selectedSections.value)
 }
 
@@ -118,27 +114,65 @@ const handleSectionToggle = () => {
   emit('update:modelValue', selectedSections.value)
 }
 
-const getQualityClass = (quality: string) => {
-  switch (quality.toLowerCase()) {
-    case 'high':
-      return 'quality-high'
-    case 'good':
-      return 'quality-good'
-    case 'moderate':
-      return 'quality-moderate'
-    case 'low':
-      return 'quality-low'
+const getSectionDisplayName = (section: typeof sections.value[0]): string => {
+  // Try to get section name from entity data if available
+  if (section.entity && typeof section.entity === 'object' && 'sectionName' in section.entity) {
+    return section.entity.sectionName as string
+  }
+  
+  // Fallback to section ID if no name available
+  return `Section ${section.sectionId}`
+}
+
+const getStatusClass = (status: string): string => {
+  switch (status) {
+    case 'complete':
+      return 'status-complete'
+    case 'in_progress':
+      return 'status-in-progress'
+    case 'not_started':
+      return 'status-not-started'
     default:
-      return 'quality-unknown'
+      return 'status-unknown'
+  }
+}
+
+const formatStatus = (status: string): string => {
+  switch (status) {
+    case 'complete':
+      return 'Complete'
+    case 'in_progress':
+      return 'In Progress'
+    case 'not_started':
+      return 'Not Started'
+    default:
+      return status
   }
 }
 
 const useSelectedAsContext = () => {
-  const selectedSectionObjects = sections.filter(section =>
-    selectedSections.value.includes(section.sectionId)
+  const selectedSectionObjects = sections.value.filter(section =>
+    selectedSections.value.includes(`${section.projectId}-${section.sectionId}`)
   )
   emit('context-selected', selectedSectionObjects)
 }
+
+const retryLoad = async () => {
+  if (props.projectId) {
+    await sectionStore.fetchSectionsByProject(props.projectId)
+  } else {
+    await sectionStore.fetchSections()
+  }
+}
+
+// Load sections on mount
+onMounted(async () => {
+  if (props.projectId) {
+    await sectionStore.fetchSectionsByProject(props.projectId)
+  } else {
+    await sectionStore.fetchSections()
+  }
+})
 
 // Watch for external changes to the modelValue
 watch(() => props.modelValue, (newValue) => {
@@ -321,7 +355,7 @@ watch(() => props.modelValue, (newValue) => {
   color: #6b7280;
 }
 
-.quality {
+.status {
   padding: 2px 6px;
   border-radius: 4px;
   font-weight: 600;
@@ -329,27 +363,22 @@ watch(() => props.modelValue, (newValue) => {
   font-size: 10px;
 }
 
-.quality-high {
+.status-complete {
   background: #dcfce7;
   color: #166534;
 }
 
-.quality-good {
+.status-in-progress {
   background: #dbeafe;
   color: #1e40af;
 }
 
-.quality-moderate {
+.status-not-started {
   background: #fef3c7;
   color: #92400e;
 }
 
-.quality-low {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.quality-unknown {
+.status-unknown {
   background: #f3f4f6;
   color: #6b7280;
 }
@@ -385,6 +414,48 @@ watch(() => props.modelValue, (newValue) => {
   transform: none;
 }
 
+.loading-state, .error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #008C8E;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+.error-message {
+  color: #991b1b;
+  margin-bottom: 15px;
+}
+
+.retry-btn {
+  padding: 8px 16px;
+  background: #008C8E;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retry-btn:hover {
+  background: #007a7c;
+  transform: translateY(-1px);
+}
+
 /* Mobile responsive styles */
 @media (max-width: 768px) {
   .workbench-sidebar {
@@ -397,5 +468,10 @@ watch(() => props.modelValue, (newValue) => {
   .sections-container {
     max-height: 400px;
   }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>

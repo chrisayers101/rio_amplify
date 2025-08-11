@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed, readonly } from 'vue'
 import { generateClient } from 'aws-amplify/data'
 import { getCurrentUser } from 'aws-amplify/auth'
+import type { FeasibilityStudySection, FeasibilityStudySectionStatus } from '@/types/feasibilityStudy'
 
 // Lazy initialization of Amplify Data client
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -20,30 +21,37 @@ const getClient = () => {
   return client
 }
 
-// Type for our entity
-export interface Entity {
-  id: string
-  name?: string | null
-  data?: string | null
+// Type for our feasibility study sections
+export interface FeasibilityStudySectionEntity extends FeasibilityStudySection {
   createdAt?: string | null
   updatedAt?: string | null
 }
 
-export interface EntityState {
-  entities: Entity[]
+export interface FeasibilityStudySectionState {
+  sections: FeasibilityStudySectionEntity[]
   isLoading: boolean
   error: string | null
 }
 
-export const useEntityStore = defineStore('entity', () => {
+export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySection', () => {
   // State
-  const entities = ref<Entity[]>([])
+  const sections = ref<FeasibilityStudySectionEntity[]>([])
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
   // Computed
-  const entityCount = computed(() => entities.value.length)
-  const hasEntities = computed(() => entities.value.length > 0)
+  const sectionCount = computed(() => sections.value.length)
+  const hasSections = computed(() => sections.value.length > 0)
+
+  // Get sections by project
+  const getSectionsByProject = computed(() => (projectId: string) => {
+    return sections.value.filter(section => section.projectId === projectId)
+  })
+
+  // Get sections by status
+  const getSectionsByStatus = computed(() => (status: FeasibilityStudySectionStatus) => {
+    return sections.value.filter(section => section.status === status)
+  })
 
   // Helper function to check authentication
   const checkAuthentication = async (): Promise<boolean> => {
@@ -51,44 +59,82 @@ export const useEntityStore = defineStore('entity', () => {
       await getCurrentUser()
       return true
     } catch {
-      console.log('User not authenticated for entity operations')
+      console.log('User not authenticated for feasibility study section operations')
       error.value = 'Authentication required'
       return false
     }
   }
 
   // Actions
-  const fetchEntities = async (): Promise<void> => {
+  const fetchSections = async (): Promise<void> => {
     if (!(await checkAuthentication())) return
 
     isLoading.value = true
     error.value = null
 
     try {
-      console.log('Fetching entities...')
-      const { data: entitiesList, errors } = await getClient().models.defaultDynamoTable.list({})
+      console.log('Fetching feasibility study sections...')
+      const { data: sectionsList, errors } = await getClient().models.FeasibilityStudySections.list({})
 
       if (errors) {
-        console.error('Errors fetching entities:', errors)
-        error.value = 'Failed to fetch entities'
+        console.error('Errors fetching sections:', errors)
+        error.value = 'Failed to fetch sections'
         return
       }
 
-      entities.value = entitiesList
-      console.log('Entities loaded:', entities.value)
+      sections.value = sectionsList
+      console.log('Sections loaded:', sections.value)
     } catch (err) {
-      console.error('Error loading entities:', err)
-      error.value = err instanceof Error ? err.message : 'Failed to load entities'
+      console.error('Error loading sections:', err)
+      error.value = err instanceof Error ? err.message : 'Failed to load sections'
     } finally {
       isLoading.value = false
     }
   }
 
-  const createEntity = async (name: string, data: string = ''): Promise<Entity | null> => {
+  const fetchSectionsByProject = async (projectId: string): Promise<void> => {
+    if (!(await checkAuthentication())) return
+
+    isLoading.value = true
+    error.value = null
+
+    try {
+      console.log('Fetching sections for project:', projectId)
+      const { data: sectionsList, errors } = await getClient().models.FeasibilityStudySections.list({
+        filter: {
+          projectId: { eq: projectId }
+        }
+      })
+
+      if (errors) {
+        console.error('Errors fetching project sections:', errors)
+        error.value = 'Failed to fetch project sections'
+        return
+      }
+
+      // Update sections for this project
+      const otherSections = sections.value.filter(s => s.projectId !== projectId)
+      sections.value = [...otherSections, ...sectionsList]
+      console.log('Project sections loaded:', sectionsList)
+    } catch (err) {
+      console.error('Error loading project sections:', err)
+      error.value = err instanceof Error ? err.message : 'Failed to load project sections'
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const createSection = async (
+    projectId: string,
+    sectionId: string,
+    percentComplete: number = 0,
+    status: FeasibilityStudySectionStatus = 'not_started',
+    entity: Record<string, unknown> = {}
+  ): Promise<FeasibilityStudySectionEntity | null> => {
     if (!(await checkAuthentication())) return null
 
-    if (!name.trim()) {
-      error.value = 'Entity name is required'
+    if (!projectId.trim() || !sectionId.trim()) {
+      error.value = 'Project ID and Section ID are required'
       return null
     }
 
@@ -96,147 +142,155 @@ export const useEntityStore = defineStore('entity', () => {
     error.value = null
 
     try {
-      console.log('Creating entity:', { name, data })
-      const { data: newEntity, errors } = await getClient().models.defaultDynamoTable.create({
-        name: name.trim(),
-        data: data.trim(),
+      console.log('Creating section:', { projectId, sectionId, percentComplete, status, entity })
+      const { data: newSection, errors } = await getClient().models.FeasibilityStudySections.create({
+        projectId: projectId.trim(),
+        sectionId: sectionId.trim(),
+        percentComplete,
+        status,
+        entity,
       })
 
       if (errors) {
-        console.error('Errors creating entity:', errors)
-        error.value = 'Failed to create entity'
+        console.error('Errors creating section:', errors)
+        error.value = 'Failed to create section'
         return null
       }
 
-      if (!newEntity) {
-        error.value = 'Failed to create entity'
+      if (!newSection) {
+        error.value = 'Failed to create section'
         return null
       }
 
-      console.log('Entity created:', newEntity)
+      console.log('Section created:', newSection)
 
       // Add to local state
-      entities.value.push(newEntity)
+      sections.value.push(newSection)
 
-      return newEntity
+      return newSection
     } catch (err) {
-      console.error('Error creating entity:', err)
-      error.value = err instanceof Error ? err.message : 'Failed to create entity'
+      console.error('Error creating section:', err)
+      error.value = err instanceof Error ? err.message : 'Failed to create section'
       return null
     } finally {
       isLoading.value = false
     }
   }
 
-  const updateEntity = async (id: string, name: string, data: string = ''): Promise<Entity | null> => {
+  const updateSection = async (
+    projectId: string,
+    sectionId: string,
+    updates: Partial<Pick<FeasibilityStudySection, 'percentComplete' | 'status' | 'entity'>>
+  ): Promise<FeasibilityStudySectionEntity | null> => {
     if (!(await checkAuthentication())) return null
-
-    if (!name.trim()) {
-      error.value = 'Entity name is required'
-      return null
-    }
 
     isLoading.value = true
     error.value = null
 
     try {
-      console.log('Updating entity:', id, { name, data })
-      const { data: updatedEntity, errors } = await getClient().models.defaultDynamoTable.update({
-        id,
-        name: name.trim(),
-        data: data.trim(),
+      console.log('Updating section:', { projectId, sectionId, updates })
+      const { data: updatedSection, errors } = await getClient().models.FeasibilityStudySections.update({
+        projectId,
+        sectionId,
+        ...updates
       })
 
       if (errors) {
-        console.error('Errors updating entity:', errors)
-        error.value = 'Failed to update entity'
+        console.error('Errors updating section:', errors)
+        error.value = 'Failed to update section'
         return null
       }
 
-      if (!updatedEntity) {
-        error.value = 'Failed to update entity'
+      if (!updatedSection) {
+        error.value = 'Failed to update section'
         return null
       }
 
-      console.log('Entity updated:', updatedEntity)
+      console.log('Section updated:', updatedSection)
 
       // Update in local state
-      const index = entities.value.findIndex((e: Entity) => e.id === id)
+      const index = sections.value.findIndex(s => s.projectId === projectId && s.sectionId === sectionId)
       if (index !== -1) {
-        entities.value[index] = updatedEntity
+        sections.value[index] = updatedSection
       }
 
-      return updatedEntity
+      return updatedSection
     } catch (err) {
-      console.error('Error updating entity:', err)
-      error.value = err instanceof Error ? err.message : 'Failed to update entity'
+      console.error('Error updating section:', err)
+      error.value = err instanceof Error ? err.message : 'Failed to update section'
       return null
     } finally {
       isLoading.value = false
     }
   }
 
-  const deleteEntity = async (id: string): Promise<boolean> => {
+  const deleteSection = async (projectId: string, sectionId: string): Promise<boolean> => {
     if (!(await checkAuthentication())) return false
 
     isLoading.value = true
     error.value = null
 
     try {
-      console.log('Deleting entity:', id)
-      const { errors } = await getClient().models.defaultDynamoTable.delete({ id })
+      console.log('Deleting section:', { projectId, sectionId })
+      const { errors } = await getClient().models.FeasibilityStudySections.delete({
+        projectId,
+        sectionId
+      })
 
       if (errors) {
-        console.error('Errors deleting entity:', errors)
-        error.value = 'Failed to delete entity'
+        console.error('Errors deleting section:', errors)
+        error.value = 'Failed to delete section'
         return false
       }
 
-      console.log('Entity deleted successfully')
+      console.log('Section deleted successfully')
 
       // Remove from local state
-      entities.value = entities.value.filter((e: Entity) => e.id !== id)
+      sections.value = sections.value.filter(s => !(s.projectId === projectId && s.sectionId === sectionId))
 
       return true
     } catch (err) {
-      console.error('Error deleting entity:', err)
-      error.value = err instanceof Error ? err.message : 'Failed to delete entity'
+      console.error('Error deleting section:', err)
+      error.value = err instanceof Error ? err.message : 'Failed to delete section'
       return false
     } finally {
       isLoading.value = false
     }
   }
 
+  const getSectionById = (projectId: string, sectionId: string): FeasibilityStudySectionEntity | undefined => {
+    return sections.value.find(section => section.projectId === projectId && section.sectionId === sectionId)
+  }
+
   const clearError = (): void => {
     error.value = null
   }
 
-  const clearEntities = (): void => {
-    entities.value = []
+  const clearSections = (): void => {
+    sections.value = []
     error.value = null
-  }
-
-  const getEntityById = (id: string): Entity | undefined => {
-    return entities.value.find((entity: Entity) => entity.id === id)
   }
 
   return {
     // State
-    entities: readonly(entities),
+    sections: readonly(sections),
     isLoading: readonly(isLoading),
     error: readonly(error),
 
     // Computed
-    entityCount,
-    hasEntities,
+    sectionCount,
+    hasSections,
+    getSectionsByProject,
+    getSectionsByStatus,
 
     // Actions
-    fetchEntities,
-    createEntity,
-    updateEntity,
-    deleteEntity,
+    fetchSections,
+    fetchSectionsByProject,
+    createSection,
+    updateSection,
+    deleteSection,
+    getSectionById,
     clearError,
-    clearEntities,
-    getEntityById
+    clearSections
   }
 })
