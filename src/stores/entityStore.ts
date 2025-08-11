@@ -119,7 +119,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
       // NEW: Parse and replace entities in the sections array
       console.log('=== PARSING AND REPLACING ENTITIES ===')
-      sections.value = sectionsList.map((section: any) => {
+      sections.value = sectionsList.map((section: FeasibilityStudySectionEntity) => {
         if (section.entity) {
           try {
             const firstParse = JSON.parse(section.entity)
@@ -140,7 +140,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
       // NEW: Log the complete parsed entity data
       console.log('=== PARSED ENTITY DATA ===')
-      sections.value.forEach((section: any, index: number) => {
+      sections.value.forEach((section: FeasibilityStudySectionEntity, index: number) => {
         if (section.entity) {
           console.log(`Section ${index + 1} (${section.sectionId}) parsed entity:`, section.entity)
           console.log(`Section ${index + 1} (${section.sectionId}) parsed entity type:`, typeof section.entity)
@@ -304,6 +304,40 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     }
   }
 
+  // New method for updating specific entity fields
+  const updateSectionEntity = async (
+    projectId: string,
+    sectionId: string,
+    fieldName: string,
+    newValue: string
+  ): Promise<boolean> => {
+    if (!(await checkAuthentication())) return false
+
+    try {
+      // Get the current section
+      const currentSection = getSection(projectId, sectionId)
+      if (!currentSection) {
+        error.value = 'Section not found'
+        return false
+      }
+
+      // Create updated entity with the new field value
+      const currentEntity = (currentSection.entity as unknown) as Record<string, unknown> || {}
+      const updatedEntity = {
+        ...currentEntity,
+        [fieldName]: newValue
+      }
+
+      // Update the section with the new entity (convert back to string for DynamoDB)
+      const result = await updateSection(projectId, sectionId, { entity: JSON.stringify(updatedEntity) })
+      return result !== null
+    } catch (err) {
+      console.error('Error updating section entity:', err)
+      error.value = err instanceof Error ? err.message : 'Failed to update section entity'
+      return false
+    }
+  }
+
   const deleteSection = async (projectId: string, sectionId: string): Promise<boolean> => {
     if (!(await checkAuthentication())) return false
 
@@ -351,7 +385,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     error.value = null
   }
 
-  const setSelectedSections = (sections: readonly any[]): void => {
+  const setSelectedSections = (sections: readonly FeasibilityStudySectionEntity[]): void => {
     selectedSections.value = [...sections]
   }
 
@@ -395,6 +429,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     fetchSectionsByProject,
     createSection,
     updateSection,
+    updateSectionEntity,
     deleteSection,
     getSectionById,
     clearError,

@@ -71,49 +71,89 @@
                     @click="setActiveTab(fieldName)"
                   >
                     {{ formatTabName(fieldName) }}
+                    <button
+                      v-if="activeTab === fieldName"
+                      @click.stop="toggleEditMode(fieldName)"
+                      class="edit-button"
+                      :class="{ 'editing': isEditing(fieldName) }"
+                    >
+                      {{ isEditing(fieldName) ? 'Cancel' : 'Edit' }}
+                    </button>
                   </div>
                 </div>
 
                 <div class="tab-content">
-                  <div v-if="activeTab && section.entity && section.entity[activeTab]" class="tab-panel">
-                    <div v-if="Array.isArray(section.entity[activeTab])" class="array-content">
-                      <div v-for="(item, index) in section.entity[activeTab]" :key="index" class="array-item">
-                        <div v-if="typeof item === 'object' && item !== null" class="object-item">
-                          <div v-for="(propValue, propKey) in item" :key="String(propKey)" class="property">
-                            <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
-                            <span class="property-value">
-                              <span class="markdown-inline">
-                                <span v-html="renderMarkdown(String(propValue))"></span>
+                  <div v-if="activeTab && section.entity && ((section.entity as unknown) as Record<string, unknown>)[activeTab]" class="tab-panel">
+                    <!-- Edit Mode -->
+                    <div v-if="isEditing(activeTab)" class="edit-mode">
+                      <div class="edit-controls">
+                        <textarea
+                          v-model="editValues[activeTab]"
+                          class="edit-textarea"
+                          :placeholder="`Edit ${formatTabName(activeTab)}...`"
+                          rows="10"
+                        ></textarea>
+                        <div class="edit-actions">
+                          <button
+                            @click="saveEdit(section.projectId, section.sectionId, activeTab)"
+                            class="save-button"
+                            :disabled="isSaving"
+                          >
+                            <span v-if="isSaving" class="loading-spinner-small"></span>
+                            {{ isSaving ? 'Saving...' : 'Save' }}
+                          </button>
+                          <button
+                            @click="cancelEdit(activeTab)"
+                            class="cancel-button"
+                            :disabled="isSaving"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- View Mode -->
+                    <div v-else class="view-mode">
+                      <div v-if="Array.isArray(getEntityValue(section.entity, activeTab))" class="array-content">
+                        <div v-for="(item, index) in (getEntityValue(section.entity, activeTab) as unknown[])" :key="index" class="array-item">
+                          <div v-if="typeof item === 'object' && item !== null" class="object-item">
+                            <div v-for="(propValue, propKey) in item" :key="String(propKey)" class="property">
+                              <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
+                              <span class="property-value">
+                                <span class="markdown-inline">
+                                  <span v-html="renderMarkdown(String(propValue))"></span>
+                                </span>
                               </span>
+                            </div>
+                          </div>
+                          <div v-else class="simple-value">
+                            <span class="markdown-inline">
+                              <span v-html="renderMarkdown(String(item))"></span>
                             </span>
                           </div>
                         </div>
-                        <div v-else class="simple-value">
-                          <span class="markdown-inline">
-                            <span v-html="renderMarkdown(String(item))"></span>
+                      </div>
+
+                      <div v-else-if="typeof getEntityValue(section.entity, activeTab) === 'object' && getEntityValue(section.entity, activeTab) !== null" class="object-content">
+                        <div v-for="(propValue, propKey) in (getEntityValue(section.entity, activeTab) as Record<string, unknown>)" :key="String(propKey)" class="property">
+                          <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
+                          <span class="property-value">
+                            <span class="markdown-inline">
+                              <span v-html="renderMarkdown(String(propValue))"></span>
+                            </span>
                           </span>
                         </div>
                       </div>
-                    </div>
 
-                    <div v-else-if="typeof section.entity[activeTab] === 'object' && section.entity[activeTab] !== null" class="object-content">
-                      <div v-for="(propValue, propKey) in section.entity[activeTab]" :key="String(propKey)" class="property">
-                        <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
-                        <span class="property-value">
-                          <span class="markdown-inline">
-                            <span v-html="renderMarkdown(String(propValue))"></span>
-                          </span>
-                        </span>
-                      </div>
-                    </div>
-
-                    <div v-else class="simple-content">
-                      <!-- Render all content as markdown -->
-                      <div class="markdown-content">
-                        <div
-                          class="markdown-body"
-                          v-html="renderMarkdown(String(section.entity[activeTab] || ''))"
-                        ></div>
+                      <div v-else class="simple-content">
+                        <!-- Render all content as markdown -->
+                        <div class="markdown-content">
+                          <div
+                            class="markdown-body"
+                            v-html="renderMarkdown(String(getEntityValue(section.entity, activeTab) || ''))"
+                          ></div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -136,8 +176,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
+import type { FeasibilityStudySectionEntity } from '@/stores/entityStore'
 import WorkbenchSidebar from '@/components/WorkbenchSidebar.vue'
 import Conversation from '@/components/Conversation.vue'
 import { marked } from 'marked'
@@ -160,12 +201,18 @@ const sectionStore = useFeasibilityStudySectionStore()
 
 // State
 const selectedSections = ref<string[]>([])
-const selectedSectionObjects = ref<readonly any[]>([])
+const selectedSectionObjects = ref<readonly FeasibilityStudySectionEntity[]>([])
 const activeTab = ref<string>('')
 const chatWidth = ref(50) // Default 50% split
 const isResizing = ref(false)
 const isLoading = ref(true)
 const hasError = ref(false)
+
+// Edit mode state
+const editMode = ref<Record<string, boolean>>({})
+const editValues = ref<Record<string, string>>({})
+const isSaving = ref(false)
+const originalValues = ref<Record<string, string>>({})
 
 // Load all sections on component mount
 const loadSections = async () => {
@@ -185,7 +232,7 @@ const retryLoad = () => {
   loadSections()
 }
 
-const handleContextSelected = (sections: readonly any[]) => {
+const handleContextSelected = (sections: readonly FeasibilityStudySectionEntity[]) => {
   selectedSectionObjects.value = sections
 
   // Set the first available tab as active if sections are selected
@@ -197,7 +244,7 @@ const handleContextSelected = (sections: readonly any[]) => {
   }
 }
 
-const handleSectionsSelected = (sections: readonly any[]) => {
+const handleSectionsSelected = (sections: readonly FeasibilityStudySectionEntity[]) => {
   selectedSectionObjects.value = sections
 
   // Set the first available tab as active if sections are selected
@@ -209,10 +256,13 @@ const handleSectionsSelected = (sections: readonly any[]) => {
   }
 }
 
-const getSectionDisplayName = (section: any): string => {
+const getSectionDisplayName = (section: FeasibilityStudySectionEntity): string => {
   // Get section name from parsed entity data
-  if (section.entity && typeof section.entity === 'object' && 'sectionName' in section.entity) {
-    return section.entity.sectionName as string
+  if (section.entity && typeof section.entity === 'object') {
+    const entity = section.entity as Record<string, unknown>
+    if ('sectionName' in entity && typeof entity.sectionName === 'string') {
+      return entity.sectionName
+    }
   }
 
   // Fallback to section ID if no name available
@@ -267,19 +317,79 @@ const formatPropertyName = (key: string): string => {
     .trim()
 }
 
-const formatPropertyValue = (value: any): string => {
-  if (value === null || value === undefined) {
-    return 'N/A'
+
+
+// Helper function to safely access entity properties
+const getEntityValue = (entity: unknown, key: string): unknown => {
+  if (entity && typeof entity === 'object') {
+    return (entity as Record<string, unknown>)[key]
   }
-  if (typeof value === 'boolean') {
-    return value ? 'Yes' : 'No'
-  }
-  if (typeof value === 'object') {
-    return JSON.stringify(value)
-  }
-  return String(value)
+  return undefined
 }
 
+// Edit mode methods
+const toggleEditMode = (fieldName: string): void => {
+  if (editMode.value[fieldName]) {
+    // Cancel edit mode
+    cancelEdit(fieldName)
+  } else {
+    // Enter edit mode
+    const currentValue = getEntityValue(selectedSectionObjects.value[0]?.entity, fieldName)
+    if (currentValue !== undefined) {
+      editMode.value[fieldName] = true
+      editValues.value[fieldName] = String(currentValue)
+      originalValues.value[fieldName] = String(currentValue)
+    }
+  }
+}
+
+const isEditing = (fieldName: string): boolean => {
+  return editMode.value[fieldName] || false
+}
+
+const saveEdit = async (projectId: string, sectionId: string, fieldName: string): Promise<void> => {
+  if (!editValues.value[fieldName]) return
+
+  try {
+    isSaving.value = true
+    const success = await sectionStore.updateSectionEntity(
+      projectId,
+      sectionId,
+      fieldName,
+      editValues.value[fieldName]
+    )
+
+    if (success) {
+      // Exit edit mode
+      editMode.value[fieldName] = false
+      delete editValues.value[fieldName]
+      delete originalValues.value[fieldName]
+
+      // Refresh the store data
+      await sectionStore.fetchSections()
+
+      // Force UI update by temporarily clearing and restoring the selection
+      const currentSections = [...selectedSectionObjects.value]
+      selectedSectionObjects.value = []
+
+      nextTick(() => {
+        selectedSectionObjects.value = currentSections
+      })
+    } else {
+      console.error('Failed to save edit')
+    }
+  } catch (error) {
+    console.error('Error saving edit:', error)
+  } finally {
+    isSaving.value = false
+  }
+}
+
+const cancelEdit = (fieldName: string): void => {
+  editMode.value[fieldName] = false
+  delete editValues.value[fieldName]
+  delete originalValues.value[fieldName]
+}
 
 
 // Markdown rendering function
@@ -502,6 +612,10 @@ onUnmounted(() => {
   user-select: none;
   height: auto;
   overflow: visible;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .tab-header:hover {
@@ -515,6 +629,131 @@ onUnmounted(() => {
   border-color: #008C8E;
   border-bottom-color: white;
   margin-bottom: -1px;
+}
+
+/* Edit Button Styles */
+.edit-button {
+  background: #008C8E;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.edit-button:hover {
+  background: #007779;
+}
+
+.edit-button.editing {
+  background: #ef4444;
+}
+
+.edit-button.editing:hover {
+  background: #dc2626;
+}
+
+/* Edit Mode Styles */
+.edit-mode {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.edit-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.edit-textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  resize: vertical;
+  background: white;
+}
+
+.edit-textarea:focus {
+  outline: none;
+  border-color: #008C8E;
+  box-shadow: 0 0 0 3px rgba(0, 140, 142, 0.1);
+}
+
+.edit-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.save-button {
+  background: #008C8E;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.save-button:hover:not(:disabled) {
+  background: #007779;
+}
+
+.save-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.cancel-button {
+  background: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-button:hover:not(:disabled) {
+  background: #4b5563;
+}
+
+.cancel-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Loading Spinner for Save Button */
+.loading-spinner-small {
+  width: 12px;
+  height: 12px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* View Mode Styles */
+.view-mode {
+  /* Existing styles remain the same */
 }
 
 .tab-content {
