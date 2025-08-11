@@ -76,9 +76,28 @@ export function convertLegacySectionToNewSchema(
   const entity = {
     sectionName: legacySection.sectionName,
     qualityRating: legacySection.qualityRating,
+    content: {}, // Empty content object as required by interface
     issues: legacySection.issues,
     observations: legacySection.observations,
-    subSections: legacySection.subSections
+    subSections: legacySection.subSections.map(subSection => ({
+      subSectionId: subSection.id,
+      subSectionTitle: subSection.name,
+      percentComplete: 0, // Default value since legacy doesn't have this
+      content: {}, // Empty content object as required by interface
+      assessment: subSection.assessment,
+      observations: subSection.observations.map(obs => ({
+        note: obs.note,
+        source: obs.source,
+        changeDetected: obs.changeDetected
+      })),
+      decisions: subSection.decisions.map(dec => ({
+        date: dec.date,
+        original: dec.original,
+        revised: dec.revised,
+        reason: dec.rationale || '', // Map rationale to reason
+        source: '' // Legacy doesn't have source, use empty string
+      }))
+    }))
   }
 
   return {

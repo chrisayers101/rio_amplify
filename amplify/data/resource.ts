@@ -3,14 +3,6 @@ import { chatOrchestratorFunction } from '../functions/chat-orchestrator/resourc
 import { s3ProxyFunction } from '../functions/s3-proxy/resource';
 
 const schema = a.schema({
-  defaultDynamoTable: a
-    .model({
-      // Add your table fields here
-      name: a.string(),
-      data: a.string(),
-    })
-    .authorization((allow) => [allow.authenticated()]),
-
   FeasibilityStudySections: a
     .model({
       projectId: a.string().required(),   // PK

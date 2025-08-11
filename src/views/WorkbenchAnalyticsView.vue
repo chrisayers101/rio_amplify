@@ -1,5 +1,24 @@
 <template>
   <div class="workbench-layout">
+    <!-- Loading State -->
+    <div v-if="isLoading" class="loading-overlay">
+      <div class="loading-content">
+        <div class="loading-spinner"></div>
+        <h3>Loading Feasibility Study Sections</h3>
+        <p>Fetching data from the database...</p>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div v-else-if="hasError" class="error-overlay">
+      <div class="error-content">
+        <div class="error-icon">⚠️</div>
+        <h3>Failed to Load Sections</h3>
+        <p>There was an error loading the feasibility study sections from the database.</p>
+        <button @click="retryLoad" class="retry-button">Try Again</button>
+      </div>
+    </div>
+
     <!-- Sidebar Navigation -->
     <WorkbenchSidebar
       v-model="selectedSections"
@@ -57,36 +76,44 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
+import type { FeasibilityStudySectionEntity } from '@/stores/entityStore'
 import WorkbenchSidebar from '@/components/WorkbenchSidebar.vue'
 import Conversation from '@/components/Conversation.vue'
 
-interface Section {
-  sectionId: string
-  sectionName: string
-  percentComplete: number
-  statusOfCompleteness: string
-  qualityRating: string
-  issues: Array<{
-    id: string
-    description: string
-    status: string
-    source: string
-  }>
-  observations: Array<{
-    id: string
-    text: string
-    source: string
-    changeOccurred: boolean
-  }>
-}
+// Use the store
+const sectionStore = useFeasibilityStudySectionStore()
 
+// State
 const selectedSections = ref<string[]>([])
-const selectedSectionObjects = ref<Section[]>([])
+const selectedSectionObjects = ref<typeof sectionStore.sections>([])
 const chatWidth = ref(50) // Default 50% split
 const isResizing = ref(false)
+const isLoading = ref(true)
+const hasError = ref(false)
 
-const handleContextSelected = (sections: Section[]) => {
+// Load all sections on component mount
+const loadSections = async () => {
+  try {
+    isLoading.value = true
+    hasError.value = false
+    console.log('Loading feasibility study sections for workbench...')
+    await sectionStore.fetchSections()
+    console.log('Sections loaded successfully:', sectionStore.sections.length)
+  } catch (error) {
+    console.error('Failed to load sections:', error)
+    hasError.value = true
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const retryLoad = () => {
+  loadSections()
+}
+
+const handleContextSelected = (sections: typeof sectionStore.sections) => {
   selectedSectionObjects.value = sections
   console.log('Selected sections for chat context:', sections)
   // Here you would typically send these sections to your chat component
@@ -98,38 +125,36 @@ const startResize = (event: MouseEvent | TouchEvent) => {
   event.preventDefault()
 
   const handleMouseMove = (e: MouseEvent | TouchEvent) => {
-    if (!isResizing.value) return
+    if (isResizing.value) {
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
+      const containerWidth = window.innerWidth
+      const newChatWidth = (clientX / containerWidth) * 100
 
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
-    const container = document.querySelector('.workbench-main') as HTMLElement
-    if (!container) return
-
-    const containerRect = container.getBoundingClientRect()
-    const newWidth = ((clientX - containerRect.left) / containerRect.width) * 100
-
-    // Constrain width between 20% and 80%
-    chatWidth.value = Math.max(20, Math.min(80, newWidth))
+      // Constrain chat width between 20% and 80%
+      chatWidth.value = Math.max(20, Math.min(80, newChatWidth))
+    }
   }
 
   const handleMouseUp = () => {
     isResizing.value = false
-    document.removeEventListener('mousemove', handleMouseMove)
-    document.removeEventListener('mouseup', handleMouseUp)
-    document.removeEventListener('touchmove', handleMouseMove)
-    document.removeEventListener('touchend', handleMouseUp)
   }
 
   document.addEventListener('mousemove', handleMouseMove)
-  document.addEventListener('mouseup', handleMouseUp)
   document.addEventListener('touchmove', handleMouseMove)
+  document.addEventListener('mouseup', handleMouseUp)
   document.addEventListener('touchend', handleMouseUp)
 }
 
-// Clean up event listeners on component unmount
+// Load sections when component mounts
+onMounted(() => {
+  loadSections()
+})
+
 onUnmounted(() => {
+  // Clean up resize event listeners
   document.removeEventListener('mousemove', () => {})
-  document.removeEventListener('mouseup', () => {})
   document.removeEventListener('touchmove', () => {})
+  document.removeEventListener('mouseup', () => {})
   document.removeEventListener('touchend', () => {})
 })
 </script>
@@ -306,6 +331,115 @@ onUnmounted(() => {
 
 .chat-section :deep(.conversation-content) {
   height: 100%;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loading-content {
+  text-align: center;
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e5e7eb;
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #008C8E;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+.loading-content h3 {
+  color: #1f2937;
+  margin: 0 0 8px 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.loading-content p {
+  color: #6b7280;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error Overlay */
+.error-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.error-content {
+  text-align: center;
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e5e7eb;
+}
+
+.error-icon {
+  font-size: 3rem;
+  color: #ef4444; /* Red color for error */
+  margin-bottom: 16px;
+}
+
+.error-content h3 {
+  color: #1f2937;
+  margin: 0 0 8px 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.error-content p {
+  color: #6b7280;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.retry-button {
+  background-color: #008C8E;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.retry-button:hover {
+  background-color: #007779;
 }
 
 /* Mobile responsive styles */

@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LandingPage from '@/views/LandingPage.vue'
 import AuthView from '@/views/AuthView.vue'
-import EntitiesView from '@/views/EntitiesView.vue'
 import FilesView from '@/views/FilesView.vue'
 import HomeView from '@/views/HomeView.vue'
 import ProjectAnalyticsView from '@/views/ProjectAnalyticsView.vue'
@@ -51,13 +50,6 @@ const router = createRouter({
             path: '/auth',
             name: 'Auth',
             component: AuthView,
-        },
-
-        {
-            path: '/entities',
-            name: 'Entities',
-            component: EntitiesView,
-            meta: { requiresAuth: true }
         },
         {
             path: '/files',

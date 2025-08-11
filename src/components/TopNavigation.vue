@@ -64,7 +64,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { useProjectStore } from '@/stores/projectStore'
 import { useViewStore } from '@/stores/viewStore'
 import RioLogo from '@/assets/RioLogo.svg'
-import { ArrowLeftStartOnRectangleIcon, ChevronDownIcon, DocumentIcon, ServerIcon, ChartBarIcon, CpuChipIcon } from '@heroicons/vue/24/outline'
+import { ArrowLeftStartOnRectangleIcon, ChevronDownIcon, DocumentIcon, ChartBarIcon, CpuChipIcon } from '@heroicons/vue/24/outline'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -120,10 +120,6 @@ watch(() => router.currentRoute.value.path, (newPath) => {
 
 const navigateToFiles = () => {
   router.push('/files')
-}
-
-const navigateToEntities = () => {
-  router.push('/entities')
 }
 
 async function signOut() {
