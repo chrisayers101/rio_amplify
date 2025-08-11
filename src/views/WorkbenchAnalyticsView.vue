@@ -427,6 +427,7 @@ onUnmounted(() => {
   display: flex;
   height: calc(100vh - 64px);
   background: #f8fafc;
+  overflow: hidden;
 }
 
 /* Main Content Styles */
@@ -444,6 +445,8 @@ onUnmounted(() => {
   background: white;
   min-width: 0;
   transition: width 0.1s ease;
+  max-height: calc(100vh - 64px);
+  overflow: hidden;
 }
 
 /* Resize Handle */
@@ -507,12 +510,13 @@ onUnmounted(() => {
 
 .canvas-content {
   flex: 1;
-  padding: 32px;
+  padding: 24px;
   overflow-y: auto;
+  max-height: calc(100vh - 64px - 80px); /* Account for top nav + header */
 }
 
 .canvas-placeholder {
-  padding: 48px;
+  padding: 32px 24px;
   text-align: center;
   transition: all 0.3s ease;
 }
@@ -535,7 +539,7 @@ onUnmounted(() => {
   font-size: 1rem;
   color: #666;
   line-height: 1.6;
-  margin: 0 0 32px 0;
+  margin: 0 0 16px 0;
   max-width: 500px;
   margin-left: auto;
   margin-right: auto;
@@ -586,11 +590,11 @@ onUnmounted(() => {
 }
 
 .tab-content {
-  min-height: 200px;
+  min-height: 120px;
 }
 
 .tab-panel {
-  padding: 20px 0;
+  padding: 16px 0;
 }
 
 .array-content, .object-content {
@@ -646,7 +650,7 @@ onUnmounted(() => {
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  padding: 24px;
+  padding: 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -654,8 +658,8 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
   border-bottom: 1px solid #f3f4f6;
 }
 

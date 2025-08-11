@@ -60,15 +60,7 @@
       </div>
     </div>
 
-    <div class="sidebar-footer">
-      <button
-        @click="useSelectedAsContext"
-        class="context-btn"
-        :disabled="selectedSections.length === 0"
-      >
-        Use Selected as Chat Context
-      </button>
-    </div>
+
   </div>
 </template>
 
@@ -104,7 +96,7 @@ const selectedSections = ref<string[]>(props.modelValue || [])
 const selectAll = () => {
   selectedSections.value = sections.value.map(section => `${section.projectId}-${section.sectionId}`)
   emit('update:modelValue', selectedSections.value)
-  
+
   // Emit the selected sections for the canvas
   emit('sections-selected', sections.value)
 }
@@ -112,19 +104,19 @@ const selectAll = () => {
 const clearAll = () => {
   selectedSections.value = []
   emit('update:modelValue', selectedSections.value)
-  
+
   // Emit empty selection for the canvas
   emit('sections-selected', [])
 }
 
 const handleSectionToggle = () => {
   emit('update:modelValue', selectedSections.value)
-  
+
   // Get the selected section objects
   const selectedSectionObjects = sections.value.filter(section =>
     selectedSections.value.includes(`${section.projectId}-${section.sectionId}`)
   )
-  
+
   // Emit the selected sections for the canvas
   emit('sections-selected', selectedSectionObjects)
 }
@@ -134,7 +126,7 @@ const getSectionDisplayName = (section: typeof sections.value[0]): string => {
   if (section.entity && typeof section.entity === 'object' && 'sectionName' in section.entity) {
     return section.entity.sectionName as string
   }
-  
+
   // Fallback to section ID if no name available
   return `Section ${section.sectionId}`
 }
@@ -170,7 +162,7 @@ const useSelectedAsContext = () => {
     selectedSections.value.includes(`${section.projectId}-${section.sectionId}`)
   )
   emit('context-selected', selectedSectionObjects)
-  
+
   // Also emit for canvas display
   emit('sections-selected', selectedSectionObjects)
 }

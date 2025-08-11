@@ -78,6 +78,8 @@ function toggleConversation() {
 html, body {
     height: 100%;
     width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 /* Base font settings that will cascade to all elements */
@@ -110,15 +112,16 @@ code, pre, .numeric {
 
 /* Ensure proper height for the app container */
 #app {
-  height: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .main-content {
   margin-top: 0;
   height: calc(100vh - 64px);
-  overflow-y: auto;
+  overflow: hidden;
   background: #fff;
   padding: 0;
   transition: margin-left 0.2s ease-in-out;
