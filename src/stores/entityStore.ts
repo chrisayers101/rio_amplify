@@ -116,10 +116,10 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       }
       console.log('All sections:', sectionsList)
       console.log('=== END ENTITY STORE DATA ===')
-      
+
       // NEW: Parse and replace entities in the sections array
       console.log('=== PARSING AND REPLACING ENTITIES ===')
-      sections.value = sectionsList.map(section => {
+      sections.value = sectionsList.map((section: any) => {
         if (section.entity) {
           try {
             const firstParse = JSON.parse(section.entity)
@@ -137,15 +137,15 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         return section
       })
       console.log('=== ENTITIES PARSED AND REPLACED ===')
-      
+
       // NEW: Log the complete parsed entity data
       console.log('=== PARSED ENTITY DATA ===')
-      sections.value.forEach((section, index) => {
+      sections.value.forEach((section: any, index: number) => {
         if (section.entity) {
           console.log(`Section ${index + 1} (${section.sectionId}) parsed entity:`, section.entity)
           console.log(`Section ${index + 1} (${section.sectionId}) parsed entity type:`, typeof section.entity)
           console.log(`Section ${index + 1} (${section.sectionId}) entity keys:`, Object.keys(section.entity))
-          
+
           console.log(`Section ${index + 1} (${section.sectionId}):`, {
             projectId: section.projectId,
             sectionId: section.sectionId,
@@ -162,18 +162,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       console.log('=== COMPLETE ENTITY STORE STATE ===')
       console.log('Store sections array:', sections.value)
       console.log('Store sections length:', sections.value.length)
-      console.log('Store getters available:', {
-        getSection: typeof getSection,
-        getParsedEntity: typeof getParsedEntity,
-        getSectionsByProject: typeof getSectionsByProject,
-        getSectionsByStatus: typeof getSectionsByStatus
-      })
-      console.log('Store actions available:', {
-        fetchSections: typeof fetchSections,
-        createSection: typeof createSection,
-        updateSection: typeof updateSection,
-        deleteSection: typeof deleteSection
-      })
+      console.log('Store sections loaded successfully')
       console.log('=== END COMPLETE ENTITY STORE STATE ===')
     } catch (err) {
       console.error('Error loading sections:', err)

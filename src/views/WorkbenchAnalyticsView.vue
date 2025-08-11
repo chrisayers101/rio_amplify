@@ -44,8 +44,6 @@
 
       <!-- Canvas Section (Right Half) -->
       <div class="canvas-section" :style="{ width: (100 - chatWidth) + '%' }">
-
-
         <div class="canvas-content">
           <div v-if="selectedSectionObjects.length === 0" class="canvas-placeholder">
             <h3>Select a Feasibility Study Section</h3>
@@ -53,7 +51,6 @@
 
           <div v-else class="canvas-sections">
             <div v-for="section in selectedSectionObjects" :key="`${section.projectId}-${section.sectionId}`" class="section-content">
-
               <div class="section-header">
                 <h3>{{ getSectionDisplayName(section) }}</h3>
                 <div class="section-meta">
@@ -65,17 +62,9 @@
               </div>
 
               <div v-if="section.entity" class="section-entity">
-                <!-- Debug info -->
-                <div style="background: #f0f0f0; padding: 10px; margin-bottom: 10px; font-family: monospace; font-size: 12px;">
-                  <strong>DEBUG:</strong> Raw entity type: {{ typeof section.entity }}<br>
-                  <strong>DEBUG:</strong> Raw entity: {{ section.entity }}<br>
-                  <strong>DEBUG:</strong> Parsed entity keys: {{ Object.keys(parsedEntity || {}) }}<br>
-                  <strong>DEBUG:</strong> Parsed entity: {{ JSON.stringify(parsedEntity, null, 2) }}
-                </div>
-
                 <div class="entity-tabs">
                   <div
-                    v-for="fieldName in ['sectionName', 'qualityRating', 'assessment', 'observations', 'issues', 'content']"
+                    v-for="fieldName in Object.keys(section.entity)"
                     :key="fieldName"
                     class="tab-header"
                     :class="{ active: activeTab === fieldName }"
@@ -86,9 +75,9 @@
                 </div>
 
                 <div class="tab-content">
-                  <div v-if="activeTab && parsedEntity && parsedEntity[activeTab]" class="tab-panel">
-                    <div v-if="Array.isArray(parsedEntity[activeTab])" class="array-content">
-                      <div v-for="(item, index) in parsedEntity[activeTab]" :key="index" class="array-item">
+                  <div v-if="activeTab && section.entity && section.entity[activeTab]" class="tab-panel">
+                    <div v-if="Array.isArray(section.entity[activeTab])" class="array-content">
+                      <div v-for="(item, index) in section.entity[activeTab]" :key="index" class="array-item">
                         <div v-if="typeof item === 'object' && item !== null" class="object-item">
                           <div v-for="(propValue, propKey) in item" :key="String(propKey)" class="property">
                             <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
@@ -101,8 +90,8 @@
                       </div>
                     </div>
 
-                    <div v-else-if="typeof parsedEntity[activeTab] === 'object' && parsedEntity[activeTab] !== null" class="object-content">
-                      <div v-for="(propValue, propKey) in parsedEntity[activeTab]" :key="String(propKey)" class="property">
+                    <div v-else-if="typeof section.entity[activeTab] === 'object' && section.entity[activeTab] !== null" class="object-content">
+                      <div v-for="(propValue, propKey) in section.entity[activeTab]" :key="String(propKey)" class="property">
                         <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
                         <span class="property-value">{{ formatPropertyValue(propValue) }}</span>
                       </div>
@@ -115,20 +104,20 @@
                           <h4 class="content-section-title">Executive Summary</h4>
                           <div
                             class="markdown-body"
-                            v-html="renderMarkdown(String(parsedEntity.content || ''))"
+                            v-html="renderMarkdown(String(section.entity.content || ''))"
                           ></div>
                         </div>
                         <div class="content-section">
                           <h4 class="content-section-title">Key Recommendations</h4>
                           <div
                             class="markdown-body"
-                            v-html="renderMarkdown(String(parsedEntity.keyRecommendations || ''))"
+                            v-html="renderMarkdown(String(section.entity.keyRecommendations || ''))"
                           ></div>
                         </div>
                       </div>
                       <!-- For non-content tabs, display as before -->
                       <div v-else>
-                        {{ parsedEntity[activeTab] }}
+                        {{ section.entity[activeTab] }}
                       </div>
                     </div>
                   </div>
@@ -151,7 +140,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
 import WorkbenchSidebar from '@/components/WorkbenchSidebar.vue'
 import Conversation from '@/components/Conversation.vue'
@@ -182,15 +171,6 @@ const isResizing = ref(false)
 const isLoading = ref(true)
 const hasError = ref(false)
 
-// Computed property to get parsed entity from store
-const parsedEntity = computed(() => {
-  if (selectedSectionObjects.value.length > 0) {
-    const section = selectedSectionObjects.value[0]
-    return sectionStore.getParsedEntity(section.projectId, section.sectionId)
-  }
-  return null
-})
-
 // Load all sections on component mount
 const loadSections = async () => {
   try {
@@ -214,13 +194,8 @@ const handleContextSelected = (sections: readonly any[]) => {
 
   // Set the first available tab as active if sections are selected
   if (sections.length > 0 && sections[0].entity) {
-    const parsedEntity = getParsedEntity(sections[0].entity)
-    if (parsedEntity && typeof parsedEntity === 'object' && Object.keys(parsedEntity).length > 0) {
-      const firstKey = Object.keys(parsedEntity)[0]
-      activeTab.value = firstKey
-    } else {
-      activeTab.value = ''
-    }
+    const firstKey = Object.keys(sections[0].entity)[0]
+    activeTab.value = firstKey
   } else {
     activeTab.value = ''
   }
@@ -229,54 +204,19 @@ const handleContextSelected = (sections: readonly any[]) => {
 const handleSectionsSelected = (sections: readonly any[]) => {
   selectedSectionObjects.value = sections
 
-  console.log('=== CANVAS SECTIONS SELECTED ===')
-  console.log('Selected sections:', sections)
-  console.log('Number of sections:', sections.length)
-
-  if (sections.length > 0) {
-    console.log('First section:', sections[0])
-    console.log('First section entity:', sections[0].entity)
-    if (sections[0].entity) {
-      console.log('Entity keys:', Object.keys(sections[0].entity))
-      console.log('Entity type:', typeof sections[0].entity)
-      console.log('Is entity object:', typeof sections[0].entity === 'object')
-      console.log('Entity stringified:', JSON.stringify(sections[0].entity, null, 2))
-
-      // NEW: Log what getParsedEntity actually returns
-      const parsedEntity = getParsedEntity(sections[0].entity)
-      console.log('=== PARSED ENTITY FOR VUE LOOP ===')
-      console.log('getParsedEntity result:', parsedEntity)
-      console.log('getParsedEntity type:', typeof parsedEntity)
-      console.log('getParsedEntity keys:', Object.keys(parsedEntity || {}))
-      console.log('=== END PARSED ENTITY FOR VUE LOOP ===')
-    }
-  }
-  console.log('=== END CANVAS SECTIONS ===')
-
   // Set the first available tab as active if sections are selected
   if (sections.length > 0 && sections[0].entity) {
-    const parsedEntity = getParsedEntity(sections[0].entity)
-    if (parsedEntity && typeof parsedEntity === 'object' && Object.keys(parsedEntity).length > 0) {
-      const firstKey = Object.keys(parsedEntity)[0]
-      activeTab.value = firstKey
-      console.log('Set active tab to:', firstKey)
-    } else {
-      activeTab.value = ''
-      console.log('No active tab set - parsed entity is not an object or has no keys')
-    }
+    const firstKey = Object.keys(sections[0].entity)[0]
+    activeTab.value = firstKey
   } else {
     activeTab.value = ''
-    console.log('No active tab set - no entity')
   }
 }
 
 const getSectionDisplayName = (section: any): string => {
-  // Try to get section name from parsed entity data if available
-  if (section.entity) {
-    const parsedEntity = getParsedEntity(section.entity)
-    if (parsedEntity && typeof parsedEntity === 'object' && 'sectionName' in parsedEntity) {
-      return parsedEntity.sectionName as string
-    }
+  // Get section name from parsed entity data
+  if (section.entity && typeof section.entity === 'object' && 'sectionName' in section.entity) {
+    return section.entity.sectionName as string
   }
 
   // Fallback to section ID if no name available
@@ -344,82 +284,22 @@ const formatPropertyValue = (value: any): string => {
   return String(value)
 }
 
-// Helper function to parse DynamoDB format
-const parseDynamoDBValue = (value: any): any => {
-  console.log('parseDynamoDBValue called with:', value, 'type:', typeof value)
-
-  if (!value || typeof value !== 'object') {
-    console.log('Returning non-object value:', value)
-    return value
-  }
-
-  // Handle DynamoDB string type: { "S": "value" }
-  if ('S' in value) {
-    console.log('Found DynamoDB string:', value.S)
-    return value.S
-  }
-
-  // Handle DynamoDB number type: { "N": "123" }
-  if ('N' in value) {
-    console.log('Found DynamoDB number:', value.N)
-    return Number(value.N)
-  }
-
-  // Handle DynamoDB boolean type: { "BOOL": true/false }
-  if ('BOOL' in value) {
-    console.log('Found DynamoDB boolean:', value.BOOL)
-    return value.BOOL
-  }
-
-  // Handle DynamoDB list type: { "L": [...] }
-  if ('L' in value) {
-    console.log('Found DynamoDB list with', value.L.length, 'items')
-    return value.L.map((item: any) => parseDynamoDBValue(item))
-  }
-
-  // Handle DynamoDB map type: { "M": {...} }
-  if ('M' in value) {
-    console.log('Found DynamoDB map with keys:', Object.keys(value.M))
-    const result: any = {}
-    for (const [key, val] of Object.entries(value.M)) {
-      result[key] = parseDynamoDBValue(val)
-    }
-    return result
-  }
-
-  // If it's not DynamoDB format, return as is
-  console.log('No DynamoDB format detected, returning as-is:', value)
-  return value
-}
-
 // Markdown rendering function
 const renderMarkdown = (markdownText: string): string => {
   if (!markdownText) return ''
 
   try {
-    console.log('=== RENDER MARKDOWN ===')
-            console.log('Input markdown:', markdownText)
-    console.log('Input markdown length:', markdownText.length)
-    console.log('Input markdown char codes:', Array.from(markdownText).map(c => c.charCodeAt(0)))
-
     // Convert PowerShell-style newlines to actual newlines
     const processedMarkdown = markdownText.replace(/`n/g, '\n')
-    console.log('Processed markdown:', processedMarkdown)
 
     // Parse markdown to HTML using the correct marked v16 API
-    // In v16+, we need to use the marked function directly
     const html = marked(processedMarkdown)
-    console.log('Raw HTML from marked:', html)
 
     // Ensure html is a string before sanitizing
     const htmlString = typeof html === 'string' ? html : String(html)
-    console.log('HTML string:', htmlString)
 
     // Sanitize HTML to prevent XSS
     const sanitizedHtml = DOMPurify.sanitize(htmlString)
-    console.log('Sanitized HTML:', sanitizedHtml)
-
-    console.log('=== END RENDER MARKDOWN ===')
 
     // Return the sanitized HTML
     return sanitizedHtml
@@ -427,84 +307,6 @@ const renderMarkdown = (markdownText: string): string => {
     console.error('Error rendering markdown:', error)
     return markdownText // Fallback to raw text if parsing fails
   }
-}
-
-// Get parsed entity data for display
-const getParsedEntity = (entity: any): any => {
-  console.log('=== GET PARSED ENTITY ===')
-  console.log('Input entity:', entity)
-  console.log('Entity type:', typeof entity)
-  console.log('Is entity null/undefined:', !entity)
-
-  if (!entity) {
-    console.log('Entity is null/undefined, returning null')
-    return null
-  }
-
-  // If entity is a string, try to parse it as JSON first
-  if (typeof entity === 'string') {
-    try {
-      console.log('Entity is a string, attempting to parse as JSON...')
-      const firstParse = JSON.parse(entity)
-      console.log('First parse result:', firstParse)
-      console.log('First parse type:', typeof firstParse)
-
-      // Fix: Parse twice because entity is double-encoded
-      const parsed = typeof firstParse === 'string' ? JSON.parse(firstParse) : firstParse
-      console.log('Successfully parsed JSON string, result:', parsed)
-      console.log('=== END GET PARSED ENTITY ===')
-      return parsed
-    } catch (parseError) {
-      console.log('Failed to parse JSON string:', parseError)
-      console.log('Returning original string')
-      console.log('=== END GET PARSED ENTITY ===')
-      return entity
-    }
-  }
-
-  // Check if this is DynamoDB format by looking for type indicators
-  const hasDynamoDBFormat = Object.values(entity).some((value: any) =>
-    value && typeof value === 'object' && ('S' in value || 'N' in value || 'L' in value || 'M' in value || 'BOOL' in value)
-  )
-
-  console.log('Has DynamoDB format:', hasDynamoDBFormat)
-  console.log('Entity values:', Object.values(entity))
-
-  if (hasDynamoDBFormat) {
-    console.log('Parsing DynamoDB format...')
-    const parsed = parseDynamoDBValue(entity)
-    console.log('Parsed result:', parsed)
-    console.log('=== END GET PARSED ENTITY ===')
-    return parsed
-  }
-
-  // NEW: Handle the case where the entity is an object with numeric keys containing JSON strings
-  if (typeof entity === 'object' && entity !== null) {
-    const keys = Object.keys(entity)
-    console.log('Entity keys:', keys)
-    if (keys.length > 0 && keys.every(key => !isNaN(Number(key)))) {
-      console.log('Found object with numeric keys, checking first value...')
-      const firstValue = entity[keys[0]]
-      console.log('First value type:', typeof firstValue)
-      console.log('First value:', firstValue)
-      if (typeof firstValue === 'string' && firstValue.trim().startsWith('{')) {
-        try {
-          console.log('Attempting to parse first value as JSON...')
-          const parsed = JSON.parse(firstValue)
-          console.log('Successfully parsed nested JSON, result:', parsed)
-          console.log('=== END GET PARSED ENTITY ===')
-          return parsed
-        } catch (parseError) {
-          console.log('Failed to parse nested JSON:', parseError)
-        }
-      }
-    }
-  }
-
-  console.log('No special format detected, returning entity as-is')
-  console.log('Final return value:', entity)
-  console.log('=== END GET PARSED ENTITY ===')
-  return entity
 }
 
 const startResize = (event: MouseEvent | TouchEvent) => {
