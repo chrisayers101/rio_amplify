@@ -7,8 +7,10 @@ const schema = a.schema({
     .model({
       projectId: a.string().required(),   // PK
       sectionId: a.string().required(),   // SK
+      sectionName: a.string(),            // Section display name
       percentComplete: a.integer(),       // you'll filter/sort on this
       status: a.enum(['not_started', 'in_progress', 'complete']), // maybe a GSI on this later
+      qualityRating: a.string(),          // Quality assessment rating
       entity: a.json(),                   // the rest (nested content, issues…)
       createdAt: a.datetime(),            // automatically managed timestamp
       updatedAt: a.datetime(),            // automatically managed timestamp

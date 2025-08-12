@@ -83,10 +83,11 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
   const parseEntityData = (rawEntity: Record<string, unknown> | string): FeasibilityStudySectionEntity => {
     console.log('🔍 parseEntityData - Input rawEntity type:', typeof rawEntity)
     console.log('🔍 parseEntityData - Input rawEntity value:', rawEntity)
+    console.log('🔍 parseEntityData - Raw entity structure:', JSON.stringify(rawEntity, null, 2))
 
     let entityObject: Record<string, unknown>
 
-        // Handle case where entity is a JSON string
+    // Handle case where entity is a JSON string
     if (typeof rawEntity === 'string') {
       try {
         // The entity string appears to be double-encoded, so we need to parse it twice
@@ -130,8 +131,9 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
     console.log('🔍 parseEntityData - Entity object keys:', Object.keys(entityObject))
     console.log('🔍 parseEntityData - Entity object values:', entityObject)
+    console.log('🔍 parseEntityData - Full entity object structure:', JSON.stringify(entityObject, null, 2))
 
-        // Log the entity structure for debugging
+    // Log the entity structure for debugging
     console.log('🔍 parseEntityData - Raw content value:', entityObject.content)
     console.log('🔍 parseEntityData - Raw assessment value:', entityObject.assessment)
     console.log('🔍 parseEntityData - Raw issues value:', entityObject.issues)
@@ -162,14 +164,22 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
   // Utility functions for formatting and display
   const getSectionDisplayName = (section: ParsedFeasibilityStudySection): string => {
+    // Use the sectionName field if available
+    if (section.sectionName) {
+      return `${section.sectionId}: ${section.sectionName}`
+    }
+
+    // Fallback to extracting from content if sectionName is not available
     if (section.entity && typeof section.entity === 'object' && section.entity.content) {
       const content = section.entity.content as string
       // Extract section name from the first heading (e.g., "# Executive Summary" -> "Executive Summary")
       const headingMatch = content.match(/^#\s+(.+)$/m)
       if (headingMatch) {
-        return headingMatch[1].trim()
+        return `${section.sectionId}: ${headingMatch[1].trim()}`
       }
     }
+
+    // Final fallback
     return `Section ${section.sectionId}`
   }
 
@@ -234,16 +244,26 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       const { data: sectionsList, errors } = await getClient().models.FeasibilityStudySections.list({})
       console.log('🔍 fetchSections - Raw data received from Amplify:', sectionsList)
       console.log('🔍 fetchSections - Errors from Amplify:', errors)
+      console.log('🔍 fetchSections - Error details:', JSON.stringify(errors, null, 2))
 
       if (errors) {
         console.error('Errors fetching sections:', errors)
+        console.error('Full error details:', JSON.stringify(errors, null, 2))
         error.value = 'Failed to fetch sections'
         return
       }
 
       // Parse and validate all sections
       console.log('🔍 Raw section from Amplify:', sectionsList[0])
+      console.log('🔍 Complete raw DynamoDB object structure:', JSON.stringify(sectionsList[0], null, 2))
+      console.log('🔍 Raw entity field type:', typeof sectionsList[0].entity)
+      console.log('🔍 Raw entity field value:', sectionsList[0].entity)
+
       sections.value = sectionsList.map((section: FeasibilityStudySection) => {
+        console.log('🔍 Processing section:', section.projectId, section.sectionId)
+        console.log('🔍 Section entity before parsing:', section.entity)
+        console.log('🔍 Section entity type:', typeof section.entity)
+
         const parsedEntity = parseEntityData(section.entity)
 
         // Use the parsed entity directly since it only contains fields that exist
@@ -280,6 +300,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
       if (errors) {
         console.error('Errors fetching project sections:', errors)
+        console.error('Full error details:', JSON.stringify(errors, null, 2))
         error.value = 'Failed to fetch project sections'
         return
       }

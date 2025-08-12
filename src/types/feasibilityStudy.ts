@@ -14,8 +14,10 @@ export interface FeasibilityStudySectionEntity {
 export interface FeasibilityStudySection {
   projectId: string;
   sectionId: string;
+  sectionName: string;
   percentComplete: number;
   status: FeasibilityStudySectionStatus;
+  qualityRating: string;
   entity: Record<string, unknown> | string;  // Can be JSON object or JSON string
   createdAt?: string | null;
   updatedAt?: string | null;
