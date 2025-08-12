@@ -7,16 +7,13 @@ import type { S3Object } from '@/interfaces/s3';
 export async function listObjects(): Promise<S3Object[]> {
   try {
     const path = 'uploads/';
-    console.log('Calling list with path:', path);
+
     const result = await list({
       path: path,
       options: {
         listAll: true,
       },
     });
-
-    console.log('Raw list result:', result);
-    console.log('All items:', result.items);
 
     return result.items.map((item) => ({
       key: item.path,
@@ -35,16 +32,12 @@ export async function listObjects(): Promise<S3Object[]> {
  */
 export async function listObjectsInFolder(folderPath: string): Promise<S3Object[]> {
   try {
-    console.log('Calling list with path:', folderPath);
     const result = await list({
       path: folderPath,
       options: {
         listAll: true,
       },
     });
-
-    console.log('Raw list result:', result);
-    console.log('All items:', result.items);
 
     return result.items.map((item) => ({
       key: item.path,
@@ -100,11 +93,9 @@ export async function getDownloadUrl(key: string): Promise<string> {
  */
 export async function deleteFile(key: string): Promise<void> {
   try {
-    console.log('Deleting file with key:', key);
     await remove({
       path: key,
     });
-    console.log('File deleted successfully');
   } catch (error) {
     console.error('Error deleting file:', error);
     throw error;
@@ -116,13 +107,11 @@ export async function deleteFile(key: string): Promise<void> {
  */
 export async function downloadFolder(folderPath: string, folderName?: string): Promise<void> {
   try {
-    console.log('Starting folder download for:', folderPath);
 
     // List all objects in the folder
     const objects = await listObjectsInFolder(folderPath);
 
     if (objects.length === 0) {
-      console.log('No files found in folder');
       return;
     }
 
@@ -133,7 +122,6 @@ export async function downloadFolder(folderPath: string, folderName?: string): P
     // Download each file and add to zip
     for (const obj of objects) {
       try {
-        console.log('Downloading file:', obj.key);
         const url = await getDownloadUrl(obj.key);
         const response = await fetch(url);
         const blob = await response.blob();
@@ -141,8 +129,6 @@ export async function downloadFolder(folderPath: string, folderName?: string): P
         // Extract filename from path for cleaner zip structure
         const fileName = obj.key.replace(folderPath, '').replace(/^\/+/, '');
         zip.file(fileName, blob);
-
-        console.log('Added to zip:', fileName);
       } catch (error) {
         console.error('Error downloading file for zip:', obj.key, error);
         // Continue with other files even if one fails
@@ -162,8 +148,6 @@ export async function downloadFolder(folderPath: string, folderName?: string): P
 
     // Clean up the URL object
     URL.revokeObjectURL(zipUrl);
-
-    console.log('Folder download completed');
   } catch (error) {
     console.error('Error downloading folder:', error);
     throw error;

@@ -73,7 +73,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       await getCurrentUser()
       return true
     } catch {
-      console.log('User not authenticated for feasibility study section operations')
+
       error.value = 'Authentication required'
       return false
     }
@@ -81,9 +81,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
     // Helper function to parse and validate entity data
   const parseEntityData = (rawEntity: Record<string, unknown> | string): FeasibilityStudySectionEntity => {
-    console.log('🔍 parseEntityData - Input rawEntity type:', typeof rawEntity)
-    console.log('🔍 parseEntityData - Input rawEntity value:', rawEntity)
-    console.log('🔍 parseEntityData - Raw entity structure:', JSON.stringify(rawEntity, null, 2))
+
 
     let entityObject: Record<string, unknown>
 
@@ -112,32 +110,20 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
           .replace(/\t/g, '\\t')          // Escape actual tabs
           .replace(/\r/g, '\\r')          // Escape actual carriage returns
 
-        console.log('🔍 parseEntityData - Cleaned string before JSON parse:', parsedString.substring(0, 200) + '...')
-
         entityObject = JSON.parse(parsedString)
-        console.log('🔍 parseEntityData - Parsed JSON string successfully')
       } catch (error) {
         console.error('Failed to parse JSON string:', error)
-        console.log('🔍 parseEntityData - Failed string was:', rawEntity.substring(0, 200) + '...')
+
         return { sectionName: 'Unknown Section' }
       }
     } else if (typeof rawEntity === 'object' && rawEntity !== null) {
       entityObject = rawEntity
-      console.log('🔍 parseEntityData - Using raw object directly')
     } else {
-      console.log('🔍 parseEntityData - Invalid input type, returning default')
+
       return { sectionName: 'Unknown Section' }
     }
 
-    console.log('🔍 parseEntityData - Entity object keys:', Object.keys(entityObject))
-    console.log('🔍 parseEntityData - Entity object values:', entityObject)
-    console.log('🔍 parseEntityData - Full entity object structure:', JSON.stringify(entityObject, null, 2))
 
-    // Log the entity structure for debugging
-    console.log('🔍 parseEntityData - Raw content value:', entityObject.content)
-    console.log('🔍 parseEntityData - Raw assessment value:', entityObject.assessment)
-    console.log('🔍 parseEntityData - Raw issues value:', entityObject.issues)
-    console.log('🔍 parseEntityData - Raw observations value:', entityObject.observations)
 
     // Only include fields that actually exist in the original data
     const parsedEntity: FeasibilityStudySectionEntity = {}
@@ -155,9 +141,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       parsedEntity.observations = entityObject.observations as string
     }
 
-    console.log('🔍 parseEntityData - Final parsed entity:', parsedEntity)
-    console.log('🔍 parseEntityData - Content preview:', parsedEntity.content ? parsedEntity.content.substring(0, 100) + '...' : 'No content')
-    console.log('🔍 parseEntityData - Entity keys:', Object.keys(parsedEntity))
+
 
     return parsedEntity
   }
@@ -240,11 +224,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     error.value = null
 
     try {
-      console.log('🔍 fetchSections - Starting to fetch data from Amplify...')
       const { data: sectionsList, errors } = await getClient().models.FeasibilityStudySections.list({})
-      console.log('🔍 fetchSections - Raw data received from Amplify:', sectionsList)
-      console.log('🔍 fetchSections - Errors from Amplify:', errors)
-      console.log('🔍 fetchSections - Error details:', JSON.stringify(errors, null, 2))
 
       if (errors) {
         console.error('Errors fetching sections:', errors)
@@ -254,15 +234,8 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       }
 
       // Parse and validate all sections
-      console.log('🔍 Raw section from Amplify:', sectionsList[0])
-      console.log('🔍 Complete raw DynamoDB object structure:', JSON.stringify(sectionsList[0], null, 2))
-      console.log('🔍 Raw entity field type:', typeof sectionsList[0].entity)
-      console.log('🔍 Raw entity field value:', sectionsList[0].entity)
 
       sections.value = sectionsList.map((section: FeasibilityStudySection) => {
-        console.log('🔍 Processing section:', section.projectId, section.sectionId)
-        console.log('🔍 Section entity before parsing:', section.entity)
-        console.log('🔍 Section entity type:', typeof section.entity)
 
         const parsedEntity = parseEntityData(section.entity)
 
@@ -275,7 +248,9 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         } as ParsedFeasibilityStudySection
       })
 
-      console.log('✅ Entity Store - All sections loaded successfully:', sections.value)
+      // Log the loaded sections
+      console.log(`[EntityStore] Loaded ${sections.value.length} sections:`, sections.value.map((s: ParsedFeasibilityStudySection) => ({ projectId: s.projectId, sectionId: s.sectionId, status: s.status })))
+
     } catch (err) {
       console.error('Error loading sections:', err)
       error.value = err instanceof Error ? err.message : 'Failed to load sections'
@@ -291,7 +266,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     error.value = null
 
     try {
-      console.log('Fetching sections for project:', projectId)
+
       const { data: sectionsList, errors } = await getClient().models.FeasibilityStudySections.list({
         filter: {
           projectId: { eq: projectId }
@@ -321,7 +296,11 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       // Update sections for this project
       const otherSections = sections.value.filter(s => s.projectId !== projectId)
       sections.value = [...otherSections, ...parsedProjectSections]
-      console.log(`✅ Entity Store - Loaded ${parsedProjectSections.length} sections for project ${projectId}:`, parsedProjectSections)
+
+      // Log the loaded project sections
+      console.log(`[EntityStore] Loaded ${parsedProjectSections.length} sections for project ${projectId}:`, parsedProjectSections.map((s: ParsedFeasibilityStudySection) => ({ sectionId: s.sectionId, status: s.status })))
+      console.log(`[EntityStore] Total sections in store: ${sections.value.length}`)
+
     } catch (err) {
       console.error('Error loading project sections:', err)
       error.value = err instanceof Error ? err.message : 'Failed to load project sections'
@@ -348,7 +327,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     error.value = null
 
     try {
-      console.log('Creating section:', { projectId, sectionId, percentComplete, status, entity })
+
       const { data: newSection, errors } = await getClient().models.FeasibilityStudySections.create({
         projectId: projectId.trim(),
         sectionId: sectionId.trim(),
@@ -368,7 +347,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         return null
       }
 
-      console.log('Section created:', newSection)
+
 
       // Parse and add to local state
       const parsedEntity = parseEntityData(newSection.entity)
@@ -399,8 +378,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     error.value = null
 
     try {
-      console.log('Updating section:', { projectId, sectionId, updates })
-      console.log('Updates being sent:', JSON.stringify(updates, null, 2))
+
       const { data: updatedSection, errors } = await getClient().models.FeasibilityStudySections.update({
         projectId,
         sectionId,
@@ -419,7 +397,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         return null
       }
 
-      console.log('Section updated:', updatedSection)
+
 
       // Parse and update in local state
       const parsedEntity = parseEntityData(updatedSection.entity)
@@ -465,13 +443,11 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         ...currentSection.entity,
         [fieldName]: newValue
       }
-      console.log('Current entity:', currentSection.entity)
-      console.log('Updated entity being sent:', updatedEntity)
-      console.log('Field being updated:', fieldName, 'with value:', newValue)
+
 
       // Convert entity object to JSON string for DynamoDB
       const entityJsonString = JSON.stringify(updatedEntity)
-      console.log('Entity converted to JSON string:', entityJsonString)
+
 
       // Update the section with the new entity (as JSON string)
       const result = await updateSection(projectId, sectionId, { entity: entityJsonString })
@@ -490,7 +466,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     error.value = null
 
     try {
-      console.log('Deleting section:', { projectId, sectionId })
+
       const { errors } = await getClient().models.FeasibilityStudySections.delete({
         projectId,
         sectionId
@@ -502,7 +478,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         return false
       }
 
-      console.log('Section deleted successfully')
+
 
       // Remove from local state
       sections.value = sections.value.filter(s => !(s.projectId === projectId && s.sectionId === sectionId))

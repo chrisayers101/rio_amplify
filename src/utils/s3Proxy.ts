@@ -82,7 +82,7 @@ export async function listAllObjectsFromExistingBucket(
   let continuationToken: string | undefined = undefined;
   let hasMoreObjects = true;
 
-  console.log(`Starting to list all objects in bucket: ${bucketName}, prefix: "${prefix}"`);
+
 
   while (hasMoreObjects) {
     try {
@@ -91,7 +91,7 @@ export async function listAllObjectsFromExistingBucket(
       // Add objects from this batch
       allObjects.push(...response.objects);
 
-      console.log(`Retrieved ${response.objects.length} objects. Total so far: ${allObjects.length}`);
+
 
       // Check if there are more objects to retrieve
       if (response.isTruncated && response.nextContinuationToken) {
@@ -106,7 +106,7 @@ export async function listAllObjectsFromExistingBucket(
     }
   }
 
-  console.log(`Completed listing all objects. Total objects: ${allObjects.length}`);
+
   return allObjects;
 }
 
@@ -335,13 +335,12 @@ export async function downloadFolderFromExistingBucket(
   folderName?: string
 ): Promise<void> {
   try {
-    console.log('Starting folder download for:', folderPath);
+
 
     // List all objects in the folder with pagination
     const objects = await listAllObjectsFromExistingBucket(bucketName, folderPath);
 
     if (objects.length === 0) {
-      console.log('No files found in folder');
       return;
     }
 
@@ -352,7 +351,6 @@ export async function downloadFolderFromExistingBucket(
     // Download each file and add to zip
     for (const obj of objects) {
       try {
-        console.log('Downloading file:', obj.key);
 
         // Use the S3 proxy to get the file content directly
         const client = generateClient();
@@ -387,8 +385,6 @@ export async function downloadFolderFromExistingBucket(
         // Extract filename from path for cleaner zip structure
         const fileName = obj.key.replace(folderPath, '').replace(/^\/+/, '');
         zip.file(fileName, blob);
-
-        console.log('Added to zip:', fileName);
       } catch (error) {
         console.error('Error downloading file for zip:', obj.key, error);
         // Continue with other files even if one fails
@@ -408,8 +404,6 @@ export async function downloadFolderFromExistingBucket(
 
     // Clean up the URL object
     URL.revokeObjectURL(zipUrl);
-
-    console.log('Folder download completed');
   } catch (error) {
     console.error('Error downloading folder from existing bucket:', error);
     throw error;

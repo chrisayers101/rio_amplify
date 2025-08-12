@@ -62,18 +62,11 @@ export const useAuthStore = defineStore('auth', () => {
 
       user.value = userInfo
 
-      console.log('User authenticated:', {
-        userId: userInfo.userId,
-        username: userInfo.username,
-        email: userInfo.email,
-        name: userInfo.name,
-        givenName: userInfo.givenName,
-        familyName: userInfo.familyName
-      })
+
 
       return true
     } catch (err) {
-      console.log('User not authenticated:', err)
+
       user.value = null
       return false
     } finally {
@@ -86,7 +79,7 @@ export const useAuthStore = defineStore('auth', () => {
       await amplifySignOut()
       user.value = null
       error.value = null
-      console.log('User signed out successfully')
+
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Sign out failed'
       console.error('Sign out error:', err)

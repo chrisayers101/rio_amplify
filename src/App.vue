@@ -8,6 +8,7 @@ import ToggleConversationButton from '@/components/ToggleConversationButton.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useSidebarStore } from '@/stores/sidebarStore'
 import { useViewStore } from '@/stores/viewStore'
+import { useGuidelinesStore } from '@/stores/guidelinesStore'
 import { ViewportHandler } from '@/utils/viewport'
 import './assets/main.css'
 import './assets/mobile-optimizations.css'
@@ -16,6 +17,7 @@ const route = useRoute()
 const authStore = useAuthStore()
 const sidebarStore = useSidebarStore()
 const viewStore = useViewStore()
+const guidelinesStore = useGuidelinesStore()
 const conversationOpen = ref(false)
 let viewportHandler: ViewportHandler | null = null
 
@@ -23,12 +25,14 @@ let viewportHandler: ViewportHandler | null = null
 onMounted(async () => {
   try {
     await authStore.initializeAuth()
-    console.log('Authentication initialized:', authStore.isAuthenticated)
+
+    // Initialize guidelines store
+    await guidelinesStore.initializeGuidelines()
 
     // Initialize viewport handler for mobile layout fixes
     if (ViewportHandler.isMobile()) {
       viewportHandler = ViewportHandler.getInstance()
-      console.log('Mobile viewport handler initialized')
+
     }
   } catch (error) {
     console.error('Failed to initialize authentication:', error)

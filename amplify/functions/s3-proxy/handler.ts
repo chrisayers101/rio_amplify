@@ -53,7 +53,7 @@ interface S3Object {
 
 export const handler = async (event: any): Promise<string> => {
   try {
-    console.log('S3 Proxy received event:', JSON.stringify(event, null, 2));
+
 
     const { operation, bucketName, key, prefix, maxKeys, continuationToken, contentType, contentLength, expiresIn } = event.arguments as S3ProxyRequest;
 
@@ -68,7 +68,7 @@ export const handler = async (event: any): Promise<string> => {
 
     // Validate bucket name
     const bucketConfig = Object.values(BUCKET_CONFIGS).find(config => config.name === bucketName);
-    console.log(`Bucket validation: bucketName=${bucketName}, bucketConfig=`, bucketConfig);
+
     if (!bucketConfig) {
       throw new Error(`Unsupported bucket: ${bucketName}`);
     }
@@ -124,7 +124,7 @@ export const handler = async (event: any): Promise<string> => {
 
 async function listObjects(bucketName: string, prefix: string, maxKeys: number, continuationToken?: string): Promise<S3ProxyResponse> {
   try {
-    console.log(`Listing objects in bucket: ${bucketName}, prefix: "${prefix}", maxKeys: ${maxKeys}`);
+
 
     const command = new ListObjectsV2Command({
       Bucket: bucketName,
@@ -135,7 +135,7 @@ async function listObjects(bucketName: string, prefix: string, maxKeys: number, 
 
     const response = await s3Client.send(command);
 
-    console.log(`S3 response:`, JSON.stringify(response, null, 2));
+
 
     const objects: S3Object[] = (response.Contents || []).map(obj => ({
       key: obj.Key!,
@@ -145,7 +145,7 @@ async function listObjects(bucketName: string, prefix: string, maxKeys: number, 
       contentType: obj.Key?.includes('.') ? getContentType(obj.Key) : undefined
     }));
 
-    console.log(`Mapped objects:`, JSON.stringify(objects, null, 2));
+
 
     return {
       success: true,

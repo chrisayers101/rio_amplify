@@ -54,8 +54,6 @@ export class ChatApi {
       }
 
       // Parse the response
-      console.log('Raw result.data:', result.data);
-      console.log('Result data type:', typeof result.data);
 
       let response;
       try {

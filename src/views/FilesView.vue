@@ -283,14 +283,12 @@ async function uploadFiles() {
 
   uploading.value = true;
   try {
-    console.log('Starting upload of', selectedFiles.value.length, 'files to bucket:', selectedBucket.value);
+
 
     if (selectedBucket.value === 'default') {
       // Use Amplify storage for default bucket
       for (const file of selectedFiles.value) {
-        console.log('Uploading file:', file.name);
         const result = await uploadFile(file);
-        console.log('Upload result:', result);
       }
     } else {
       // Use AWS SDK for existing buckets
@@ -300,9 +298,7 @@ async function uploadFiles() {
       }
 
       for (const file of selectedFiles.value) {
-        console.log('Uploading file:', file.name);
         const result = await uploadFileToExistingBucket(file, bucketConfig.bucketName);
-        console.log('Upload result:', result);
       }
     }
 
@@ -311,9 +307,7 @@ async function uploadFiles() {
     if (fileInput.value) {
       fileInput.value.value = '';
     }
-    console.log('Refreshing file list...');
     await refreshFiles();
-    console.log('File list refreshed, total files:', files.value.length);
   } catch (error) {
     console.error('Error uploading files:', error);
   } finally {
@@ -324,12 +318,11 @@ async function uploadFiles() {
 async function refreshFiles() {
   loading.value = true;
   try {
-    console.log('Calling listObjects for bucket:', selectedBucket.value);
+
 
     if (selectedBucket.value === 'default') {
       // Use Amplify storage for default bucket
       const result = await listObjects();
-      console.log('List objects result:', result);
       files.value = result;
     } else {
       // Use AWS SDK for existing buckets
@@ -339,11 +332,10 @@ async function refreshFiles() {
       }
 
       const result = await listAllObjectsFromExistingBucket(bucketConfig.bucketName);
-      console.log('List objects result:', result);
       files.value = result;
     }
 
-    console.log('Files array updated:', files.value);
+
   } catch (error) {
     console.error('Error loading files:', error);
   } finally {
@@ -356,7 +348,7 @@ async function downloadAllFiles() {
 
   downloadingAll.value = true;
   try {
-    console.log('Starting download of all files from bucket:', selectedBucket.value);
+
 
     if (selectedBucket.value === 'default') {
       // Use Amplify storage for default bucket
@@ -371,7 +363,7 @@ async function downloadAllFiles() {
       await downloadFolderFromExistingBucket(bucketConfig.bucketName, '', `${bucketConfig.displayName.toLowerCase().replace(/\s+/g, '-')}-files`);
     }
 
-    console.log('All files downloaded successfully');
+
   } catch (error) {
     console.error('Error downloading all files:', error);
   } finally {

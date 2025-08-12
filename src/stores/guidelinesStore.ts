@@ -142,15 +142,20 @@ export const useGuidelinesStore = defineStore('guidelines', () => {
       // Load data from the JSON file
       sections.value = guidelinesData as GuidelineSection[]
 
-      console.log('✅ Guidelines Store - Loaded guidelines successfully:', sections.value.length, 'sections')
+      // Log the loaded guidelines
+      console.log(`[GuidelinesStore] Loaded ${sections.value.length} guideline sections:`, sections.value.map(s => ({ id: s.id, sectionName: s.sectionName })))
 
-      // Log basic store info
-      console.log('📊 Guidelines Store State:', {
-        totalSections: sections.value.length,
-        isLoading: isLoading.value,
-        error: error.value,
-        selectedSectionId: selectedSectionId.value
-      })
+      // Log a sample of the first section to show the full structure including markdown
+      if (sections.value.length > 0) {
+        const firstSection = sections.value[0]
+        console.log(`[GuidelinesStore] Sample section structure:`, {
+          id: firstSection.id,
+          sectionName: firstSection.sectionName,
+          hasMarkdown: !!firstSection.markdown,
+          markdownLength: firstSection.markdown?.length || 0,
+          markdownPreview: firstSection.markdown?.substring(0, 100) + '...' || 'No markdown'
+        })
+      }
 
     } catch (err) {
       console.error('Error loading guidelines:', err)
