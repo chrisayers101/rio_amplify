@@ -6,8 +6,7 @@ import type {
   FeasibilityStudySection,
   FeasibilityStudySectionStatus,
   ParsedFeasibilityStudySection,
-  FeasibilityStudySectionEntity,
-  SubSection
+  FeasibilityStudySectionEntity
 } from '@/types/feasibilityStudy'
 
 // Lazy initialization of Amplify Data client
@@ -106,7 +105,6 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       content: (entityObject.content as Record<string, unknown>) || undefined,
       issues: (entityObject.issues as string) || undefined,
       observations: (entityObject.observations as string) || undefined,
-      subSections: (entityObject.subSections as SubSection[]) || undefined,
     }
 
     return parsedEntity
