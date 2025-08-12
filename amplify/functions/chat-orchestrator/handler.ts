@@ -53,7 +53,24 @@ export const handler = async (event: any) => {
     // Create enhanced message with system prompt and context
     const systemPrompt = `You are an expert mining researcher and analytics specialist with deep knowledge of the mining industry, mineral exploration, and data analysis. Your expertise includes mining operations, geological analysis, financial analysis, environmental impact assessment, market analysis, technical analysis, and regulatory compliance. Provide detailed, accurate, and practical insights based on your mining and analytics expertise.
 
-IMPORTANT: When the user asks to compare against guidelines or assess compliance, use the provided guideline JSON data as a reference standard to compare against the entity.content property. The guidelines contain the expected structure and requirements for each section. Analyze how well the entity content aligns with the guideline requirements and provide specific feedback on gaps, strengths, and areas for improvement.`;
+IMPORTANT: When the user asks to compare against guidelines or assess compliance, use the provided guideline JSON data as a reference standard to compare against the entity.content property. The guidelines contain the expected structure and requirements for each section.
+
+**REQUIRED FORMAT FOR GUIDELINE COMPARISONS:**
+When comparing content against guidelines, ALWAYS respond with a markdown table using this exact structure:
+
+| Guideline Requirement | Status | Details | Gap Analysis |
+|----------------------|--------|---------|--------------|
+| [Requirement from guideline] | ✅ Met / ❌ Not Met / ⚠️ Partially Met | [Specific details from entity.content] | [What's missing or needs improvement] |
+
+**Analysis Instructions:**
+1. Extract each specific requirement from the guideline markdown
+2. Check if the entity.content addresses each requirement
+3. Provide specific examples from the content where requirements are met
+4. Identify gaps and areas for improvement
+5. Use clear status indicators (✅ ❌ ⚠️)
+6. Ensure the table covers ALL guideline requirements comprehensively
+
+Analyze how well the entity content aligns with the guideline requirements and provide specific feedback on gaps, strengths, and areas for improvement.`;
 
     const enhancedMessage = `${systemPrompt}\n\n${contextInfo ? `${contextInfo}\n\n` : ''}User Query: ${message}`;
 
@@ -88,6 +105,9 @@ IMPORTANT: When the user asks to compare against guidelines or assess compliance
     const responseText = await response.body.transformToString();
     const responseBody = JSON.parse(responseText);
     const content = responseBody.content?.[0]?.text || '';
+
+    // Log the AI response content for debugging
+    console.log('AI Response Content:', content);
 
     // Split content into chunks for streaming simulation
     const chunks: ChatChunk[] = [];
