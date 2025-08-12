@@ -1,19 +1,13 @@
 import { defineStore } from 'pinia'
 import { ref, computed, readonly } from 'vue'
 import guidelinesData from '@/mockdata/guidelines_markdown.json'
-
-export interface GuidelineSection {
-  id: number
-  sectionName: string
-  markdown: string
-}
-
-export interface GuidelinesState {
-  sections: GuidelineSection[]
-  isLoading: boolean
-  error: string | null
-  selectedSectionId: number | null
-}
+import type {
+  GuidelineSection,
+  GuidelineCategory,
+  GuidelineCategoryRanges,
+  GuidelineSearchResult,
+  GuidelineFilterOptions
+} from '@/types/guidelines'
 
 export const useGuidelinesStore = defineStore('guidelines', () => {
   // State
@@ -56,8 +50,8 @@ export const useGuidelinesStore = defineStore('guidelines', () => {
   }
 
   // Get sections by category (based on ID ranges)
-  const getSectionsByCategory = (category: 'summary' | 'business' | 'technical' | 'execution' | 'analysis'): GuidelineSection[] => {
-    const categoryRanges = {
+  const getSectionsByCategory = (category: GuidelineCategory): GuidelineSection[] => {
+    const categoryRanges: GuidelineCategoryRanges = {
       summary: [1, 1],      // Summary & Recommendations
       business: [2, 9],     // Business Strategy through Tax, Legal & Commercial
       technical: [10, 22],  // Permits & Approvals through New Technologies
@@ -67,6 +61,73 @@ export const useGuidelinesStore = defineStore('guidelines', () => {
 
     const [startId, endId] = categoryRanges[category]
     return getSectionsByIdRange(startId, endId)
+  }
+
+  // Search functionality with relevance scoring
+  const searchSections = (searchTerm: string): GuidelineSearchResult[] => {
+    if (!searchTerm.trim()) return []
+
+    const results: GuidelineSearchResult[] = []
+    const term = searchTerm.toLowerCase()
+
+    sections.value.forEach(section => {
+      let relevanceScore = 0
+      const matchedFields: string[] = []
+
+      // Check section name (highest weight)
+      if (section.sectionName.toLowerCase().includes(term)) {
+        relevanceScore += 10
+        matchedFields.push('sectionName')
+      }
+
+      // Check markdown content (lower weight)
+      if (section.markdown.toLowerCase().includes(term)) {
+        relevanceScore += 5
+        matchedFields.push('markdown')
+      }
+
+      // Check for exact matches (bonus points)
+      if (section.sectionName.toLowerCase() === term) {
+        relevanceScore += 5
+      }
+
+      if (relevanceScore > 0) {
+        results.push({
+          section,
+          relevanceScore,
+          matchedFields
+        })
+      }
+    })
+
+    // Sort by relevance score (highest first)
+    return results.sort((a, b) => b.relevanceScore - a.relevanceScore)
+  }
+
+  // Filter sections with multiple criteria
+  const filterSections = (options: GuidelineFilterOptions): GuidelineSection[] => {
+    let filtered = [...sections.value]
+
+    if (options.category) {
+      filtered = getSectionsByCategory(options.category)
+    }
+
+    if (options.searchTerm) {
+      const searchResults = searchSections(options.searchTerm)
+      filtered = filtered.filter(section =>
+        searchResults.some(result => result.section.id === section.id)
+      )
+    }
+
+    if (options.minId !== undefined) {
+      filtered = filtered.filter(section => section.id >= options.minId!)
+    }
+
+    if (options.maxId !== undefined) {
+      filtered = filtered.filter(section => section.id <= options.maxId!)
+    }
+
+    return filtered
   }
 
   // Actions
@@ -82,6 +143,15 @@ export const useGuidelinesStore = defineStore('guidelines', () => {
       sections.value = guidelinesData as GuidelineSection[]
 
       console.log('✅ Guidelines Store - Loaded guidelines successfully:', sections.value.length, 'sections')
+
+      // Log basic store info
+      console.log('📊 Guidelines Store State:', {
+        totalSections: sections.value.length,
+        isLoading: isLoading.value,
+        error: error.value,
+        selectedSectionId: selectedSectionId.value
+      })
+
     } catch (err) {
       console.error('Error loading guidelines:', err)
       error.value = err instanceof Error ? err.message : 'Failed to load guidelines'
@@ -151,6 +221,10 @@ export const useGuidelinesStore = defineStore('guidelines', () => {
     getSectionsByPartialName,
     getSectionsByIdRange,
     getSectionsByCategory,
+
+    // Search and Filter
+    searchSections,
+    filterSections,
 
     // Actions
     loadGuidelines,

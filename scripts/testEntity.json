@@ -9,7 +9,172 @@
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
     "entity": {
-      "content": "# Executive Summary\n\nThe **Amrun Bauxite Project** is a cornerstone investment in Queensland's mining infrastructure, commanding a projected capital commitment of **AUD 1.9 billion** over an initial five-year rollout.\n\nKey strategic goals include:\n\n- Scaling bauxite extraction capacity while maintaining environmental standards.\n- Strengthening employment and supplier engagement across adjacent communities.\n- Deploying advanced monitoring and automation technologies for operations.\n\n### Financial Snapshot\n\n| Year | CapEx (AUD)     | Projected ROI (%) |\n|------|------------------|-------------------|\n| 2023 | 480 million      | 8.5%              |\n| 2024 | 610 million      | 11.2%             |\n| 2025 | 810 million      | 14.3%             |\n\n---\n\n## Recommendations\n\n1. **Proceed with phased rollout**, using iterative reviews per stage to assess scope and risk.\n2. **Develop an Environmental Management Plan** targeting biodiversity conservation and waste reduction.\n3. **Fund community engagement initiatives** centered on transparency, landowner partnerships, and stakeholder trust.\n4. **Strengthen risk mitigation frameworks** addressing supply chain contingencies and workforce continuity.\n5. **Leverage real‑time analytics and ESG tracking dashboards** to support operational oversight and reporting.\n\n> These measures lay the foundation for sustainable, community-aligned, data-driven project governance.",
+      "content": "# Mining Feasibility Study  
+_Executive Summary_  
+*(Facts compiled from Claude 3.5 and OpenAI GPT-4.1 • Generated 07-Aug-2025)*  
+
+---
+
+## 1 Project Snapshot
+
+| Item | Detail |
+|------|--------|
+| **Location** | Weipa, Western Cape York, QLD (Australia) |
+| **Leases** | Andoom – Special Bauxite Mining Lease **ML7024** (plus ML6024) |
+| **Development Window** | 2008 → 2020 (baseline 2008–2013) |
+| **Mine Life** | ~20 years |
+| **Mining Method** | Open-pit, truck-and-shovel |
+| **Target Market** | China (primary), supported by global demand modelling |
+| **Regulatory Regime** | EPBC Act, Water Resources Act, Sea Dumping Act, QLD EPA & SDPWO Act |
+| **Key Agreements** | Western Cape Communities Co-existence Agreement (WCCCA) |
+
+---
+
+## 2 Executive Summary
+
+* All environmental & operational permits **secured for 2008-2013**; clear pathway for remaining approvals.  
+* Phased ramp-up aligns with Rio Tinto strategy, limiting early capital exposure.  
+* **NPV (8 % DR):** robust under all sensitivity cases.  
+* **IRR:** ≈ 15 % (> 12 % hurdle).  
+* **CAPEX:** ~US $500 M (initial); **OPEX:** competitive vs peer set.  
+* Break-even reached within **5 years** of first production.  
+* 20-year LOM based on reserve models and optimisation studies.  
+
+---
+
+## 3 Finance
+
+| Metric | Value | Notes |
+|--------|-------|-------|
+| **Discount rate (base)** | 10 % | Risk-adjusted, industry standard |
+| **NPV (10 %)** | See sensitivities | Positive in all modelled cases |
+| **IRR** | > Company hurdle | Surpasses 12 % |
+| **CAPEX** | US $300 M (detail); US $500 M (total incl. contingency) | 10 % contingency applied |
+| **OPEX** | US $50 /t | Benchmarked to peers |
+| **Break-even volume** | 3 Mt pa | Modelled via scenario analysis |
+| **Market share uplift** | +5 % | Via pricing & supply strategy |
+
+Sensitivity work confirms resilience to price, FX and cost shocks.
+
+---
+
+## 4 Strategic Alignment
+
+* Tier-1 brownfield expansion within **Rio Tinto Aluminium – Weipa** hub.  
+* Supports corporate goals of reserve replacement, portfolio optimisation and ESG leadership.  
+* Leverages existing **port & road** infrastructure; captures ~10 % additional market share.  
+* Aligns with Rio Tinto’s **Environmental & Communities Standards** and “**The Way We Work**”.
+
+---
+
+## 5 Regulatory & Approvals
+
+**Federal**
+
+* EPBC Act approvals (Commonwealth waters & MNES).  
+* Sea Dumping Act consent for marine works.
+
+**State (Queensland)**  
+
+* SDPWO Act coordination; QLD EPA licences for Environmentally Relevant Activities.  
+* Design acceptance from EPA; Coordinator-General oversight.
+
+**Stakeholder Framework**
+
+* WCCCA provides consultation & social-licence structure.  
+* Ongoing EIS (initiated 2008) with Matrix+ (EIS), Hydrobiology (water), cultural heritage teams.
+
+---
+
+## 6 Business Structure
+
+* **Entity:** Rio Tinto Alcan (**100 % ownership**; no JVs).  
+* **Leases:** ML7024 (allows tidal wharf works), ML6024 (restricted harbour rights).  
+* Clear governance, IP, and decision-rights matrix; balanced capital structure and diversified funding.
+
+---
+
+## 7 Resource & Reserve Statement
+
+| Category | Tonnes (Mt) | Grade % Al₂O₃ | Contained Metal (Mt) | Cut-off % | Density (t/m³) | Confidence | Notes |
+|----------|-------------|--------------|---------------------|-----------|----------------|------------|-------|
+| **Measured** | 100 | 45.0 | 45 | 30.5 | — | High | Dense drill grid |
+| **Indicated** | 200 | 42.5 | 85 | 30.5 | — | Moderate | Geo-model validated |
+| **Inferred** | 50 | 40.0 | 20 | 30.5 | — | Low | More drilling required |
+| **Proven** | 80 | 44.0 | 35 | 30.5 | — | High | Core sampled |
+| **Probable** | 120 | 43.0 | 52 | 30.5 | — | Moderate | Reserve models |
+
+Resource estimation follows **JORC 2012** guidelines using block-modelling and geostatistical validation.
+
+---
+
+## 8 Risks & Mitigations
+
+| Risk Class | Key Exposure | Mitigation |
+|------------|--------------|-----------|
+| **III–IV (High)** | Marine Protected Areas; EPBC-listed species | Route optimisation, offset plans |
+| | Catastrophic outload failure | Redundant design; regular NDT |
+| | Demand volatility (China) | Diversified offtake; price hedging |
+| **II (Moderate)** | Ground conditions / mobility | Bearing-capacity testing & design margins |
+| | Weather delays | Historical weather analytics; berth redundancy |
+| **I (Low)** | Community relations | WCCCA engagement & benefit sharing |
+
+Risk register reviewed quarterly; owners assigned and residual risk tracked.
+
+---
+
+## 9 Development Options & Decision Rationale
+
+| Scenario | CAPEX | NPV | IRR | LOM | Key Finding |
+|----------|-------|-----|-----|-----|-------------|
+| **5 Mt pa** | Base case | ✔︎ | ✔︎ | 20 y | Meets strategic goals w/ lowest risk |
+| 10 Mt pa | +30 % | ↑ | ↑ | 18 y | Higher value but larger exposure |
+| 15 Mt pa | +60 % | Highest | Highest | 16 y | Best NPV but cap-intensive |
+
+Decision matrix (weighted criteria) selected **5 Mt pa** as preferred, balancing value with risk & capital discipline.
+
+---
+
+## 10 Technical Overview
+
+* **Mining:** open-pit, truck-shovel fleet sized via equipment optimisation; 95 % recovery assumption.  
+* **Processing:** proven bauxite beneficiation; technology trade-off favoured cost-efficient, low-complexity option.  
+* **Infrastructure:** 50 MW power plant, 100 km water pipeline, port upgrades (ML7024).  
+* **Geotechnical:** stable Proterozoic host; UCS ≈ 150 MPa; minimal seismicity.
+
+---
+
+## 11 Assumptions & Validation
+
+| Domain | Key Assumption | Validation |
+|--------|---------------|-----------|
+| Market | US $50/t bauxite | Historical trends, expert consensus |
+| Discount Rate | 10 % | WACC + risk premium |
+| Inflation/Escalation | 2 % CPI | Gov-data & Rio Tinto forecasts |
+| Recovery | 95 % | Pilot trials & operational benchmarks |
+
+Sensitivity tests (+/- 20 %) show NPV robustness; contingency plans in place.
+
+---
+
+## 12 Timeline (2008 → 2013 – Key Milestones)
+
+```mermaid
+gantt
+    title Development & Approval Schedule
+    dateFormat  YYYY
+    section Approvals
+    EPBC Approval           :done, a1, 2008, 1y
+    State Permits           :done, a2, 2008, 1y
+    EIS Public Display      :a3, 2009, 0.5y
+    Coordinator-General Eval:after a3, 0.5y
+    section Construction
+    Early Works             :b1, 2010, 1y
+    Plant & Port Build      :b2, 2011, 2y
+    Commissioning           :c1, 2013, 0.5y
+    section Operations
+    Ramp-up to 5 Mt pa      :c2, after c1, 2y
+",
       "assessment": "# Assessment Overview\n\nThe project was evaluated across multiple dimensions, ensuring alignment with internal standards and guidelines:\n\n- **Contradictions**: Minor — evidence of misalignment between data sources is minimal.\n- **Guideline Reference**: Section 1.1 — follows the framework established in the project guidelines.\n- **Gaps**: Seasonal data missing — Q4/Q1 metrics are currently unavailable and recommended for inclusion.\n- **Consistency**: High — documentation and datasets exhibit strong internal coherence.\n- **Quality**: High — data sources are current, well-founded, and thoroughly documented.\n\n> **Note**: Incorporate seasonal data into the next reporting cycle to enhance trend analysis.",
       "observations": "## Observations Summary\n\nKey insights gathered from stakeholder interviews, documentation reviews, and internal audits:\n\n| ID     | Observation                                                                 | Source                                                | Action Required |\n|--------|------------------------------------------------------------------------------|-------------------------------------------------------|------------------|\n| 01‑O1  | Summary & recommendations require clarification for regional stakeholders.     | Summary Document                                      |  No             |\n| 01‑O2  | Slight divergence identified in projected vs. actual workforce numbers.       | Q2 Workforce Report                                   |  Yes            |\n| 01‑O3  | Community feedback emphasizes transparency and more frequent updates.         | Stakeholder Survey – May 2025                         |  Yes            |\n\n**Recommendation**: Schedule quarterly briefings with regional stakeholders to keep alignment high.",
       "issues": "## Issues Log\n\nThe following table outlines unresolved items and next steps:\n\n| Issue ID | Description                                                         | Source                              | Status        | Priority        |\n|----------|----------------------------------------------------------------------|-------------------------------------|----------------|-----------------|\n| 01‑I1    | Outdated formatting in summary section causing readability issues.   | 2024 Report Template Review         | Resolved      | Low             |\n| 01‑I2    | Missing Q1–Q2 workforce allocation data causing planning delays.      | Operational HR Tracker              | Open           | High            |\n| 01‑I3    | Delay in regional permit timelines challenging project milestones.   | Compliance Coordination Log         | Under Review   | Critical        |\n\n> **Action Required**: Prioritize resolution of Issue 01‑I2 to avoid bottlenecks in Q3 planning."
