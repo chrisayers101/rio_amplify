@@ -79,41 +79,96 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     }
   }
 
-  // Helper function to parse and validate entity data
+    // Helper function to parse and validate entity data
   const parseEntityData = (rawEntity: Record<string, unknown> | string): FeasibilityStudySectionEntity => {
+    console.log('🔍 parseEntityData - Input rawEntity type:', typeof rawEntity)
+    console.log('🔍 parseEntityData - Input rawEntity value:', rawEntity)
+
     let entityObject: Record<string, unknown>
 
-    // Handle case where entity is a JSON string
+        // Handle case where entity is a JSON string
     if (typeof rawEntity === 'string') {
       try {
-        entityObject = JSON.parse(rawEntity)
+        // The entity string appears to be double-encoded, so we need to parse it twice
+        let parsedString = rawEntity
+        // Remove outer quotes if they exist
+        if (parsedString.startsWith('"') && parsedString.endsWith('"')) {
+          parsedString = parsedString.slice(1, -1)
+        }
+
+        // More comprehensive unescaping to handle all control characters
+        parsedString = parsedString
+          .replace(/\\"/g, '"')           // Unescape quotes
+          .replace(/\\\\n/g, '\n')        // Unescape newlines
+          .replace(/\\\\t/g, '\t')        // Unescape tabs
+          .replace(/\\\\r/g, '\r')        // Unescape carriage returns
+          .replace(/\\\\/g, '\\')         // Unescape backslashes
+
+        // The content contains actual newlines that need to be escaped for JSON parsing
+        // We need to escape newlines, tabs, and other control characters in the content
+        parsedString = parsedString
+          .replace(/\n/g, '\\n')          // Escape actual newlines
+          .replace(/\t/g, '\\t')          // Escape actual tabs
+          .replace(/\r/g, '\\r')          // Escape actual carriage returns
+
+        console.log('🔍 parseEntityData - Cleaned string before JSON parse:', parsedString.substring(0, 200) + '...')
+
+        entityObject = JSON.parse(parsedString)
+        console.log('🔍 parseEntityData - Parsed JSON string successfully')
       } catch (error) {
         console.error('Failed to parse JSON string:', error)
+        console.log('🔍 parseEntityData - Failed string was:', rawEntity.substring(0, 200) + '...')
         return { sectionName: 'Unknown Section' }
       }
     } else if (typeof rawEntity === 'object' && rawEntity !== null) {
       entityObject = rawEntity
+      console.log('🔍 parseEntityData - Using raw object directly')
     } else {
+      console.log('🔍 parseEntityData - Invalid input type, returning default')
       return { sectionName: 'Unknown Section' }
     }
 
-    // Ensure required fields exist with defaults
-    const parsedEntity = {
-      sectionName: (entityObject.sectionName as string) || 'Unknown Section',
-      qualityRating: (entityObject.qualityRating as string) || undefined,
-      assessment: (entityObject.assessment as string) || undefined,
-      content: (entityObject.content as Record<string, unknown>) || undefined,
-      issues: (entityObject.issues as string) || undefined,
-      observations: (entityObject.observations as string) || undefined,
+    console.log('🔍 parseEntityData - Entity object keys:', Object.keys(entityObject))
+    console.log('🔍 parseEntityData - Entity object values:', entityObject)
+
+        // Log the entity structure for debugging
+    console.log('🔍 parseEntityData - Raw content value:', entityObject.content)
+    console.log('🔍 parseEntityData - Raw assessment value:', entityObject.assessment)
+    console.log('🔍 parseEntityData - Raw issues value:', entityObject.issues)
+    console.log('🔍 parseEntityData - Raw observations value:', entityObject.observations)
+
+    // Only include fields that actually exist in the original data
+    const parsedEntity: FeasibilityStudySectionEntity = {}
+
+    if (entityObject.assessment) {
+      parsedEntity.assessment = entityObject.assessment as string
     }
+    if (entityObject.content) {
+      parsedEntity.content = entityObject.content as string
+    }
+    if (entityObject.issues) {
+      parsedEntity.issues = entityObject.issues as string
+    }
+    if (entityObject.observations) {
+      parsedEntity.observations = entityObject.observations as string
+    }
+
+    console.log('🔍 parseEntityData - Final parsed entity:', parsedEntity)
+    console.log('🔍 parseEntityData - Content preview:', parsedEntity.content ? parsedEntity.content.substring(0, 100) + '...' : 'No content')
+    console.log('🔍 parseEntityData - Entity keys:', Object.keys(parsedEntity))
 
     return parsedEntity
   }
 
   // Utility functions for formatting and display
   const getSectionDisplayName = (section: ParsedFeasibilityStudySection): string => {
-    if (section.entity && typeof section.entity === 'object' && 'sectionName' in section.entity) {
-      return section.entity.sectionName as string
+    if (section.entity && typeof section.entity === 'object' && section.entity.content) {
+      const content = section.entity.content as string
+      // Extract section name from the first heading (e.g., "# Executive Summary" -> "Executive Summary")
+      const headingMatch = content.match(/^#\s+(.+)$/m)
+      if (headingMatch) {
+        return headingMatch[1].trim()
+      }
     }
     return `Section ${section.sectionId}`
   }
@@ -175,7 +230,10 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     error.value = null
 
     try {
+      console.log('🔍 fetchSections - Starting to fetch data from Amplify...')
       const { data: sectionsList, errors } = await getClient().models.FeasibilityStudySections.list({})
+      console.log('🔍 fetchSections - Raw data received from Amplify:', sectionsList)
+      console.log('🔍 fetchSections - Errors from Amplify:', errors)
 
       if (errors) {
         console.error('Errors fetching sections:', errors)
@@ -184,22 +242,20 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       }
 
       // Parse and validate all sections
+      console.log('🔍 Raw section from Amplify:', sectionsList[0])
       sections.value = sectionsList.map((section: FeasibilityStudySection) => {
         const parsedEntity = parseEntityData(section.entity)
+
+        // Use the parsed entity directly since it only contains fields that exist
+        const finalEntity = parsedEntity
+
         return {
           ...section,
-          entity: parsedEntity
+          entity: finalEntity
         } as ParsedFeasibilityStudySection
       })
 
-      console.log('✅ Store loaded successfully:', {
-        sectionCount: sections.value.length,
-        firstSection: sections.value[0] ? {
-          id: sections.value[0].sectionId,
-          name: sections.value[0].entity.sectionName,
-          entityKeys: Object.keys(sections.value[0].entity)
-        } : 'No sections'
-      })
+      console.log('✅ Entity Store - All sections loaded successfully:', sections.value)
     } catch (err) {
       console.error('Error loading sections:', err)
       error.value = err instanceof Error ? err.message : 'Failed to load sections'
@@ -231,16 +287,20 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       // Parse and validate project sections
       const parsedProjectSections = sectionsList.map((section: FeasibilityStudySection) => {
         const parsedEntity = parseEntityData(section.entity)
+
+        // Use the parsed entity directly since it only contains fields that exist
+        const finalEntity = parsedEntity
+
         return {
           ...section,
-          entity: parsedEntity
+          entity: finalEntity
         } as ParsedFeasibilityStudySection
       })
 
       // Update sections for this project
       const otherSections = sections.value.filter(s => s.projectId !== projectId)
       sections.value = [...otherSections, ...parsedProjectSections]
-      console.log(`Loaded ${parsedProjectSections.length} sections for project ${projectId}`)
+      console.log(`✅ Entity Store - Loaded ${parsedProjectSections.length} sections for project ${projectId}:`, parsedProjectSections)
     } catch (err) {
       console.error('Error loading project sections:', err)
       error.value = err instanceof Error ? err.message : 'Failed to load project sections'

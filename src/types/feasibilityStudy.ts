@@ -3,10 +3,8 @@ export type FeasibilityStudySectionStatus = 'not_started' | 'in_progress' | 'com
 
 // Main section entity interface (what goes in the 'entity' field)
 export interface FeasibilityStudySectionEntity {
-  sectionName: string;
-  qualityRating?: string;
   assessment?: string;  // Markdown string
-  content?: Record<string, unknown>; // Flexible content structure
+  content?: string; // Markdown string content
   issues?: string;  // Markdown string instead of array
   observations?: string;  // Markdown string instead of array
   [key: string]: unknown; // Allow dynamic property access
