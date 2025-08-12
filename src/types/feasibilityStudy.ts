@@ -27,15 +27,3 @@ export interface FeasibilityStudySection {
 export interface ParsedFeasibilityStudySection extends Omit<FeasibilityStudySection, 'entity'> {
   entity: FeasibilityStudySectionEntity;  // Parsed and typed entity
 }
-
-// Utility type for creating new sections
-export type CreateFeasibilityStudySectionInput = Omit<FeasibilityStudySection, 'projectId' | 'sectionId'> & {
-  projectId: string;
-  sectionId: string;
-};
-
-// Utility type for updating sections
-export type UpdateFeasibilityStudySectionInput = Partial<Omit<FeasibilityStudySection, 'projectId' | 'sectionId'>> & {
-  projectId: string;
-  sectionId: string;
-};
