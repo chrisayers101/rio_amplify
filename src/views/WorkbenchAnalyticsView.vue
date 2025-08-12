@@ -176,9 +176,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
-import type { FeasibilityStudySectionEntity } from '@/stores/entityStore'
+import type { ParsedFeasibilityStudySection } from '@/types/feasibilityStudy'
 import WorkbenchSidebar from '@/components/WorkbenchSidebar.vue'
 import Conversation from '@/components/Conversation.vue'
 import { marked } from 'marked'
@@ -201,7 +201,7 @@ const sectionStore = useFeasibilityStudySectionStore()
 
 // State
 const selectedSections = ref<string[]>([])
-const selectedSectionObjects = ref<readonly FeasibilityStudySectionEntity[]>([])
+const selectedSectionObjects = ref<readonly ParsedFeasibilityStudySection[]>([])
 const activeTab = ref<string>('')
 const chatWidth = ref(50) // Default 50% split
 const isResizing = ref(false)
@@ -216,15 +216,29 @@ const originalValues = ref<Record<string, string>>({})
 
 // Load all sections on component mount
 const loadSections = async () => {
+  console.log('=== LOADING SECTIONS ===')
   try {
     isLoading.value = true
     hasError.value = false
+    console.log('Calling sectionStore.fetchSections()')
     await sectionStore.fetchSections()
+    console.log('Sections loaded, store state:', {
+      sections: sectionStore.sections,
+      sectionCount: sectionStore.sectionCount,
+      hasSections: sectionStore.hasSections
+    })
+
+    // Auto-select sections when they load
+    if (sectionStore.hasSections && sectionStore.sections.length > 0) {
+      console.log('Auto-selecting loaded sections')
+      handleSectionsSelected(sectionStore.sections)
+    }
   } catch (error) {
     console.error('Failed to load sections:', error)
     hasError.value = true
   } finally {
     isLoading.value = false
+    console.log('=== END LOADING SECTIONS ===')
   }
 }
 
@@ -232,67 +246,76 @@ const retryLoad = () => {
   loadSections()
 }
 
-const handleContextSelected = (sections: readonly FeasibilityStudySectionEntity[]) => {
+const handleContextSelected = (sections: readonly ParsedFeasibilityStudySection[]) => {
+  console.log('=== CONTEXT SELECTED ===')
+  console.log('Sections received:', sections.length, 'sections')
+  console.log('First section entity keys:', sections[0]?.entity ? Object.keys(sections[0].entity) : 'No entity')
+
   selectedSectionObjects.value = sections
 
   // Set the first available tab as active if sections are selected
   if (sections.length > 0 && sections[0].entity) {
-    const firstKey = Object.keys(sections[0].entity)[0]
-    activeTab.value = firstKey
-  } else {
-    activeTab.value = ''
-  }
-}
+    // Find the first field that contains actual content (not undefined/empty)
+    const entity = sections[0].entity
+    const contentFields = ['assessment', 'content', 'issues', 'observations']
+    let firstKey = 'sectionName' // fallback
 
-const handleSectionsSelected = (sections: readonly FeasibilityStudySectionEntity[]) => {
-  selectedSectionObjects.value = sections
-
-  // Set the first available tab as active if sections are selected
-  if (sections.length > 0 && sections[0].entity) {
-    const firstKey = Object.keys(sections[0].entity)[0]
-    activeTab.value = firstKey
-  } else {
-    activeTab.value = ''
-  }
-}
-
-const getSectionDisplayName = (section: FeasibilityStudySectionEntity): string => {
-  // Get section name from parsed entity data
-  if (section.entity && typeof section.entity === 'object') {
-    const entity = section.entity as Record<string, unknown>
-    if ('sectionName' in entity && typeof entity.sectionName === 'string') {
-      return entity.sectionName
+    for (const field of contentFields) {
+      if (entity[field] && typeof entity[field] === 'string' && (entity[field] as string).trim().length > 0) {
+        firstKey = field
+        break
+      }
     }
-  }
 
-  // Fallback to section ID if no name available
-  return `Section ${section.sectionId}`
+    activeTab.value = firstKey
+    console.log('Set active tab to:', firstKey, 'with content length:', (entity[firstKey] as string)?.length || 0)
+  } else {
+    activeTab.value = ''
+    console.log('No active tab set - no sections or entities')
+  }
+  console.log('=== END CONTEXT SELECTED ===')
+}
+
+const handleSectionsSelected = (sections: readonly ParsedFeasibilityStudySection[]) => {
+  console.log('=== SECTIONS SELECTED ===')
+  console.log('Sections received:', sections.length, 'sections')
+  console.log('First section entity keys:', sections[0]?.entity ? Object.keys(sections[0].entity) : 'No entity')
+
+  selectedSectionObjects.value = sections
+
+  // Set the first available tab as active if sections are selected
+  if (sections.length > 0 && sections[0].entity) {
+    // Find the first field that contains actual content (not undefined/empty)
+    const entity = sections[0].entity
+    const contentFields = ['assessment', 'content', 'issues', 'observations']
+    let firstKey = 'sectionName' // fallback
+
+    for (const field of contentFields) {
+      if (entity[field] && typeof entity[field] === 'string' && (entity[field] as string).trim().length > 0) {
+        firstKey = field
+        break
+      }
+    }
+
+    activeTab.value = firstKey
+    console.log('Set active tab to:', firstKey, 'with content length:', (entity[firstKey] as string)?.length || 0)
+  } else {
+    activeTab.value = ''
+    console.log('No active tab set - no sections or entities')
+  }
+  console.log('=== END SECTIONS SELECTED ===')
+}
+
+const getSectionDisplayName = (section: ParsedFeasibilityStudySection): string => {
+  return sectionStore.getSectionDisplayName(section)
 }
 
 const getStatusClass = (status: string): string => {
-  switch (status) {
-    case 'complete':
-      return 'status-complete'
-    case 'in_progress':
-      return 'status-in-progress'
-    case 'not_started':
-      return 'status-not-started'
-    default:
-      return 'status-unknown'
-  }
+  return sectionStore.getStatusClass(status)
 }
 
 const formatStatus = (status: string): string => {
-  switch (status) {
-    case 'complete':
-      return 'Complete'
-    case 'in_progress':
-      return 'In Progress'
-    case 'not_started':
-      return 'Not Started'
-    default:
-      return status
-  }
+  return sectionStore.formatStatus(status)
 }
 
 const setActiveTab = (tabKey: string): void => {
@@ -300,21 +323,11 @@ const setActiveTab = (tabKey: string): void => {
 }
 
 const formatTabName = (key: string): string => {
-  // Convert camelCase or snake_case to Title Case
-  return key
-    .replace(/([A-Z])/g, ' $1')
-    .replace(/_/g, ' ')
-    .replace(/^\w/, c => c.toUpperCase())
-    .trim()
+  return sectionStore.formatTabName(key)
 }
 
 const formatPropertyName = (key: string): string => {
-  // Convert camelCase or snake_case to Title Case
-  return key
-    .replace(/([A-Z])/g, ' $1')
-    .replace(/_/g, ' ')
-    .replace(/^\w/, c => c.toUpperCase())
-    .trim()
+  return sectionStore.formatPropertyName(key)
 }
 
 
@@ -418,7 +431,9 @@ const cancelEdit = (fieldName: string): void => {
 
 // Markdown rendering function
 const renderMarkdown = (markdownText: string): string => {
-  if (!markdownText) return ''
+  if (!markdownText) {
+    return ''
+  }
 
   try {
     // Convert PowerShell-style newlines to actual newlines
@@ -468,7 +483,9 @@ const startResize = (event: MouseEvent | TouchEvent) => {
 
 // Load sections when component mounts
 onMounted(() => {
+  console.log('=== WORKBENCH ANALYTICS VIEW MOUNTED ===')
   loadSections()
+  console.log('=== END WORKBENCH ANALYTICS VIEW MOUNTED ===')
 })
 
 onUnmounted(() => {

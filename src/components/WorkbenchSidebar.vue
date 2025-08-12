@@ -65,8 +65,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
+import type { ParsedFeasibilityStudySection } from '@/types/feasibilityStudy'
 
 interface Props {
   modelValue?: string[]
@@ -123,21 +124,8 @@ const handleSectionToggle = () => {
   emit('sections-selected', selectedSectionObjects)
 }
 
-const getSectionDisplayName = (section: typeof sections.value[0]): string => {
-  // Try to get section name from entity data if available
-  if (section.entity && typeof section.entity === 'string') {
-    try {
-      const parsedEntity = JSON.parse(section.entity)
-      if (parsedEntity && typeof parsedEntity === 'object' && 'sectionName' in parsedEntity) {
-        return parsedEntity.sectionName as string
-      }
-    } catch (error) {
-      console.warn('Failed to parse entity JSON:', error)
-    }
-  }
-
-  // Fallback to section ID if no name available
-  return `Section ${section.sectionId}`
+const getSectionDisplayName = (section: ParsedFeasibilityStudySection): string => {
+  return sectionStore.getSectionDisplayName(section)
 }
 
 

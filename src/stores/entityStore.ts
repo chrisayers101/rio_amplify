@@ -1,8 +1,14 @@
 import { defineStore } from 'pinia'
-import { ref, computed, readonly } from 'vue'
+import { ref, computed } from 'vue'
 import { generateClient } from 'aws-amplify/data'
 import { getCurrentUser } from 'aws-amplify/auth'
-import type { FeasibilityStudySection, FeasibilityStudySectionStatus } from '@/types/feasibilityStudy'
+import type {
+  FeasibilityStudySection,
+  FeasibilityStudySectionStatus,
+  ParsedFeasibilityStudySection,
+  FeasibilityStudySectionEntity,
+  SubSection
+} from '@/types/feasibilityStudy'
 
 // Lazy initialization of Amplify Data client
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -21,26 +27,19 @@ const getClient = () => {
   return client
 }
 
-// Type for our feasibility study sections
-export interface FeasibilityStudySectionEntity extends Omit<FeasibilityStudySection, 'entity'> {
-  entity: Record<string, unknown> // Changed from string to object
-  createdAt?: string | null
-  updatedAt?: string | null
-}
-
 export interface FeasibilityStudySectionState {
-  sections: FeasibilityStudySectionEntity[]
+  sections: ParsedFeasibilityStudySection[]
   isLoading: boolean
   error: string | null
-  selectedSections: FeasibilityStudySectionEntity[]
+  selectedSections: ParsedFeasibilityStudySection[]
 }
 
 export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySection', () => {
   // State
-  const sections = ref<FeasibilityStudySectionEntity[]>([])
+  const sections = ref<ParsedFeasibilityStudySection[]>([])
   const isLoading = ref(false)
   const error = ref<string | null>(null)
-  const selectedSections = ref<FeasibilityStudySectionEntity[]>([])
+  const selectedSections = ref<ParsedFeasibilityStudySection[]>([])
 
   // Computed
   const sectionCount = computed(() => sections.value.length)
@@ -58,13 +57,13 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     return sections.value.filter(section => section.status === status)
   })
 
-  // Getters
-  const getSection = (projectId: string, sectionId: string) => {
+  // Consolidated getter function - single source of truth
+  const getSection = (projectId: string, sectionId: string): ParsedFeasibilityStudySection | undefined => {
     return sections.value.find(s => s.projectId === projectId && s.sectionId === sectionId)
   }
 
-  // Get entity for a section (now directly accessible as object)
-  const getEntity = (projectId: string, sectionId: string) => {
+  // Get entity for a section (now directly accessible as typed object)
+  const getEntity = (projectId: string, sectionId: string): FeasibilityStudySectionEntity | null => {
     const section = getSection(projectId, sectionId)
     return section?.entity || null
   }
@@ -79,6 +78,95 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       error.value = 'Authentication required'
       return false
     }
+  }
+
+  // Helper function to parse and validate entity data
+  const parseEntityData = (rawEntity: Record<string, unknown> | string): FeasibilityStudySectionEntity => {
+    let entityObject: Record<string, unknown>
+
+    // Handle case where entity is a JSON string
+    if (typeof rawEntity === 'string') {
+      try {
+        entityObject = JSON.parse(rawEntity)
+      } catch (error) {
+        console.error('Failed to parse JSON string:', error)
+        return { sectionName: 'Unknown Section' }
+      }
+    } else if (typeof rawEntity === 'object' && rawEntity !== null) {
+      entityObject = rawEntity
+    } else {
+      return { sectionName: 'Unknown Section' }
+    }
+
+    // Ensure required fields exist with defaults
+    const parsedEntity = {
+      sectionName: (entityObject.sectionName as string) || 'Unknown Section',
+      qualityRating: (entityObject.qualityRating as string) || undefined,
+      assessment: (entityObject.assessment as string) || undefined,
+      content: (entityObject.content as Record<string, unknown>) || undefined,
+      issues: (entityObject.issues as string) || undefined,
+      observations: (entityObject.observations as string) || undefined,
+      subSections: (entityObject.subSections as SubSection[]) || undefined,
+    }
+
+    return parsedEntity
+  }
+
+  // Utility functions for formatting and display
+  const getSectionDisplayName = (section: ParsedFeasibilityStudySection): string => {
+    if (section.entity && typeof section.entity === 'object' && 'sectionName' in section.entity) {
+      return section.entity.sectionName as string
+    }
+    return `Section ${section.sectionId}`
+  }
+
+  const formatStatus = (status: string): string => {
+    switch (status) {
+      case 'complete':
+        return 'Complete'
+      case 'in_progress':
+        return 'In Progress'
+      case 'not_started':
+        return 'Not Started'
+      default:
+        return status
+    }
+  }
+
+  const getStatusClass = (status: string): string => {
+    switch (status) {
+      case 'complete':
+        return 'status-complete'
+      case 'in_progress':
+        return 'status-in-progress'
+      case 'not_started':
+        return 'status-not-started'
+      default:
+        return 'status-unknown'
+    }
+  }
+
+  const formatTabName = (key: string): string => {
+    return key
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/_/g, ' ')
+      .replace(/^\w/, c => c.toUpperCase())
+      .trim()
+  }
+
+  const formatPropertyName = (key: string): string => {
+    return key
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/_/g, ' ')
+      .replace(/^\w/, c => c.toUpperCase())
+      .trim()
+  }
+
+  const getCompletionStatus = (percentage: number): string => {
+    if (percentage >= 90) return 'excellent'
+    if (percentage >= 80) return 'good'
+    if (percentage >= 70) return 'moderate'
+    return 'needs-improvement'
   }
 
   // Actions
@@ -97,65 +185,23 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         return
       }
 
-      sections.value = sectionsList
-      console.log('=== ENTITY STORE DATA LOADED ===')
-      console.log('Total sections loaded:', sectionsList.length)
-      console.log('First section:', sectionsList[0])
-      if (sectionsList[0] && sectionsList[0].entity) {
-        console.log('First section entity:', sectionsList[0].entity)
-        console.log('Entity keys:', Object.keys(JSON.parse(sectionsList[0].entity)))
-        console.log('Entity type:', typeof sectionsList[0].entity)
-      }
-      console.log('All sections:', sectionsList)
-      console.log('=== END ENTITY STORE DATA ===')
-
-      // NEW: Parse and replace entities in the sections array
-      console.log('=== PARSING AND REPLACING ENTITIES ===')
+      // Parse and validate all sections
       sections.value = sectionsList.map((section: FeasibilityStudySection) => {
-        if (section.entity) {
-          try {
-            const firstParse = JSON.parse(section.entity)
-            const parsedEntity = typeof firstParse === 'string' ? JSON.parse(firstParse) : firstParse
-            console.log(`Parsed entity for ${section.sectionId}:`, parsedEntity)
-            return {
-              ...section,
-              entity: parsedEntity  // Replace string with parsed object
-            } as unknown as FeasibilityStudySectionEntity
-          } catch (error) {
-            console.error(`Failed to parse entity for section ${section.sectionId}:`, error)
-            return section as unknown as FeasibilityStudySectionEntity
-          }
-        }
-        return section as unknown as FeasibilityStudySectionEntity
+        const parsedEntity = parseEntityData(section.entity)
+        return {
+          ...section,
+          entity: parsedEntity
+        } as ParsedFeasibilityStudySection
       })
-      console.log('=== ENTITIES PARSED AND REPLACED ===')
 
-      // NEW: Log the complete parsed entity data
-      console.log('=== PARSED ENTITY DATA ===')
-      sections.value.forEach((section: FeasibilityStudySectionEntity, index: number) => {
-        if (section.entity) {
-          console.log(`Section ${index + 1} (${section.sectionId}) parsed entity:`, section.entity)
-          console.log(`Section ${index + 1} (${section.sectionId}) parsed entity type:`, typeof section.entity)
-          console.log(`Section ${index + 1} (${section.sectionId}) entity keys:`, Object.keys(section.entity))
-
-          console.log(`Section ${index + 1} (${section.sectionId}):`, {
-            projectId: section.projectId,
-            sectionId: section.sectionId,
-            percentComplete: section.percentComplete,
-            status: section.status,
-            parsedEntity: section.entity,
-            entityKeys: Object.keys(section.entity)
-          })
-        }
+      console.log('✅ Store loaded successfully:', {
+        sectionCount: sections.value.length,
+        firstSection: sections.value[0] ? {
+          id: sections.value[0].sectionId,
+          name: sections.value[0].entity.sectionName,
+          entityKeys: Object.keys(sections.value[0].entity)
+        } : 'No sections'
       })
-      console.log('=== END PARSED ENTITY DATA ===')
-
-      // NEW: Log the entire store state
-      console.log('=== COMPLETE ENTITY STORE STATE ===')
-      console.log('Store sections array:', sections.value)
-      console.log('Store sections length:', sections.value.length)
-      console.log('Store sections loaded successfully')
-      console.log('=== END COMPLETE ENTITY STORE STATE ===')
     } catch (err) {
       console.error('Error loading sections:', err)
       error.value = err instanceof Error ? err.message : 'Failed to load sections'
@@ -184,10 +230,19 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         return
       }
 
+      // Parse and validate project sections
+      const parsedProjectSections = sectionsList.map((section: FeasibilityStudySection) => {
+        const parsedEntity = parseEntityData(section.entity)
+        return {
+          ...section,
+          entity: parsedEntity
+        } as ParsedFeasibilityStudySection
+      })
+
       // Update sections for this project
       const otherSections = sections.value.filter(s => s.projectId !== projectId)
-      sections.value = [...otherSections, ...sectionsList]
-      console.log('Project sections loaded:', sectionsList)
+      sections.value = [...otherSections, ...parsedProjectSections]
+      console.log(`Loaded ${parsedProjectSections.length} sections for project ${projectId}`)
     } catch (err) {
       console.error('Error loading project sections:', err)
       error.value = err instanceof Error ? err.message : 'Failed to load project sections'
@@ -202,7 +257,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     percentComplete: number = 0,
     status: FeasibilityStudySectionStatus = 'not_started',
     entity: Record<string, unknown> = {}
-  ): Promise<FeasibilityStudySectionEntity | null> => {
+  ): Promise<ParsedFeasibilityStudySection | null> => {
     if (!(await checkAuthentication())) return null
 
     if (!projectId.trim() || !sectionId.trim()) {
@@ -236,10 +291,15 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
       console.log('Section created:', newSection)
 
-      // Add to local state
-      sections.value.push(newSection)
+      // Parse and add to local state
+      const parsedEntity = parseEntityData(newSection.entity)
+      const parsedSection: ParsedFeasibilityStudySection = {
+        ...newSection,
+        entity: parsedEntity
+      }
 
-      return newSection
+      sections.value.push(parsedSection)
+      return parsedSection
     } catch (err) {
       console.error('Error creating section:', err)
       error.value = err instanceof Error ? err.message : 'Failed to create section'
@@ -253,7 +313,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     projectId: string,
     sectionId: string,
     updates: Partial<Pick<FeasibilityStudySection, 'percentComplete' | 'status' | 'entity'>>
-  ): Promise<FeasibilityStudySectionEntity | null> => {
+  ): Promise<ParsedFeasibilityStudySection | null> => {
     if (!(await checkAuthentication())) return null
 
     isLoading.value = true
@@ -280,13 +340,19 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
       console.log('Section updated:', updatedSection)
 
-      // Update in local state
-      const index = sections.value.findIndex(s => s.projectId === projectId && s.sectionId === sectionId)
-      if (index !== -1) {
-        sections.value[index] = updatedSection
+      // Parse and update in local state
+      const parsedEntity = parseEntityData(updatedSection.entity)
+      const parsedSection: ParsedFeasibilityStudySection = {
+        ...updatedSection,
+        entity: parsedEntity
       }
 
-      return updatedSection
+      const index = sections.value.findIndex(s => s.projectId === projectId && s.sectionId === sectionId)
+      if (index !== -1) {
+        sections.value[index] = parsedSection
+      }
+
+      return parsedSection
     } catch (err) {
       console.error('Error updating section:', err)
       error.value = err instanceof Error ? err.message : 'Failed to update section'
@@ -296,7 +362,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     }
   }
 
-  // New method for updating specific entity fields
+  // Consolidated method for updating specific entity fields
   const updateSectionEntity = async (
     projectId: string,
     sectionId: string,
@@ -314,14 +380,13 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       }
 
       // Create updated entity with the new field value
-      const currentEntity = (currentSection.entity as unknown) as Record<string, unknown> || {}
       const updatedEntity = {
-        ...currentEntity,
+        ...currentSection.entity,
         [fieldName]: newValue
       }
 
-      // Update the section with the new entity (convert back to string for DynamoDB)
-      const result = await updateSection(projectId, sectionId, { entity: JSON.stringify(updatedEntity) })
+      // Update the section with the new entity
+      const result = await updateSection(projectId, sectionId, { entity: updatedEntity })
       return result !== null
     } catch (err) {
       console.error('Error updating section entity:', err)
@@ -364,10 +429,6 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     }
   }
 
-  const getSectionById = (projectId: string, sectionId: string): FeasibilityStudySectionEntity | undefined => {
-    return sections.value.find(section => section.projectId === projectId && section.sectionId === sectionId)
-  }
-
   const clearError = (): void => {
     error.value = null
   }
@@ -377,7 +438,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     error.value = null
   }
 
-  const setSelectedSections = (sections: readonly FeasibilityStudySectionEntity[]): void => {
+  const setSelectedSections = (sections: readonly ParsedFeasibilityStudySection[]): void => {
     selectedSections.value = [...sections]
   }
 
@@ -385,7 +446,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     selectedSections.value = []
   }
 
-  const addSelectedSection = (section: FeasibilityStudySectionEntity): void => {
+  const addSelectedSection = (section: ParsedFeasibilityStudySection): void => {
     if (!selectedSections.value.find(s => s.projectId === section.projectId && s.sectionId === section.sectionId)) {
       selectedSections.value.push(section)
     }
@@ -399,10 +460,10 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
   return {
     // State
-    sections: readonly(sections),
-    isLoading: readonly(isLoading),
-    error: readonly(error),
-    selectedSections: readonly(selectedSections),
+    sections: sections,
+    isLoading: isLoading,
+    error: error,
+    selectedSections: selectedSections,
 
     // Computed
     sectionCount,
@@ -423,12 +484,19 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     updateSection,
     updateSectionEntity,
     deleteSection,
-    getSectionById,
     clearError,
     clearSections,
     setSelectedSections,
     clearSelectedSections,
     addSelectedSection,
-    removeSelectedSection
+    removeSelectedSection,
+
+    // Utility functions
+    getSectionDisplayName,
+    formatStatus,
+    getStatusClass,
+    formatTabName,
+    formatPropertyName,
+    getCompletionStatus
   }
 })

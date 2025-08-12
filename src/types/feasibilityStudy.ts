@@ -57,17 +57,23 @@ export interface FeasibilityStudySectionEntity {
   issues?: string;  // Markdown string instead of array
   observations?: string;  // Markdown string instead of array
   subSections?: SubSection[];
+  [key: string]: unknown; // Allow dynamic property access
 }
 
-// Main DynamoDB table record interface
+// Main DynamoDB table record interface (raw from database)
 export interface FeasibilityStudySection {
   projectId: string;
   sectionId: string;
   percentComplete: number;
   status: FeasibilityStudySectionStatus;
-  entity: string;  // JSON string as stored in DynamoDB
+  entity: Record<string, unknown> | string;  // Can be JSON object or JSON string
   createdAt?: string | null;
   updatedAt?: string | null;
+}
+
+// Parsed section interface for use in the application
+export interface ParsedFeasibilityStudySection extends Omit<FeasibilityStudySection, 'entity'> {
+  entity: FeasibilityStudySectionEntity;  // Parsed and typed entity
 }
 
 // Project metadata interface
