@@ -1,13 +1,14 @@
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
+import type { FeasibilityStudySectionEntity } from '@/types/feasibilityStudy';
+import type { GuidelineSection } from '@/types/guidelines';
 
 interface ChatRequest {
   message: string
   threadId?: string
   context?: {
-    projects?: string[]
-    minerals?: string[]
-    audience?: string[]
+    selectedEntity?: FeasibilityStudySectionEntity
+    matchingGuideline?: GuidelineSection
   }
   messages?: unknown[] // Conversation history from Pinia store
 }
@@ -18,8 +19,54 @@ interface ChatResponse {
   threadId: string
 }
 
+// Utility function to find matching guideline by section ID
+export function findMatchingGuideline(sectionId: string, guidelines: readonly GuidelineSection[]): GuidelineSection | null {
+  // Try to match by section name first (most reliable)
+  const sectionName = sectionId.toLowerCase();
+
+  // Look for exact or partial matches in guideline section names
+  const matchingGuideline = guidelines.find(guideline => {
+    const guidelineName = guideline.sectionName.toLowerCase();
+    return guidelineName.includes(sectionName) || sectionName.includes(guidelineName);
+  });
+
+  if (matchingGuideline) {
+    return matchingGuideline;
+  }
+
+  // Fallback: try to match by numeric ID if sectionId is numeric
+  const numericId = parseInt(sectionId, 10);
+  if (!isNaN(numericId)) {
+    return guidelines.find(guideline => guideline.id === numericId) || null;
+  }
+
+  return null;
+}
+
+// Helper function to prepare chat context with selected entity and matching guideline
+export function prepareChatContext(
+  selectedEntity: FeasibilityStudySectionEntity | null,
+  sectionId: string | null,
+  guidelines: readonly GuidelineSection[]
+): ChatRequest['context'] | undefined {
+  if (!selectedEntity || !sectionId) {
+    return undefined;
+  }
+
+  const matchingGuideline = findMatchingGuideline(sectionId, guidelines);
+
+  if (!matchingGuideline) {
+    return undefined;
+  }
+
+  return {
+    selectedEntity,
+    matchingGuideline
+  };
+}
+
 export class ChatApi {
-  private client: any = null;
+  private client: ReturnType<typeof generateClient<Schema>> | null = null;
 
   private getClient() {
     if (!this.client) {
@@ -92,9 +139,8 @@ export class ChatApi {
   async sendMessage(
     message: string,
     context?: {
-      projects?: string[]
-      minerals?: string[]
-      audience?: string[]
+      selectedEntity?: FeasibilityStudySectionEntity
+      matchingGuideline?: GuidelineSection
     },
     threadId?: string,
     messages?: unknown[]

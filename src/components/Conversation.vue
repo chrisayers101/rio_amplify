@@ -50,7 +50,9 @@
 
 <script setup lang="ts">
 import { defineProps, defineEmits, ref, nextTick, watch } from 'vue'
-import { chatApi } from '@/utils/chatApi'
+import { chatApi, prepareChatContext } from '@/utils/chatApi'
+import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
+import { useGuidelinesStore } from '@/stores/guidelinesStore'
 
 // Define component name for linting
 defineOptions({
@@ -62,6 +64,10 @@ defineProps({
   embedded: { type: Boolean, default: false }
 })
 defineEmits(['close'])
+
+// Use stores directly
+const entityStore = useFeasibilityStudySectionStore()
+const guidelinesStore = useGuidelinesStore()
 
 // Reactive data
 const newMessage = ref('')
@@ -109,16 +115,20 @@ const sendMessage = async () => {
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     })
 
+          // Prepare context with selected entity and matching guideline
+      const selectedSection = entityStore.selectedSections[0]
+      const context = selectedSection ? prepareChatContext(
+        selectedSection.entity,
+        selectedSection.sectionId,
+        guidelinesStore.sections
+      ) : undefined
+
     // Use streaming API
     await chatApi.streamChat(
       {
         message: userMessage,
         threadId: 'default',
-        context: {
-          projects: ['Amrun', 'Hamersley Iron Expansion', 'Brockman 4 Upgrade'],
-          minerals: ['Iron Ore', 'Bauxite'],
-          audience: ['Project Managers', 'Technical Analysts']
-        },
+        context,
         messages: apiMessages
       },
       (chunk) => {

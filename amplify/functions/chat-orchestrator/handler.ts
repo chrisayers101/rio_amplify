@@ -42,22 +42,24 @@ export const handler = async (event: any) => {
       content: msg.content || msg.message || ''
     }));
 
-    // Add context information if available
+    // Add context information if available - now using selected entity and guideline
     let contextInfo = '';
-    if (parsedContext.projects && parsedContext.projects.length > 0) {
-      contextInfo += `\n\nIMPORTANT CONTEXT - SELECTED PROJECTS:\n${parsedContext.projects.join(', ')}`;
-    }
-    if (parsedContext.minerals && parsedContext.minerals.length > 0) {
-      contextInfo += `\n\nIMPORTANT CONTEXT - SELECTED MINERALS:\n${parsedContext.minerals.join(', ')}`;
-    }
-    if (parsedContext.audience && parsedContext.audience.length > 0) {
-      contextInfo += `\n\nIMPORTANT CONTEXT - TARGET AUDIENCE:\n${parsedContext.audience.join(', ')}`;
+    if (parsedContext.selectedEntity && parsedContext.matchingGuideline) {
+      contextInfo += `\n\nIMPORTANT CONTEXT - SELECTED ENTITY AND GUIDELINE:\n`;
+      contextInfo += `Selected Entity: ${JSON.stringify(parsedContext.selectedEntity, null, 2)}\n`;
+      contextInfo += `Matching Guideline: ${JSON.stringify(parsedContext.matchingGuideline, null, 2)}`;
     }
 
     // Create enhanced message with system prompt and context
-    const systemPrompt = `You are an expert mining researcher and analytics specialist with deep knowledge of the mining industry, mineral exploration, and data analysis. Your expertise includes mining operations, geological analysis, financial analysis, environmental impact assessment, market analysis, technical analysis, and regulatory compliance. Provide detailed, accurate, and practical insights based on your mining and analytics expertise.`;
+    const systemPrompt = `You are an expert mining researcher and analytics specialist with deep knowledge of the mining industry, mineral exploration, and data analysis. Your expertise includes mining operations, geological analysis, financial analysis, environmental impact assessment, market analysis, technical analysis, and regulatory compliance. Provide detailed, accurate, and practical insights based on your mining and analytics expertise.
+
+IMPORTANT: When the user asks to compare against guidelines or assess compliance, use the provided guideline JSON data as a reference standard to compare against the entity.content property. The guidelines contain the expected structure and requirements for each section. Analyze how well the entity content aligns with the guideline requirements and provide specific feedback on gaps, strengths, and areas for improvement.`;
 
     const enhancedMessage = `${systemPrompt}\n\n${contextInfo ? `${contextInfo}\n\n` : ''}User Query: ${message}`;
+
+    // Log the system prompt for debugging
+    console.log('System Prompt being sent to AI:', systemPrompt);
+    console.log('Enhanced Message with Context:', enhancedMessage);
 
     conversationHistory.push({
       role: 'user',

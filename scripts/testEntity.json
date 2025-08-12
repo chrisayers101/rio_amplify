@@ -1,7 +1,7 @@
 [
   {
     "projectId": "AMRUN",
-    "sectionId": "01",
+    "sectionId": "1",
     "sectionName": "Summary & Recommendations",
     "percentComplete": 83,
     "status": "in_progress",
@@ -182,7 +182,7 @@ gantt
   },
   {
     "projectId": "AMRUN",
-    "sectionId": "02",
+    "sectionId": "2",
     "sectionName": "Business Strategy",
     "percentComplete": 75,
     "status": "in_progress",
