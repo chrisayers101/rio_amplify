@@ -176,7 +176,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
 import type { ParsedFeasibilityStudySection } from '@/types/feasibilityStudy'
 import WorkbenchSidebar from '@/components/WorkbenchSidebar.vue'
@@ -216,29 +216,15 @@ const originalValues = ref<Record<string, string>>({})
 
 // Load all sections on component mount
 const loadSections = async () => {
-  console.log('=== LOADING SECTIONS ===')
   try {
     isLoading.value = true
     hasError.value = false
-    console.log('Calling sectionStore.fetchSections()')
     await sectionStore.fetchSections()
-    console.log('Sections loaded, store state:', {
-      sections: sectionStore.sections,
-      sectionCount: sectionStore.sectionCount,
-      hasSections: sectionStore.hasSections
-    })
-
-    // Auto-select sections when they load
-    if (sectionStore.hasSections && sectionStore.sections.length > 0) {
-      console.log('Auto-selecting loaded sections')
-      handleSectionsSelected(sectionStore.sections)
-    }
   } catch (error) {
     console.error('Failed to load sections:', error)
     hasError.value = true
   } finally {
     isLoading.value = false
-    console.log('=== END LOADING SECTIONS ===')
   }
 }
 
@@ -247,10 +233,6 @@ const retryLoad = () => {
 }
 
 const handleContextSelected = (sections: readonly ParsedFeasibilityStudySection[]) => {
-  console.log('=== CONTEXT SELECTED ===')
-  console.log('Sections received:', sections.length, 'sections')
-  console.log('First section entity keys:', sections[0]?.entity ? Object.keys(sections[0].entity) : 'No entity')
-
   selectedSectionObjects.value = sections
 
   // Set the first available tab as active if sections are selected
@@ -268,19 +250,12 @@ const handleContextSelected = (sections: readonly ParsedFeasibilityStudySection[
     }
 
     activeTab.value = firstKey
-    console.log('Set active tab to:', firstKey, 'with content length:', (entity[firstKey] as string)?.length || 0)
   } else {
     activeTab.value = ''
-    console.log('No active tab set - no sections or entities')
   }
-  console.log('=== END CONTEXT SELECTED ===')
 }
 
 const handleSectionsSelected = (sections: readonly ParsedFeasibilityStudySection[]) => {
-  console.log('=== SECTIONS SELECTED ===')
-  console.log('Sections received:', sections.length, 'sections')
-  console.log('First section entity keys:', sections[0]?.entity ? Object.keys(sections[0].entity) : 'No entity')
-
   selectedSectionObjects.value = sections
 
   // Set the first available tab as active if sections are selected
@@ -298,12 +273,9 @@ const handleSectionsSelected = (sections: readonly ParsedFeasibilityStudySection
     }
 
     activeTab.value = firstKey
-    console.log('Set active tab to:', firstKey, 'with content length:', (entity[firstKey] as string)?.length || 0)
   } else {
     activeTab.value = ''
-    console.log('No active tab set - no sections or entities')
   }
-  console.log('=== END SECTIONS SELECTED ===')
 }
 
 const getSectionDisplayName = (section: ParsedFeasibilityStudySection): string => {
@@ -334,8 +306,6 @@ const formatPropertyName = (key: string): string => {
 
 // Helper function to update local section data immediately
 const updateLocalSectionData = (projectId: string, sectionId: string, fieldName: string, newValue: string): void => {
-  console.log('Updating local section data:', { projectId, sectionId, fieldName, newValue })
-
   // Update the selected sections immediately for instant UI feedback
   const updatedSections = selectedSectionObjects.value.map(section => {
     if (section.projectId === projectId && section.sectionId === sectionId) {
@@ -344,7 +314,6 @@ const updateLocalSectionData = (projectId: string, sectionId: string, fieldName:
         ...section.entity,
         [fieldName]: newValue
       }
-      console.log('Updated entity:', updatedEntity)
       return {
         ...section,
         entity: updatedEntity
@@ -355,7 +324,6 @@ const updateLocalSectionData = (projectId: string, sectionId: string, fieldName:
 
   // Force Vue reactivity by creating a new array reference
   selectedSectionObjects.value = [...updatedSections]
-  console.log('Updated selectedSectionObjects:', selectedSectionObjects.value)
 }
 
 // Edit mode methods
@@ -483,9 +451,7 @@ const startResize = (event: MouseEvent | TouchEvent) => {
 
 // Load sections when component mounts
 onMounted(() => {
-  console.log('=== WORKBENCH ANALYTICS VIEW MOUNTED ===')
   loadSections()
-  console.log('=== END WORKBENCH ANALYTICS VIEW MOUNTED ===')
 })
 
 onUnmounted(() => {

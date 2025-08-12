@@ -6,16 +6,8 @@
     </div>
 
     <div class="section-controls">
-      <div class="control-buttons">
-        <button @click="selectAll" class="control-btn select-all">
-          Select All
-        </button>
-        <button @click="clearAll" class="control-btn clear-all">
-          Clear All
-        </button>
-      </div>
       <div class="selection-info">
-        <span class="selected-count">{{ selectedSections.length }}</span>
+        <span class="selected-count">{{ storeSelectedSections.length }}</span>
         <span class="total-count">/ {{ sections.length }} selected</span>
       </div>
     </div>
@@ -39,11 +31,12 @@
         >
           <label class="section-checkbox">
             <input
-              type="checkbox"
+              type="radio"
               :value="`${section.projectId}-${section.sectionId}`"
-              v-model="selectedSections"
+              v-model="radioValue"
               @change="handleSectionToggle"
               class="checkbox-input"
+              name="section-selection"
             />
             <div class="checkbox-custom"></div>
             <div class="section-info">
@@ -93,35 +86,46 @@ const error = computed(() => sectionStore.error)
 // Track selected sections (using composite key format: "projectId-sectionId")
 const selectedSections = ref<string[]>(props.modelValue || [])
 
+// Sync with store's selected sections
+const storeSelectedSections = computed(() => sectionStore.selectedSections)
+
+// Reactive ref for radio button state
+const radioValue = ref<string>('')
+
+// Watch for changes in store selection and update radio button state
+watch(storeSelectedSections, (newSelectedSections) => {
+  if (newSelectedSections.length > 0) {
+    radioValue.value = `${newSelectedSections[0].projectId}-${newSelectedSections[0].sectionId}`
+  } else {
+    radioValue.value = ''
+  }
+}, { immediate: true })
+
+// Watch for external changes to the modelValue
+watch(() => props.modelValue, (newValue) => {
+  if (newValue) {
+    selectedSections.value = newValue
+  }
+})
 
 
 // Methods
-const selectAll = () => {
-  selectedSections.value = sections.value.map(section => `${section.projectId}-${section.sectionId}`)
-  emit('update:modelValue', selectedSections.value)
-
-  // Emit the selected sections for the canvas
-  emit('sections-selected', sections.value)
-}
-
-const clearAll = () => {
-  selectedSections.value = []
-  emit('update:modelValue', selectedSections.value)
-
-  // Emit empty selection for the canvas
-  emit('sections-selected', [])
-}
-
 const handleSectionToggle = () => {
-  emit('update:modelValue', selectedSections.value)
-
-  // Get the selected section objects
-  const selectedSectionObjects = sections.value.filter(section =>
-    selectedSections.value.includes(`${section.projectId}-${section.sectionId}`)
+  // Get the selected section object based on radio button value
+  const selectedSection = sections.value.find(section =>
+    radioValue.value === `${section.projectId}-${section.sectionId}`
   )
 
-  // Emit the selected sections for the canvas
-  emit('sections-selected', selectedSectionObjects)
+  // Update the store's selected sections (single selection)
+  if (selectedSection) {
+    sectionStore.setSelectedSections([selectedSection])
+    // Emit the selected section for the canvas
+    emit('sections-selected', [selectedSection])
+  } else {
+    sectionStore.setSelectedSections([])
+    // Emit empty selection for the canvas
+    emit('sections-selected', [])
+  }
 }
 
 const getSectionDisplayName = (section: ParsedFeasibilityStudySection): string => {
@@ -174,13 +178,6 @@ onMounted(async () => {
     await sectionStore.fetchSections()
   }
 })
-
-// Watch for external changes to the modelValue
-watch(() => props.modelValue, (newValue) => {
-  if (newValue) {
-    selectedSections.value = newValue
-  }
-})
 </script>
 
 <style scoped>
@@ -219,41 +216,6 @@ watch(() => props.modelValue, (newValue) => {
   padding: 16px 24px;
   border-bottom: 1px solid #e5e7eb;
   background: #f9fafb;
-}
-
-.control-buttons {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.control-btn {
-  padding: 6px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background: white;
-  color: #374151;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.control-btn:hover {
-  background: #f3f4f6;
-  border-color: #9ca3af;
-}
-
-.control-btn.select-all {
-  background: #dcfce7;
-  color: #166534;
-  border-color: #bbf7d0;
-}
-
-.control-btn.clear-all {
-  background: #fee2e2;
-  color: #991b1b;
-  border-color: #fecaca;
 }
 
 .selection-info {
@@ -296,7 +258,7 @@ watch(() => props.modelValue, (newValue) => {
   background: #f0f9fa;
 }
 
-.section-checkbox input[type="checkbox"] {
+.section-checkbox input[type="radio"] {
   position: absolute;
   opacity: 0;
   cursor: pointer;
@@ -308,7 +270,7 @@ watch(() => props.modelValue, (newValue) => {
   width: 18px;
   height: 18px;
   border: 2px solid #d1d5db;
-  border-radius: 4px;
+  border-radius: 50%;
   background: white;
   position: relative;
   flex-shrink: 0;
@@ -316,21 +278,20 @@ watch(() => props.modelValue, (newValue) => {
   transition: all 0.2s ease;
 }
 
-.section-checkbox input[type="checkbox"]:checked + .checkbox-custom {
+.section-checkbox input[type="radio"]:checked + .checkbox-custom {
   background: #008C8E;
   border-color: #008C8E;
 }
 
-.section-checkbox input[type="checkbox"]:checked + .checkbox-custom::after {
+.section-checkbox input[type="radio"]:checked + .checkbox-custom::after {
   content: '';
   position: absolute;
   left: 5px;
-  top: 2px;
+  top: 5px;
   width: 6px;
-  height: 10px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
+  height: 6px;
+  border-radius: 50%;
+  background: white;
 }
 
 .section-info {
