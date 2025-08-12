@@ -9,7 +9,12 @@
         <div class="messages-container" ref="messagesContainer">
           <div v-for="(message, index) in messages" :key="index" class="message-wrapper" :class="message.type">
             <div class="message-bubble">
-              <div class="message-content">{{ message.content }}</div>
+              <!-- Use VueMarkdown for AI messages to render markdown properly -->
+              <div v-if="message.type === 'ai-message'" class="message-content">
+                <VueMarkdown :source="message.content" />
+              </div>
+              <!-- Regular text for user messages -->
+              <div v-else class="message-content">{{ message.content }}</div>
               <div class="message-time">{{ message.time }}</div>
             </div>
           </div>
@@ -53,6 +58,7 @@ import { defineProps, defineEmits, ref, nextTick, watch } from 'vue'
 import { chatApi, prepareChatContext } from '@/utils/chatApi'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
 import { useGuidelinesStore } from '@/stores/guidelinesStore'
+import VueMarkdown from 'vue-markdown-render'
 
 // Define component name for linting
 defineOptions({
@@ -457,5 +463,61 @@ watch(messages, () => {
   .message-bubble {
     max-width: 90%;
   }
+}
+
+/* Style markdown tables */
+.message-content :deep(table) {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 10px 0;
+  font-size: 0.9em;
+}
+
+.message-content :deep(th),
+.message-content :deep(td) {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.message-content :deep(th) {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  color: #333;
+}
+
+.message-content :deep(tr:nth-child(even)) {
+  background-color: #f9f9f9;
+}
+
+.message-content :deep(tr:hover) {
+  background-color: #f5f5f5;
+}
+
+/* Style markdown content */
+.message-content :deep(p) {
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.message-content :deep(ul),
+.message-content :deep(ol) {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.message-content :deep(li) {
+  margin: 4px 0;
+}
+
+.message-content :deep(strong) {
+  font-weight: 600;
+  color: #333;
+}
+
+.message-content :deep(em) {
+  font-style: italic;
+  color: #666;
 }
 </style>
