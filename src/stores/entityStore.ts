@@ -321,6 +321,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
     try {
       console.log('Updating section:', { projectId, sectionId, updates })
+      console.log('Updates being sent:', JSON.stringify(updates, null, 2))
       const { data: updatedSection, errors } = await getClient().models.FeasibilityStudySections.update({
         projectId,
         sectionId,
@@ -329,6 +330,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
       if (errors) {
         console.error('Errors updating section:', errors)
+        console.error('Full error details:', JSON.stringify(errors, null, 2))
         error.value = 'Failed to update section'
         return null
       }
@@ -384,9 +386,16 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         ...currentSection.entity,
         [fieldName]: newValue
       }
+      console.log('Current entity:', currentSection.entity)
+      console.log('Updated entity being sent:', updatedEntity)
+      console.log('Field being updated:', fieldName, 'with value:', newValue)
 
-      // Update the section with the new entity
-      const result = await updateSection(projectId, sectionId, { entity: updatedEntity })
+      // Convert entity object to JSON string for DynamoDB
+      const entityJsonString = JSON.stringify(updatedEntity)
+      console.log('Entity converted to JSON string:', entityJsonString)
+
+      // Update the section with the new entity (as JSON string)
+      const result = await updateSection(projectId, sectionId, { entity: entityJsonString })
       return result !== null
     } catch (err) {
       console.error('Error updating section entity:', err)
