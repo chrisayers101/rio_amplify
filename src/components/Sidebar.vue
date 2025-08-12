@@ -100,12 +100,7 @@ const navItems = [
     route: '/dashboard',
     subLabel: 'Analytics dashboard'
   },
-  {
-    icon: DocumentTextIcon,
-    label: 'Feasibility Study Report',
-    route: '/feasibility-study',
-    subLabel: 'Creation & assessment'
-  },
+
   {
     icon: EyeIcon,
     label: 'Show Me',
