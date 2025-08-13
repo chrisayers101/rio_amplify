@@ -131,6 +131,9 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     if (entityObject.assessment) {
       parsedEntity.assessment = entityObject.assessment as string
     }
+    if (entityObject.qualityAssessment) {
+      parsedEntity.qualityAssessment = entityObject.qualityAssessment as string
+    }
     if (entityObject.content) {
       parsedEntity.content = entityObject.content as string
     }

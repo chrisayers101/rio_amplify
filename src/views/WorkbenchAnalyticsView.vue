@@ -64,7 +64,7 @@
               <div v-if="section.entity" class="section-entity">
                 <div class="entity-tabs">
                   <div
-                    v-for="fieldName in Object.keys(section.entity)"
+                    v-for="fieldName in getVisibleTabs(section)"
                     :key="fieldName"
                     class="tab-header"
                     :class="{ active: activeTab === fieldName }"
@@ -76,22 +76,28 @@
                       @click.stop="toggleEditMode(fieldName)"
                       class="edit-button"
                       :class="{ 'editing': isEditing(fieldName) }"
+                      :aria-label="isEditing(fieldName) ? 'Cancel edit' : 'Edit'"
+                      title="Edit"
                     >
-                      {{ isEditing(fieldName) ? 'Cancel' : 'Edit' }}
+                      <template v-if="!isEditing(fieldName)">
+                        <PencilSquareIcon class="edit-icon" />
+                      </template>
+                      <template v-else>
+                        Cancel
+                      </template>
                     </button>
                   </div>
                 </div>
 
                 <div class="tab-content">
-                  <div v-if="activeTab && section.entity && section.entity[activeTab]" class="tab-panel">
+                  <div v-if="activeTab && section.entity && section.entity[activeTab]" class="tab-panel fill-parent">
                     <!-- Edit Mode -->
-                    <div v-if="isEditing(activeTab)" class="edit-mode">
-                      <div class="edit-controls">
+                    <div v-if="isEditing(activeTab)" class="edit-mode fill-parent">
+                      <div class="edit-controls fill-parent">
                         <textarea
                           v-model="editValues[activeTab]"
-                          class="edit-textarea"
+                          class="edit-textarea fill-parent"
                           :placeholder="`Edit ${formatTabName(activeTab)}...`"
-                          rows="10"
                         ></textarea>
                         <div class="edit-actions">
                           <button
@@ -148,7 +154,7 @@
 
                       <div v-else class="simple-content">
                         <!-- Render all content as markdown -->
-                        <div class="markdown-content">
+                        <div class="markdown-content scrollable">
                           <div
                             class="markdown-body"
                             v-html="renderMarkdown(String(section.entity[activeTab] || ''))"
@@ -176,6 +182,7 @@
 </template>
 
 <script setup lang="ts">
+import { PencilSquareIcon } from '@heroicons/vue/24/outline'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
 import type { ParsedFeasibilityStudySection } from '@/types/feasibilityStudy'
@@ -237,18 +244,9 @@ const handleContextSelected = (sections: readonly ParsedFeasibilityStudySection[
 
   // Set the first available tab as active if sections are selected
   if (sections.length > 0 && sections[0].entity) {
-    // Find the first field that contains actual content (not undefined/empty)
     const entity = sections[0].entity
-    const contentFields = ['assessment', 'content', 'issues', 'observations']
-    let firstKey = 'sectionName' // fallback
-
-    for (const field of contentFields) {
-      if (entity[field] && typeof entity[field] === 'string' && (entity[field] as string).trim().length > 0) {
-        firstKey = field
-        break
-      }
-    }
-
+    const preferredOrder = ['content', 'qualityAssessment']
+    const firstKey = preferredOrder.find(k => typeof entity[k] === 'string' && String(entity[k]).trim().length > 0) || preferredOrder[0]
     activeTab.value = firstKey
   } else {
     activeTab.value = ''
@@ -260,18 +258,9 @@ const handleSectionsSelected = (sections: readonly ParsedFeasibilityStudySection
 
   // Set the first available tab as active if sections are selected
   if (sections.length > 0 && sections[0].entity) {
-    // Find the first field that contains actual content (not undefined/empty)
     const entity = sections[0].entity
-    const contentFields = ['assessment', 'content', 'issues', 'observations']
-    let firstKey = 'sectionName' // fallback
-
-    for (const field of contentFields) {
-      if (entity[field] && typeof entity[field] === 'string' && (entity[field] as string).trim().length > 0) {
-        firstKey = field
-        break
-      }
-    }
-
+    const preferredOrder = ['content', 'qualityAssessment']
+    const firstKey = preferredOrder.find(k => typeof entity[k] === 'string' && String(entity[k]).trim().length > 0) || preferredOrder[0]
     activeTab.value = firstKey
   } else {
     activeTab.value = ''
@@ -300,6 +289,14 @@ const formatTabName = (key: string): string => {
 
 const formatPropertyName = (key: string): string => {
   return sectionStore.formatPropertyName(key)
+}
+
+
+// Compute the visible tabs for a given section, restricted to Content and Quality Assessment in order
+const getVisibleTabs = (section: ParsedFeasibilityStudySection): string[] => {
+  const allowed = ['content', 'qualityAssessment']
+  const entity = section.entity || {}
+  return allowed.filter(key => entity[key] !== undefined && String(entity[key]).trim().length > 0)
 }
 
 
@@ -528,7 +525,7 @@ onUnmounted(() => {
   background: #f8fafc;
   min-width: 0;
   transition: width 0.1s ease;
-  height: auto;
+  height: 100%;
 }
 
 .canvas-header {
@@ -553,8 +550,10 @@ onUnmounted(() => {
 .canvas-content {
   flex: 1;
   padding: 24px;
-  height: auto;
-  overflow: visible;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .canvas-placeholder {
@@ -592,6 +591,8 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  flex: 1;
+  min-height: 0;
 }
 
 /* Entity Tabs Styles */
@@ -670,25 +671,34 @@ onUnmounted(() => {
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 16px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .edit-controls {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  flex: 1;
+  min-height: 0;
 }
 
 .edit-textarea {
   width: 100%;
-  min-height: 200px;
+  flex: 1;
+  min-height: 0;
   padding: 12px;
   border: 1px solid #d1d5db;
   border-radius: 6px;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-size: 0.875rem;
   line-height: 1.5;
-  resize: vertical;
+  resize: none;
   background: white;
+  overflow: auto;
 }
 
 .edit-textarea:focus {
@@ -701,6 +711,7 @@ onUnmounted(() => {
   display: flex;
   gap: 12px;
   justify-content: flex-end;
+  margin-top: auto;
 }
 
 .save-button {
@@ -760,17 +771,28 @@ onUnmounted(() => {
 
 /* View Mode Styles */
 .view-mode {
-  /* Existing styles remain the same */
+  padding: 0;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .tab-content {
   min-height: 120px;
-  height: auto;
-  overflow: visible;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .tab-panel {
   padding: 16px 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .array-content, .object-content {
@@ -813,8 +835,16 @@ onUnmounted(() => {
 .simple-value, .simple-content {
   color: #6b7280;
   font-style: italic;
-  height: auto;
-  overflow: visible;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.simple-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .no-tab-selected {
@@ -830,6 +860,9 @@ onUnmounted(() => {
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .section-header {
@@ -893,7 +926,11 @@ onUnmounted(() => {
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 16px;
-  overflow: visible;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .entity-json {
@@ -1092,8 +1129,11 @@ onUnmounted(() => {
   background: #f9fafb;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
-  height: auto;
-  overflow: visible;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
 }
 
 .markdown-inline {

@@ -9,6 +9,7 @@
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
     "entity": {
+      "qualityAssessment":"not yet run",
       "content": "# Mining Feasibility Study  
 _Executive Summary_  
 *(Facts compiled from Claude 3.5 and OpenAI GPT-4.1 • Generated 07-Aug-2025)*  
@@ -190,6 +191,7 @@ gantt
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
     "entity": {
+            "qualityAssessment":"not yet run",
       "content": "## Business Strategy Summary\n\nThe Amrun Bauxite Project represents a strategic investment aligned with Rio Tinto's portfolio optimization strategy. The project demonstrates strong alignment with business unit objectives and shows potential for significant value creation through operational excellence and market positioning.\n\nKey business strategy elements include:\n\n- **Portfolio Alignment**: Fits strategically within Rio Tinto's bauxite portfolio\n- **Market Position**: Leverages existing infrastructure and market relationships\n- **Operational Synergies**: Builds on established operational capabilities\n- **Growth Potential**: Provides platform for future expansion opportunities\n\n### Strategic Objectives\n\n- Achieve first quartile cost position in the bauxite industry\n- Establish sustainable operations with strong community relationships\n- Develop export infrastructure supporting regional economic development\n- Maintain environmental leadership standards throughout project lifecycle",
       "assessment": "## Business Strategy Assessment\n\nBusiness strategy assessment completed with the following findings:\n\n- **Strategic Fit**: High - Project aligns well with Rio Tinto's long-term strategy\n- **Market Position**: Strong - Leverages existing market relationships and infrastructure\n- **Risk Profile**: Moderate - Well-understood risks with clear mitigation strategies\n- **Value Creation**: High - Strong NPV and IRR projections support investment case\n\n> **Note**: Business strategy has been validated through internal review processes and stakeholder consultation.",
       "observations": "## Strategic Planning Observations\n\nStrategic planning observations from business analysis:\n\n| ID     | Observation                                                                 | Source                                                | Action Required |\n|--------|------------------------------------------------------------------------------|-------------------------------------------------------|------------------|\n| 02‑O1  | Project demonstrates strong alignment with Rio Tinto's portfolio strategy.     | Business Strategy Review                              |  No             |\n| 02‑O2  | Market positioning analysis confirms competitive advantages.                    | Market Analysis Report                                |  No             |\n| 02‑O3  | Strategic risk assessment identifies manageable risk profile.                 | Risk Assessment Framework                             |  No             |\n\n**Recommendation**: Proceed with confidence in business strategy alignment.",
