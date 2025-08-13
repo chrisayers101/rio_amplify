@@ -24,6 +24,13 @@
           <CpuChipIcon class="view-icon" />
           <span>Workbench Analytics</span>
         </button>
+        <button
+          class="view-btn"
+          @click="testOpenSearch"
+          title="Test OpenSearch"
+        >
+          <span>Test OpenSearch</span>
+        </button>
       </div>
 
       <div v-if="projectStore.hasSelectedProject" class="active-project" @click="toggleProjectDropdown">
@@ -65,6 +72,8 @@ import { useProjectStore } from '@/stores/projectStore'
 import { useViewStore } from '@/stores/viewStore'
 import RioLogo from '@/assets/RioLogo.svg'
 import { ArrowLeftStartOnRectangleIcon, ChevronDownIcon, DocumentIcon, ChartBarIcon, CpuChipIcon } from '@heroicons/vue/24/outline'
+import type { Schema } from '@/amplify/data/resource'
+import { generateClient } from 'aws-amplify/api'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -125,6 +134,25 @@ const navigateToFiles = () => {
 async function signOut() {
   await authStore.signOut()
   window.location.href = '/'
+}
+
+// Test OpenSearch proxy via Amplify Data
+const client = generateClient<Schema>()
+async function testOpenSearch() {
+  try {
+    // Try a minimal rawSearch first
+    const res = await client.queries.openSearchProxy({
+      operation: 'rawSearch',
+      index: 'fs-openai-semantic-chunk-data-automation',
+      // AppSync AWSJSON requires a string containing JSON
+      query: JSON.stringify({ size: 1, query: { match_all: {} } })
+    })
+    console.log('OpenSearch rawSearch raw response:', res)
+    const payload = typeof res === 'string' ? JSON.parse(res) : res
+    console.log('OpenSearch rawSearch parsed:', payload)
+  } catch (e) {
+    console.error('OpenSearch test failed:', e)
+  }
 }
 </script>
 

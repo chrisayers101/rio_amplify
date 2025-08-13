@@ -1,0 +1,47 @@
+{
+  "_notes": [
+    "Single-file config for OpenSearch proxy.",
+    "Switch environments by editing 'endpoint', 'domainArn', 'search.index', and 'infra.*'.",
+    "If your domain is VPC-only, set infra.vpcId, infra.subnetIds (3 private), and infra.lambdaSecurityGroupId, then attach the function to that VPC in the backend.",
+    "'domainArn' is optional; if set, the backend grants es:ESHttpGet/Post automatically."
+  ],
+  "domains": {
+    "dev": {
+      "endpoint": "https://search-amplify-os-dev-ftjbm4vtz7fj6hr3kx3lpifdyu.ap-southeast-2.es.amazonaws.com",
+      "region": "ap-southeast-2",
+      "domainArn": "arn:aws:es:ap-southeast-2:029109261863:domain/amplify-os-dev"
+    },
+    "enterprise": {
+      "endpoint": "",
+      "region": "ap-southeast-2",
+      "domainArn": ""
+    }
+  },
+  "default": "dev",
+  "search": {
+    "index": "fs-openai-semantic-chunk-data-automation",
+    "topK": 5,
+    "maxTokens": 1000,
+    "primaryContentField": "text",
+    "fallbackContentFields": ["markdown", "summary"],
+    "metadataFields": ["title", "section_title", "doc_name", "chunk_type", "chunk_subtype", "page_indices"],
+    "bedrockRegion": "ap-southeast-2",
+    "embeddingModelId": "amazon.titan-embed-text-v2:0",
+    "answerModelId": "anthropic.claude-3-5-sonnet-20241022-v2:0"
+  },
+  "infra": {
+    "vpcId": "",
+    "subnetIds": [
+      "",
+      "",
+      ""
+    ],
+    "lambdaSecurityGroupId": "",
+    "domainSecurityGroupIds": [
+      "",
+      ""
+    ]
+  }
+}
+
+

@@ -1,6 +1,7 @@
 import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
 import { chatOrchestratorFunction } from '../functions/chat-orchestrator/resource';
 import { s3ProxyFunction } from '../functions/s3-proxy/resource';
+import { openSearchProxyFunction } from '../functions/opensearch-proxy/resource';
 
 const schema = a.schema({
   FeasibilityStudySections: a
@@ -48,6 +49,24 @@ const schema = a.schema({
     .returns(a.string())
     .authorization(allow => [allow.authenticated()])
     .handler(a.handler.function(s3ProxyFunction)),
+
+  // Add OpenSearch proxy function as a query
+  openSearchProxy: a
+    .query()
+    .arguments({
+      operation: a.string().required(), // 'rawSearch' | 'ask'
+      index: a.string(),
+      question: a.string(),
+      generateAnswer: a.boolean(),
+      method: a.string(),
+      path: a.string(),
+      query: a.json(),
+      body: a.json(),
+      topK: a.integer(),
+    })
+    .returns(a.string())
+    .authorization(allow => [allow.authenticated()])
+    .handler(a.handler.function(openSearchProxyFunction)),
 });
 
 export type Schema = ClientSchema<typeof schema>;
