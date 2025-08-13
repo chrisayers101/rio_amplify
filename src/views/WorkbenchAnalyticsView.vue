@@ -127,15 +127,15 @@
                             <div v-for="(propValue, propKey) in item" :key="String(propKey)" class="property">
                               <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
                               <span class="property-value">
-                                <span class="markdown-inline">
-                                  <span v-html="renderMarkdown(String(propValue))"></span>
-                                </span>
+                              <span class="markdown-inline">
+                                <VueMarkdown class="markdown-body" :source="String(propValue)" />
+                              </span>
                               </span>
                             </div>
                           </div>
                           <div v-else class="simple-value">
                             <span class="markdown-inline">
-                              <span v-html="renderMarkdown(String(item))"></span>
+                              <VueMarkdown class="markdown-body" :source="String(item)" />
                             </span>
                           </div>
                         </div>
@@ -146,7 +146,7 @@
                           <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
                           <span class="property-value">
                             <span class="markdown-inline">
-                              <span v-html="renderMarkdown(String(propValue))"></span>
+                              <VueMarkdown class="markdown-body" :source="String(propValue)" />
                             </span>
                           </span>
                         </div>
@@ -155,10 +155,10 @@
                       <div v-else class="simple-content">
                         <!-- Render all content as markdown -->
                         <div class="markdown-content scrollable">
-                          <div
+                          <VueMarkdown
                             class="markdown-body"
-                            v-html="renderMarkdown(String(section.entity[activeTab] || ''))"
-                          ></div>
+                            :source="String(section.entity[activeTab] || '')"
+                          />
                         </div>
                       </div>
                     </div>
@@ -188,20 +188,9 @@ import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
 import type { ParsedFeasibilityStudySection } from '@/types/feasibilityStudy'
 import WorkbenchSidebar from '@/components/WorkbenchSidebar.vue'
 import Conversation from '@/components/Conversation.vue'
-import { marked } from 'marked'
-import DOMPurify from 'dompurify'
+import VueMarkdown from 'vue-markdown-render'
 
-// Configure marked options for v16+
-marked.use({
-  breaks: true,
-  gfm: true
-})
-
-// Configure DOMPurify to allow more HTML elements
-DOMPurify.setConfig({
-  ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'strong', 'b', 'em', 'i', 'ul', 'ol', 'li', 'code', 'pre', 'blockquote'],
-  ALLOWED_ATTR: []
-})
+// Use VueMarkdown for markdown rendering to match Conversation panel
 
 // Use the store
 const sectionStore = useFeasibilityStudySectionStore()
@@ -394,32 +383,7 @@ const cancelEdit = (fieldName: string): void => {
 }
 
 
-// Markdown rendering function
-const renderMarkdown = (markdownText: string): string => {
-  if (!markdownText) {
-    return ''
-  }
-
-  try {
-    // Convert PowerShell-style newlines to actual newlines
-    const processedMarkdown = markdownText.replace(/`n/g, '\n')
-
-    // Parse markdown to HTML using the correct marked v16 API
-    const html = marked(processedMarkdown)
-
-    // Ensure html is a string before sanitizing
-    const htmlString = typeof html === 'string' ? html : String(html)
-
-    // Sanitize HTML to prevent XSS
-    const sanitizedHtml = DOMPurify.sanitize(htmlString)
-
-    // Return the sanitized HTML
-    return sanitizedHtml
-  } catch (error) {
-    console.error('Error rendering markdown:', error)
-    return markdownText // Fallback to raw text if parsing fails
-  }
-}
+// Markdown is rendered via <VueMarkdown :source="..." />
 
 const startResize = (event: MouseEvent | TouchEvent) => {
   isResizing.value = true
