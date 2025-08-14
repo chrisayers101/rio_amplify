@@ -415,6 +415,23 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         sections.value[index] = parsedSection
       }
 
+      // Keep selectedSections in sync to avoid stale object references
+      const isSelected = selectedSections.value.some(s => s.projectId === projectId && s.sectionId === sectionId)
+      if (isSelected) {
+        selectedSections.value = [parsedSection]
+        // Log the selected entity after update for debugging
+        try {
+          console.log('[EntityStore] Selected entity after updateSection:', {
+            projectId,
+            sectionId,
+            entityKeys: Object.keys(selectedSections.value[0]?.entity || {}),
+            entitySample: selectedSections.value[0]?.entity
+          })
+        } catch (_) {
+          // no-op
+        }
+      }
+
       return parsedSection
     } catch (err) {
       console.error('Error updating section:', err)
@@ -455,6 +472,23 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
       // Update the section with the new entity (as JSON string)
       const result = await updateSection(projectId, sectionId, { entity: entityJsonString })
+
+      // Log selected entity after update for debugging
+      try {
+        const selected = selectedSections.value[0]
+        if (selected && selected.projectId === projectId && selected.sectionId === sectionId) {
+          console.log('[EntityStore] Selected entity after updateSectionEntity:', {
+            projectId,
+            sectionId,
+            updatedField: fieldName,
+            entityKeys: Object.keys(selected.entity || {}),
+            entitySample: selected.entity
+          })
+        }
+      } catch (_) {
+        // no-op
+      }
+
       return result !== null
     } catch (err) {
       console.error('Error updating section entity:', err)
