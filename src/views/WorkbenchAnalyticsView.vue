@@ -127,14 +127,14 @@
                               <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
                               <span class="property-value">
                               <span class="markdown-inline">
-                                <VueMarkdown class="markdown-body" :source="formatMarkdownSource(String(propValue))" />
+                                <VueMarkdown class="markdown-body" :source="formatMarkdownSource(String(propValue))" :md="md" />
                               </span>
                               </span>
                             </div>
                           </div>
                           <div v-else class="simple-value">
                             <span class="markdown-inline">
-                              <VueMarkdown class="markdown-body" :source="formatMarkdownSource(String(item))" />
+                              <VueMarkdown class="markdown-body" :source="formatMarkdownSource(String(item))" :md="md" />
                             </span>
                           </div>
                         </div>
@@ -145,7 +145,7 @@
                           <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
                           <span class="property-value">
                             <span class="markdown-inline">
-                              <VueMarkdown class="markdown-body" :source="formatMarkdownSource(String(propValue))" />
+                              <VueMarkdown class="markdown-body" :source="formatMarkdownSource(String(propValue))" :md="md" />
                             </span>
                           </span>
                         </div>
@@ -157,6 +157,7 @@
                           <VueMarkdown
                             class="markdown-body"
                             :source="formatMarkdownSource(section.entity[activeTab] || '')"
+                            :md="md"
                           />
                         </div>
                       </div>
@@ -182,13 +183,43 @@
 
 <script setup lang="ts">
 import { PencilSquareIcon } from '@heroicons/vue/24/outline'
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
 import type { ParsedFeasibilityStudySection } from '@/types/feasibilityStudy'
 import WorkbenchSidebar from '@/components/WorkbenchSidebar.vue'
 import Conversation from '@/components/Conversation.vue'
 import VueMarkdown from 'vue-markdown-render'
+import MarkdownIt from 'markdown-it'
+import mdTaskLists from 'markdown-it-task-lists'
+import mermaid from 'mermaid'
 import { useSidebarStore } from '@/stores/sidebarStore'
+
+// Initialize Mermaid once
+mermaid.initialize({ startOnLoad: false, securityLevel: 'loose' })
+
+// Configure a shared MarkdownIt instance with GFM + Mermaid
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  breaks: true
+})
+  // Tables and strikethrough are built-in to markdown-it
+  .use(mdTaskLists)
+
+// Render ```mermaid``` code fences as placeholders to be processed by Mermaid after mount
+const originalFence = md.renderer.rules.fence
+md.renderer.rules.fence = (tokens, idx, options, env, self) => {
+  const token = tokens[idx]
+  const info = (token.info || '').trim().toLowerCase()
+  if (info === 'mermaid') {
+    const code = token.content || ''
+    const escaped = md.utils.escapeHtml(code)
+    return `<pre class="mermaid-block"><code class="language-mermaid">${escaped}</code></pre>`
+  }
+  return originalFence
+    ? originalFence(tokens, idx, options, env, self)
+    : `<pre><code>${md.utils.escapeHtml(token.content || '')}</code></pre>`
+}
 
 // Use VueMarkdown for markdown rendering to match Conversation panel
 
@@ -425,9 +456,41 @@ const startResize = (event: MouseEvent | TouchEvent) => {
   document.addEventListener('touchend', handleMouseUp)
 }
 
+// Helper to render any mermaid code blocks currently in the canvas
+const renderMermaidBlocks = (): void => {
+  nextTick(() => {
+    try {
+      const container = document.querySelector('.canvas-content') as HTMLElement | null
+      if (!container) return
+      const mermaidBlocks = container.querySelectorAll('.mermaid-block')
+      mermaidBlocks.forEach((el, i) => {
+        const codeEl = el.querySelector('code')
+        const code = codeEl ? codeEl.textContent || '' : ''
+        const id = `mermaid-${Date.now()}-${i}`
+        const out = document.createElement('div')
+        out.id = id
+        el.replaceWith(out)
+        mermaid.render(id, code).then(({ svg }) => {
+          out.innerHTML = svg
+        }).catch((e) => {
+          console.warn('Mermaid render error:', e)
+        })
+      })
+    } catch (e) {
+      console.warn('Mermaid render failed:', e)
+    }
+  })
+}
+
 // Load sections when component mounts
 onMounted(() => {
   loadSections()
+  renderMermaidBlocks()
+})
+
+// Re-render diagrams when content/tab changes
+watch([activeTab, selectedSectionObjects], () => {
+  renderMermaidBlocks()
 })
 
 onUnmounted(() => {
@@ -821,9 +884,17 @@ onUnmounted(() => {
   word-break: break-word;
 }
 
-.simple-value, .simple-content {
+.simple-value {
   color: #6b7280;
   font-style: italic;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.simple-content {
+  color: inherit;
+  font-style: normal;
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
@@ -911,7 +982,7 @@ onUnmounted(() => {
 }
 
 .section-entity {
-  background: #f8fafc;
+  background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 16px;
@@ -1123,7 +1194,7 @@ onUnmounted(() => {
 .content-section {
   margin-bottom: 24px;
   padding: 16px;
-  background: #f9fafb;
+  background: #fff;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
 }
@@ -1144,7 +1215,7 @@ onUnmounted(() => {
 /* Markdown Content Styles */
 .markdown-content {
   padding: 16px;
-  background: #f9fafb;
+  background: #fff;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
   height: 100%;
@@ -1152,6 +1223,10 @@ onUnmounted(() => {
   overflow-x: hidden;
   flex: 1;
   min-height: 0;
+}
+
+.markdown-content :deep(.mermaid svg) {
+  max-width: 100%;
 }
 
 .markdown-inline {
@@ -1165,31 +1240,10 @@ onUnmounted(() => {
   margin: 0;
 }
 
-/* Markdown Body Styles */
+/* Markdown Body Styles - defer most typography to GitHub CSS */
 .markdown-body {
-  font-size: 0.875rem;
-  line-height: 1.6;
-  color: #374151;
+  color: #24292f;
 }
-
-.markdown-body h1,
-.markdown-body h2,
-.markdown-body h3,
-.markdown-body h4,
-.markdown-body h5,
-.markdown-body h6 {
-  margin: 16px 0 8px 0;
-  font-weight: 600;
-  line-height: 1.25;
-  color: #1f2937;
-}
-
-.markdown-body h1 { font-size: 1.25rem; }
-.markdown-body h2 { font-size: 1.125rem; }
-.markdown-body h3 { font-size: 1rem; }
-.markdown-body h4 { font-size: 0.875rem; }
-.markdown-body h5 { font-size: 0.875rem; }
-.markdown-body h6 { font-size: 0.875rem; }
 
 .markdown-body p {
   margin: 0 0 12px 0;
@@ -1247,6 +1301,32 @@ onUnmounted(() => {
   padding-left: 16px;
   color: #6b7280;
   font-style: italic;
+}
+
+/* Style markdown tables inside canvas */
+.markdown-content :deep(table) {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 10px 0;
+  font-size: 0.9em;
+}
+
+.markdown-content :deep(th),
+.markdown-content :deep(td) {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+
+
+.markdown-content :deep(tr:nth-child(even)) {
+  background-color: #f9f9f9;
+}
+
+.markdown-content :deep(tr:hover) {
+  background-color: #f5f5f5;
 }
 
 /* Mobile responsive styles */
