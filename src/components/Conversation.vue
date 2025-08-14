@@ -7,7 +7,7 @@
 
         <!-- Messages Container -->
         <div class="messages-container" ref="messagesContainer">
-          <div v-for="(message, index) in messages" :key="index" class="message-wrapper" :class="message.type">
+          <div v-for="(message, index) in uiMessages" :key="index" class="message-wrapper" :class="message.type">
             <div class="message-bubble">
               <!-- Use VueMarkdown for AI messages to render markdown properly -->
               <div v-if="message.type === 'ai-message'" class="message-content">
@@ -54,10 +54,11 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, ref, nextTick, watch } from 'vue'
+import { defineProps, defineEmits, ref, nextTick, watch, onMounted, computed } from 'vue'
 import { chatApi, prepareChatContext } from '@/utils/chatApi'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
 import { useGuidelinesStore } from '@/stores/guidelinesStore'
+import { useChatStore } from '@/stores/chatStore'
 import VueMarkdown from 'vue-markdown-render'
 
 // Define component name for linting
@@ -79,26 +80,33 @@ const guidelinesStore = useGuidelinesStore()
 const newMessage = ref('')
 const isTyping = ref(false)
 const messagesContainer = ref<HTMLElement>()
+const chatStore = useChatStore()
 
-// Sample messages
-const messages = ref([
-  {
-    type: 'ai-message',
-    content: 'Hello! I\'m your Rio AI Assistant, specialized in mining research and analytics. I can help you with project analysis, geological assessments, financial evaluations, and technical insights for your mining operations. What would you like to know about your projects today?',
-    time: '12:30 PM'
+// Derive UI messages from chat store
+const uiMessages = computed(() =>
+  chatStore.messages.map(m => ({
+    type: m.type === 'user' ? 'user-message' : 'ai-message',
+    content: m.content,
+    time: m.timestamp
+  }))
+)
+
+// Seed a greeting if store is empty
+onMounted(() => {
+  if (chatStore.messages.length === 0) {
+    chatStore.addMessage(
+      'Hello! I\'m your Rio AI Assistant, specialized in mining research and analytics. I can help you with project analysis, geological assessments, financial evaluations, and technical insights for your mining operations. What would you like to know about your projects today?',
+      'agent'
+    )
   }
-])
+})
 
 // Methods
 const sendMessage = async () => {
   if (!newMessage.value.trim()) return
 
-  // Add user message
-  messages.value.push({
-    type: 'user-message',
-    content: newMessage.value,
-    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  })
+  // Add user message to store
+  chatStore.addMessage(newMessage.value, 'user')
 
   const userMessage = newMessage.value
   newMessage.value = ''
@@ -107,19 +115,14 @@ const sendMessage = async () => {
   isTyping.value = true
 
     try {
-    // Convert messages to the format expected by the API
-    const apiMessages = messages.value.map(msg => ({
-      type: msg.type === 'user-message' ? 'user' : 'assistant',
+    // Convert store messages to the format expected by the API
+    const apiMessages = chatStore.messages.map(msg => ({
+      type: msg.type === 'user' ? 'user' : 'assistant',
       content: msg.content
     }))
 
-    // Add empty AI message that we'll update with streaming content
-    const aiMessageIndex = messages.value.length
-    messages.value.push({
-      type: 'ai-message',
-      content: '',
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    })
+    // Start a streaming agent message in the store
+    const streamingId = chatStore.startStreamingMessage()
 
           // Prepare context with selected entity and matching guideline
       const selectedSection = entityStore.selectedSections[0]
@@ -138,19 +141,20 @@ const sendMessage = async () => {
         messages: apiMessages
       },
       (chunk) => {
-        // Update the AI message with streaming content
+        // Update the streaming message in the store
         if (chunk.type === 'chunk') {
-          messages.value[aiMessageIndex].content += chunk.content
+          chatStore.appendToStreamingMessage(streamingId, chunk.content)
         }
       },
       (error) => {
-        // Handle streaming error
-        messages.value[aiMessageIndex].content = `Error: ${error}`
+        // Handle streaming error by finalizing message content
+        chatStore.updateMessageContent(streamingId, `Error: ${error}`)
         console.error('Streaming error:', error)
       },
       () => {
         // Streaming complete
         isTyping.value = false
+        chatStore.finishStreamingMessage(streamingId)
       }
     )
 
@@ -159,18 +163,14 @@ const sendMessage = async () => {
     isTyping.value = false
 
     // Add error message
-    messages.value.push({
-      type: 'ai-message',
-      content: `Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    })
+    chatStore.addMessage(`Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`, 'agent')
 
     console.error('Chat API error:', error)
   }
 }
 
 // Auto-scroll to bottom when new messages arrive
-watch(messages, () => {
+watch(uiMessages, () => {
   nextTick(() => {
     if (messagesContainer.value) {
       messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight

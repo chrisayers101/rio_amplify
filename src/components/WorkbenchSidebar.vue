@@ -1,8 +1,11 @@
 <template>
-  <div class="workbench-sidebar">
+  <div class="workbench-sidebar" :class="{ collapsed: sidebarStore.collapsed }">
     <div class="sidebar-header">
-      <h2>Feasibility Study Sections</h2>
-      <p>Select sections for chat context</p>
+      <div class="header-row">
+        <DocumentTextIcon class="header-icon" />
+        <h2>Feasibility Study Sections</h2>
+      </div>
+
     </div>
 
     <div class="section-controls">
@@ -39,6 +42,7 @@
               name="section-selection"
             />
             <div class="checkbox-custom"></div>
+            <div class="section-number">{{ section.sectionId }}</div>
             <div class="section-info">
               <div class="section-name">{{ getSectionDisplayName(section) }}</div>
               <div class="section-meta">
@@ -61,6 +65,8 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
 import type { ParsedFeasibilityStudySection } from '@/types/feasibilityStudy'
+import { useSidebarStore } from '@/stores/sidebarStore'
+import { DocumentTextIcon } from '@heroicons/vue/24/outline'
 
 interface Props {
   modelValue?: string[]
@@ -77,6 +83,7 @@ const emit = defineEmits<{
 
 // Use the store
 const sectionStore = useFeasibilityStudySectionStore()
+const sidebarStore = useSidebarStore()
 
 // Computed properties from store
 const sections = computed(() => sectionStore.sections)
@@ -190,13 +197,43 @@ onMounted(async () => {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: calc(100vh - 84px);
+  position: relative;
+}
+
+.workbench-sidebar.collapsed {
+  width: 72px;
+}
+
+.workbench-sidebar.collapsed .sidebar-header h2,
+.workbench-sidebar.collapsed .sidebar-header p,
+.workbench-sidebar.collapsed .section-controls {
+  display: none;
+}
+.workbench-sidebar.collapsed .sections-container .section-info,
+.workbench-sidebar.collapsed .sections-container .section-meta {
+  display: none;
+}
+.workbench-sidebar.collapsed .sections-container .section-number {
+  display: block;
 }
 
 .sidebar-header {
   padding: 24px;
   border-bottom: 1px solid #e5e7eb;
   background: linear-gradient(135deg, #008C8E, #009688);
+  color: white;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-icon {
+  width: 22px;
+  height: 22px;
   color: white;
 }
 
@@ -276,6 +313,20 @@ onMounted(async () => {
   flex-shrink: 0;
   margin-top: 2px;
   transition: all 0.2s ease;
+}
+
+.section-number {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background: #f3f4f6;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0;
 }
 
 .section-checkbox input[type="radio"]:checked + .checkbox-custom {

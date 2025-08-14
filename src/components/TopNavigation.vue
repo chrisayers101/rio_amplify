@@ -70,6 +70,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import { useProjectStore } from '@/stores/projectStore'
 import { useViewStore } from '@/stores/viewStore'
+import { useChatStore } from '@/stores/chatStore'
 import RioLogo from '@/assets/RioLogo.svg'
 import { ArrowLeftStartOnRectangleIcon, ChevronDownIcon, ChartBarIcon, CpuChipIcon } from '@heroicons/vue/24/outline'
 import type { Schema } from '../../amplify/data/resource'
@@ -79,6 +80,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 const projectStore = useProjectStore()
 const viewStore = useViewStore()
+const chatStore = useChatStore()
 const showProjectDropdown = ref(false)
 
 const user = {
@@ -152,6 +154,13 @@ async function testOpenSearch() {
     } else {
       console.log('Answer:', parsed.answer)
       console.log('Chunks:', parsed.chunks)
+      // Send the answer to the chat store so it appears in Conversation
+      try {
+        const messageId = chatStore.addMessage(parsed.answer, 'agent')
+        chatStore.updateMessageStatus(messageId, 'sent')
+      } catch (e) {
+        console.error('Failed to push answer to chat store:', e)
+      }
     }
   } catch (e) {
     console.error('OpenSearch test failed:', e)
@@ -164,7 +173,7 @@ async function testOpenSearch() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 64px;
+  height: 84px; /* increased by 20px */
   background: #fff;
   border-bottom: 1px solid #eee;
   padding: 0 24px;
@@ -177,7 +186,7 @@ async function testOpenSearch() {
   align-items: center;
 }
 .logo {
-  height: 32px;
+  height: 40px; /* scale up to harmonize with taller nav */
   width: auto;
 }
 .top-nav-center {
@@ -307,7 +316,7 @@ async function testOpenSearch() {
 /* View Toggle Container and Button Styles */
 .view-toggle-container {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   margin-right: 32px;
 }
 
@@ -318,7 +327,7 @@ async function testOpenSearch() {
   background: #f8fafc;
   border: 2px solid #e5e7eb;
   cursor: pointer;
-  padding: 12px 20px;
+  padding: 16px 22px; /* slightly taller to match nav height */
   border-radius: 8px;
   transition: all 0.3s ease;
   color: #666;

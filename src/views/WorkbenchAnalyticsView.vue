@@ -31,6 +31,10 @@
       <!-- Chat Section (Left Half) -->
       <div class="chat-section" :style="{ width: chatWidth + '%' }">
         <Conversation :open="true" :embedded="true" @close="() => {}" />
+        <!-- Floating sidebar toggle over conversation -->
+        <button class="floating-sidebar-toggle" @click="sidebarStore.toggleSidebar()" title="Toggle sidebar">
+          <span class="chevron">{{ sidebarStore.collapsed ? '›' : '‹' }}</span>
+        </button>
       </div>
 
       <!-- Resizable Divider -->
@@ -72,19 +76,14 @@
                   >
                     {{ formatTabName(fieldName) }}
                     <button
-                      v-if="activeTab === fieldName"
                       @click.stop="toggleEditMode(fieldName)"
                       class="edit-button"
-                      :class="{ 'editing': isEditing(fieldName) }"
-                      :aria-label="isEditing(fieldName) ? 'Cancel edit' : 'Edit'"
+                      :class="{ 'is-hidden': !(activeTab === fieldName && !isEditing(fieldName)) }"
+                      :disabled="!(activeTab === fieldName && !isEditing(fieldName))"
+                      aria-label="Edit"
                       title="Edit"
                     >
-                      <template v-if="!isEditing(fieldName)">
-                        <PencilSquareIcon class="edit-icon" />
-                      </template>
-                      <template v-else>
-                        Cancel
-                      </template>
+                      <PencilSquareIcon class="edit-icon" />
                     </button>
                   </div>
                 </div>
@@ -128,14 +127,14 @@
                               <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
                               <span class="property-value">
                               <span class="markdown-inline">
-                                <VueMarkdown class="markdown-body" :source="String(propValue)" />
+                                <VueMarkdown class="markdown-body" :source="formatMarkdownSource(String(propValue))" />
                               </span>
                               </span>
                             </div>
                           </div>
                           <div v-else class="simple-value">
                             <span class="markdown-inline">
-                              <VueMarkdown class="markdown-body" :source="String(item)" />
+                              <VueMarkdown class="markdown-body" :source="formatMarkdownSource(String(item))" />
                             </span>
                           </div>
                         </div>
@@ -146,7 +145,7 @@
                           <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
                           <span class="property-value">
                             <span class="markdown-inline">
-                              <VueMarkdown class="markdown-body" :source="String(propValue)" />
+                              <VueMarkdown class="markdown-body" :source="formatMarkdownSource(String(propValue))" />
                             </span>
                           </span>
                         </div>
@@ -157,7 +156,7 @@
                         <div class="markdown-content scrollable">
                           <VueMarkdown
                             class="markdown-body"
-                            :source="String(section.entity[activeTab] || '')"
+                            :source="formatMarkdownSource(section.entity[activeTab] || '')"
                           />
                         </div>
                       </div>
@@ -189,11 +188,13 @@ import type { ParsedFeasibilityStudySection } from '@/types/feasibilityStudy'
 import WorkbenchSidebar from '@/components/WorkbenchSidebar.vue'
 import Conversation from '@/components/Conversation.vue'
 import VueMarkdown from 'vue-markdown-render'
+import { useSidebarStore } from '@/stores/sidebarStore'
 
 // Use VueMarkdown for markdown rendering to match Conversation panel
 
 // Use the store
 const sectionStore = useFeasibilityStudySectionStore()
+const sidebarStore = useSidebarStore()
 
 // State
 const selectedSections = ref<string[]>([])
@@ -385,6 +386,20 @@ const cancelEdit = (fieldName: string): void => {
 
 // Markdown is rendered via <VueMarkdown :source="..." />
 
+// Normalize plain text to render better as Markdown
+const formatMarkdownSource = (raw: unknown): string => {
+  const source = raw == null ? '' : String(raw)
+  // Normalize newlines
+  let normalized = source.replace(/\r\n/g, '\n')
+  // Ensure a space after heading markers, e.g., "##Heading" -> "## Heading"
+  normalized = normalized.replace(/^(#{1,6})([^#\s])/gm, '$1 $2')
+  // Ensure a space after list bullets and ordered list numerals
+  normalized = normalized
+    .replace(/^([*-])([^*\-\s])/gm, '$1 $2')
+    .replace(/^(\d+\.)(\S)/gm, '$1 $2')
+  return normalized
+}
+
 const startResize = (event: MouseEvent | TouchEvent) => {
   isResizing.value = true
   event.preventDefault()
@@ -447,13 +462,14 @@ onUnmounted(() => {
   background: white;
   min-width: 0;
   transition: width 0.1s ease;
-  max-height: calc(100vh - 64px);
+  max-height: calc(100vh - 84px);
   overflow: hidden;
+  position: relative;
 }
 
 /* Resize Handle */
 .resize-handle {
-  width: 8px;
+  width: 4px;
   background: #f1f5f9;
   border-left: 1px solid #e2e8f0;
   border-right: 1px solid #e2e8f0;
@@ -476,7 +492,7 @@ onUnmounted(() => {
 }
 
 .resize-icon {
-  font-size: 12px;
+  font-size: 10px;
   color: #64748b;
   font-weight: bold;
   transform: rotate(90deg);
@@ -583,6 +599,7 @@ onUnmounted(() => {
   white-space: nowrap;
   user-select: none;
   height: auto;
+  min-height: 44px; /* keep height stable with/without icon (20px icon + 12px top + 12px bottom) */
   overflow: visible;
   position: relative;
   display: flex;
@@ -605,28 +622,36 @@ onUnmounted(() => {
 
 /* Edit Button Styles */
 .edit-button {
-  background: #008C8E;
-  color: white;
+  background: transparent;
+  color: #008C8E;
   border: none;
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 0.75rem;
-  font-weight: 500;
+  border-radius: 6px;
+  padding: 4px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .edit-button:hover {
-  background: #007779;
+  background: rgba(0, 140, 142, 0.08);
+  color: #007779;
 }
 
-.edit-button.editing {
-  background: #ef4444;
+.edit-button:active {
+  transform: scale(0.96);
 }
 
-.edit-button.editing:hover {
-  background: #dc2626;
+.edit-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Keep tab height stable when the edit button is not active */
+.edit-button.is-hidden {
+  visibility: hidden;
 }
 
 /* Edit Mode Styles */
@@ -950,6 +975,35 @@ onUnmounted(() => {
 /* Chat section styling */
 .chat-section {
   border-right: 1px solid #e5e7eb;
+}
+
+/* Floating sidebar toggle like dashboard's grey pill */
+.floating-sidebar-toggle {
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 9999px;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #6b7280;
+  z-index: 5;
+}
+
+.floating-sidebar-toggle:hover {
+  background: #f0f0f0;
+}
+
+.floating-sidebar-toggle .chevron {
+  font-size: 14px;
+  line-height: 1;
 }
 
 /* Loading Overlay */
