@@ -100,7 +100,7 @@
             Forgot Password?
           </button>
 
-          <button style="display: none;"
+          <button
             type="button"
             @click="toggleMode"
             class="link-button primary"
