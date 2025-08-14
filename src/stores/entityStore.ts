@@ -45,6 +45,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
   const hasSections = computed(() => sections.value.length > 0)
   const selectedSectionCount = computed(() => selectedSections.value.length)
   const hasSelectedSections = computed(() => selectedSections.value.length > 0)
+  const selectedSection = computed(() => selectedSections.value[0] ?? null)
 
   // Get sections by project
   const getSectionsByProject = computed(() => (projectId: string) => {
@@ -506,7 +507,8 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
   }
 
   const setSelectedSections = (sections: readonly ParsedFeasibilityStudySection[]): void => {
-    selectedSections.value = [...sections]
+    // Enforce single selection: keep only the first item if provided
+    selectedSections.value = sections.length > 0 ? [sections[0]] : []
   }
 
   const clearSelectedSections = (): void => {
@@ -514,9 +516,8 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
   }
 
   const addSelectedSection = (section: ParsedFeasibilityStudySection): void => {
-    if (!selectedSections.value.find(s => s.projectId === section.projectId && s.sectionId === section.sectionId)) {
-      selectedSections.value.push(section)
-    }
+    // Enforce single selection by replacing any existing selection
+    selectedSections.value = [section]
   }
 
   const removeSelectedSection = (projectId: string, sectionId: string): void => {
@@ -537,6 +538,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     hasSections,
     selectedSectionCount,
     hasSelectedSections,
+    selectedSection,
     getSectionsByProject,
     getSectionsByStatus,
 

@@ -24,13 +24,7 @@
           <CpuChipIcon class="view-icon" />
           <span>Workbench Analytics</span>
         </button>
-        <button
-          class="view-btn"
-          @click="testOpenSearch"
-          title="Test OpenSearch"
-        >
-          <span>Test OpenSearch</span>
-        </button>
+
       </div>
 
       <div v-if="projectStore.hasSelectedProject" class="active-project" @click="toggleProjectDropdown">
@@ -50,6 +44,9 @@
       </div>
     </div>
     <div class="top-nav-right">
+      <button class="nav-btn" @click="testOpenSearch" title="Test OpenSearch">
+        <BeakerIcon class="icon" />
+      </button>
       <!-- <button class="nav-btn" @click="navigateToFiles" title="Files">
         <DocumentIcon class="icon" />
       </button>
@@ -72,7 +69,7 @@ import { useProjectStore } from '@/stores/projectStore'
 import { useViewStore } from '@/stores/viewStore'
 import { useChatStore } from '@/stores/chatStore'
 import RioLogo from '@/assets/RioLogo.svg'
-import { ArrowLeftStartOnRectangleIcon, ChevronDownIcon, ChartBarIcon, CpuChipIcon } from '@heroicons/vue/24/outline'
+import { ArrowLeftStartOnRectangleIcon, ChevronDownIcon, ChartBarIcon, CpuChipIcon, BeakerIcon } from '@heroicons/vue/24/outline'
 import type { Schema } from '../../amplify/data/resource'
 import { generateClient } from 'aws-amplify/api'
 

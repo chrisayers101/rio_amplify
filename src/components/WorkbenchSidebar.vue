@@ -8,12 +8,6 @@
 
     </div>
 
-    <div class="section-controls">
-      <div class="selection-info">
-        <span class="selected-count">{{ storeSelectedSections.length }}</span>
-        <span class="total-count">/ {{ sections.length }} selected</span>
-      </div>
-    </div>
 
     <div v-if="isLoading" class="loading-state">
       <div class="loading-spinner"></div>
