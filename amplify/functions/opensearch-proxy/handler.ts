@@ -135,8 +135,15 @@ export const handler = async (event: any) => {
             const fallbackFields: string[] = searchCfg.fallbackContentFields || ['markdown', 'summary'];
             const metadataFields: string[] = searchCfg.metadataFields || [];
             const bedrockRegion = searchCfg.bedrockRegion || region;
-            const embeddingModelId = searchCfg.embeddingModelId || 'amazon.titan-embed-text-v2:0';
-            const answerModelId = searchCfg.answerModelId || 'anthropic.claude-3-5-sonnet-20241022-v2:0';
+            const embeddingModelId = searchCfg.embeddingModelId;
+            const answerModelId = searchCfg.answerModelId;
+
+            if (!embeddingModelId) {
+                return JSON.stringify({ error: 'embeddingModelId is not configured. Set it in CONFIG.search.embeddingModelId or env BEDROCK_EMBED_MODEL.' });
+            }
+            if (body.generateAnswer && !answerModelId) {
+                return JSON.stringify({ error: 'answerModelId is not configured. Set it in CONFIG.search.answerModelId or env BEDROCK_ANSWER_MODEL.' });
+            }
 
             console.log('[OpenSearchProxy] ask params', {
                 topK,
@@ -222,7 +229,7 @@ export const handler = async (event: any) => {
                 max_tokens: searchCfg.maxTokens || 1000,
                 messages: [{ role: 'user', content: prompt }]
             });
-            const answerCmd = new InvokeModelCommand({ modelId: answerModelId, contentType: 'application/json', accept: 'application/json', body: answerBody });
+            const answerCmd = new InvokeModelCommand({ modelId: answerModelId!, contentType: 'application/json', accept: 'application/json', body: answerBody });
             const answerResp = await bedrock.send(answerCmd);
             const answerText = await answerResp.body!.transformToString();
             const answerJson = JSON.parse(answerText);

@@ -138,15 +138,21 @@ async function signOut() {
 const client = generateClient<Schema>()
 async function testOpenSearch() {
   try {
-    // Try a minimal rawSearch first
+    // Full flow: Titan embeddings -> kNN search -> Claude answer
     const res = await client.queries.openSearchProxy({
-      operation: 'rawSearch',
-      // AppSync AWSJSON requires a string containing JSON
-      query: JSON.stringify({ size: 1, query: { match_all: {} } })
+      operation: 'ask',
+      question: 'What is the environmental impact assessment?',
+      generateAnswer: true,
+      topK: 5
     })
-    console.log('OpenSearch rawSearch raw response:', res)
-    const payload = typeof res === 'string' ? JSON.parse(res) : res
-    console.log('OpenSearch rawSearch parsed:', payload)
+    const raw = (typeof res === 'string' ? res : res.data) as string
+    const parsed = JSON.parse(raw)
+    if (parsed?.error) {
+      console.error('OpenSearch ask error:', parsed.error)
+    } else {
+      console.log('Answer:', parsed.answer)
+      console.log('Chunks:', parsed.chunks)
+    }
   } catch (e) {
     console.error('OpenSearch test failed:', e)
   }
