@@ -14,18 +14,49 @@ const CONFIG = {
         maxTokens: 1000,
         primaryContentField: 'text',
         fallbackContentFields: ['markdown', 'summary'],
-        metadataFields: ['doc.application_usage_daily.timestamp','timestamp','application_usage_daily.timestamp'],
+        metadataFields: ['title','section_title','doc_name','chunk_type','chunk_subtype','page_indices','doc.application_usage_daily.timestamp','timestamp','application_usage_daily.timestamp'],
         bedrockRegion: 'ap-southeast-2',
         embeddingModelId: 'amazon.titan-embed-text-v2:0',
         answerModelId: 'anthropic.claude-3-5-sonnet-20241022-v2:0'
     }
 } as const;
 
+function parseArrayEnv(value?: string, fallback: string[] = []): string[] {
+	if (!value) return fallback;
+	try {
+		const parsed = JSON.parse(value);
+		return Array.isArray(parsed) ? parsed : fallback;
+	} catch {
+		return value.split(',').map(s => s.trim()).filter(Boolean);
+	}
+}
+
+function buildConfigFromEnv() {
+	const base = CONFIG as any;
+	const endpointFromEnv = process.env.OPENSEARCH_ENDPOINT || (process.env.OPENSEARCH_HOST ? `https://${process.env.OPENSEARCH_HOST}` : undefined);
+	const endpoint: string = endpointFromEnv || base.endpoint;
+	const regionFromEnv = process.env.OPENSEARCH_REGION;
+	const region: string = regionFromEnv || base.region;
+
+	const searchBase = base.search || {};
+	const search = {
+		index: process.env.SEARCH_INDEX || searchBase.index,
+		topK: process.env.SEARCH_TOPK ? Number(process.env.SEARCH_TOPK) : searchBase.topK,
+		maxTokens: process.env.SEARCH_MAX_TOKENS ? Number(process.env.SEARCH_MAX_TOKENS) : searchBase.maxTokens,
+		primaryContentField: process.env.SEARCH_PRIMARY_FIELD || searchBase.primaryContentField,
+		fallbackContentFields: parseArrayEnv(process.env.SEARCH_FALLBACK_FIELDS, searchBase.fallbackContentFields),
+		metadataFields: parseArrayEnv(process.env.SEARCH_METADATA_FIELDS, searchBase.metadataFields),
+		bedrockRegion: process.env.BEDROCK_REGION || searchBase.bedrockRegion || region,
+		embeddingModelId: process.env.BEDROCK_EMBED_MODEL || searchBase.embeddingModelId,
+		answerModelId: process.env.BEDROCK_ANSWER_MODEL || searchBase.answerModelId,
+	};
+
+	return { endpoint, region, cfg: { ...base, endpoint, region, search } };
+}
+
 function loadEndpointFromConfig() {
-    const cfg = CONFIG as any;
-    const endpoint: string | undefined = cfg.endpoint;
+    const { endpoint, region, cfg } = buildConfigFromEnv();
     if (!endpoint) throw new Error('OpenSearch endpoint not configured in handler');
-    const region: string = cfg.region;
     if (!region) throw new Error('OpenSearch region not configured in handler');
     return { endpoint, region, cfg };
 }
@@ -56,7 +87,7 @@ export const handler = async (event: any) => {
 
         if (op === 'rawSearch') {
             const method = (body.method || 'POST').toUpperCase();
-            const index = body.index || '_all';
+            const index = body.index || (cfg.search && cfg.search.index) || '_all';
             const path = body.path || `/${encodeURIComponent(index)}/_search`;
             let reqBody = '';
             if (body.body) {
@@ -170,6 +201,7 @@ export const handler = async (event: any) => {
                     section_title: src.section_title || '',
                     doc_name: src.doc_name || '',
                     chunk_type: src.chunk_type || '',
+                    chunk_subtype: src.chunk_subtype || '',
                     page_indices: src.page_indices || []
                 };
             });
