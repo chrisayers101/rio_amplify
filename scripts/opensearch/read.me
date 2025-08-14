@@ -1,5 +1,15 @@
 # Add to open search (not AWS) permissiomn for the Lambda to access
 
+# fetch the Lambda execution role ARN for the master function
+aws lambda get-function-configuration --region ap-southeast-2 --function-name amplify-d2f5g7c9zxqcij-ma-opensearchproxylambda97D-qmL1ZxSsJ8FU --query Role --output text --profile aidev
+
+# Add the permission to open search
+curl -u osadmin: \
+  -H "Content-Type: application/json" \
+  -X PATCH "https://search-amplify-os-dev-ftjbm4vtz7fj6hr3kx3lpifdyu.ap-southeast-2.es.amazonaws.com/_plugins/_security/api/rolesmapping/all_access" \
+  -d '[{"op":"add","path":"/backend_roles","value":["arn:aws:iam::029109261863:role/amplify-d2f5g7c9zxqcij-ma-opensearchproxylambdaServ-raa8537HWomW"]}]'
+
+
 curl -u osadmin:<pw>\
   -H "Content-Type: application/json" \
   -X PATCH "https://search-amplify-os-dev-ftjbm4vtz7fj6hr3kx3lpifdyu.ap-southeast-2.es.amazonaws.com/_plugins/_security/api/rolesmapping/all_access" \
