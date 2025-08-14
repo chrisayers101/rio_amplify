@@ -1,26 +1,9 @@
-# OpenSearch proxy config
+# OpenSearch proxy configuration
 
-Edit `opensearch.config.ts` in this folder to point to your domain and index.
+Configuration now lives exclusively in `handler.ts` under the constant `CONFIG`.
 
-Example (enterprise)
-
-```ts
-export const openSearchConfig = {
-  endpoint: 'https://vpc-dnt-genai-aws-pal-openai-fqljqcy4iyrwbss6wppgjwtq3m.ap-southeast-2.es.amazonaws.com',
-  domainArn: 'arn:aws:es:ap-southeast-2:962000089409:domain/dnt-genai-aws-pal-openai',
-  search: {
-    index: 'fs-openai-semantic-chunk-data-automation',
-    topK: 5,
-    maxTokens: 1000,
-    primaryContentField: 'text',
-    fallbackContentFields: ['markdown','summary'],
-    metadataFields: ['title','section_title','doc_name','chunk_type','chunk_subtype','page_indices'],
-    embeddingModelId: 'amazon.titan-embed-text-v2:0',
-    answerModelId: 'anthropic.claude-3-5-sonnet-20241022-v2:0',
-  }
-}
-```
+- Edit `amplify/functions/opensearch-proxy/handler.ts` to set the OpenSearch `endpoint`, `region`, and search defaults.
+- Do not maintain separate config files; they have been removed to reduce duplication.
 
 Notes
-- For VPC-only domains, run the Lambda in the same VPC/subnets/SGs.
-- Set `domainArn` to auto-grant es:ESHttpGet/Post in the backend.
+- For VPC-only domains, ensure the Lambda runs with network access to the domain (same VPC/subnets/SGs as needed) and that the domain access policy allows the Lambda role.

@@ -4,8 +4,7 @@ import { CfnOutput } from 'aws-cdk-lib';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Vpc, Subnet, SecurityGroup } from 'aws-cdk-lib/aws-ec2';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+
 import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
@@ -48,49 +47,8 @@ new CfnOutput(backend.stack, 'OpenSearchProxyLambdaRoleArn', {
 
 // No function URL; invoke via Amplify Data resolver
 
-// Optionally: grant ES Http permissions from config domainArn(s)
-try {
-  const cfgPath = join(__dirname, '../config/opensearch.json');
-  const raw = readFileSync(cfgPath, 'utf8');
-  const cfg = JSON.parse(raw) as any;
-  // Prefer top-level domainArn; fallback to domains[default].domainArn
-  const key = cfg.default || 'dev';
-  const domainArn = cfg.domainArn || cfg.domains?.[key]?.domainArn;
-  if (domainArn) {
-    backend.openSearchProxyFunction.resources.lambda.addToRolePolicy(
-      new PolicyStatement({
-        effect: Effect.ALLOW,
-        actions: ['es:ESHttpGet', 'es:ESHttpPost'],
-        resources: [`${domainArn}/*`],
-      }),
-    );
-  }
-
-  // Stop reading per-profile files; single-file config only
-
-  // Optional VPC attach from config (same-account only)
-  const vpcId = cfg.infra?.vpcId;
-  const subnetIds = (cfg.infra?.subnetIds || []).filter(Boolean);
-  const lambdaSgId = cfg.infra?.lambdaSecurityGroupId;
-  if (vpcId && subnetIds.length >= 2 && lambdaSgId) {
-    const vpc = Vpc.fromLookup(backend.stack, 'OsProxyVpc', { vpcId });
-    const sg = SecurityGroup.fromSecurityGroupId(backend.stack, 'OsProxySg', lambdaSgId);
-    backend.openSearchProxyFunction.resources.lambda.addToRolePolicy(
-      new PolicyStatement({
-        effect: Effect.ALLOW,
-        actions: ['ec2:CreateNetworkInterface','ec2:DescribeNetworkInterfaces','ec2:DeleteNetworkInterface','ec2:DescribeVpcs','ec2:DescribeSubnets','ec2:DescribeSecurityGroups'],
-        resources: ['*'],
-      }),
-    );
-    // Do not call addEnvironment on IFunction; if needed, set env in function resource definition
-    backend.openSearchProxyFunction.resources.lambda.addToRolePolicy(
-      new PolicyStatement({ effect: Effect.ALLOW, actions: ['logs:CreateLogGroup','logs:CreateLogStream','logs:PutLogEvents'], resources: ['*'] }),
-    );
-    // Note: Function URL not created here; expose via API as needed
-    // Note: In Amplify Gen2, attaching to VPC usually requires properties at defineFunction time.
-    // If this does not attach, we should move this into the function resource definition file.
-  }
-} catch {}
+// Removed reading OpenSearch config from `config/opensearch.json`.
+// Configuration now lives exclusively in `amplify/functions/opensearch-proxy/handler.ts`.
 
 const akBucket = Bucket.fromBucketName(
   backend.stack,                // scope

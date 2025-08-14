@@ -1,10 +1,14 @@
-# Creates an Amazon OpenSearch Service domain for dev/testing
-# Usage examples:
-#   ./create-opensearch-domain.ps1 -DomainName amplify-os-dev -PublicAccess -Profile aidev
-#   ./create-opensearch-domain.ps1 -DomainName amplify-os-dev -VpcId vpc-abc -SubnetIds subnet-1,subnet-2,subnet-3 -SecurityGroupIds sg-123 -Profile aidev
+# ./scripts/opensearch/create-opensearch-domain.ps1 `
+#   -DomainName amplify-os-dev `
+#   -Region ap-southeast-2 `
+#   -Profile aidev `
+#   -PublicAccess `
+#   -MasterUserName osadmin `
+#   -MasterUserPassword 'Bonnie220241!' `
+#   -LambdaRoleArn arn:aws:iam::029109261863:role/amplify-amplifybase-chris-opensearchproxylambdaServ-ZOuwpGn12VBS
 
-param(
-    [string]$DomainName = "amplify-os-dev",
+  param(
+    [string]$DomainName = "mining",
     [string]$Region = "ap-southeast-2",
     [string]$Profile = "aidev",
     [string]$EngineVersion = "OpenSearch_2.19",
@@ -16,7 +20,19 @@ param(
     [switch]$PublicAccess,
     [string]$VpcId,
     [string[]]$SubnetIds,
-    [string[]]$SecurityGroupIds
+    [string[]]$SecurityGroupIds,
+    # Fine-Grained Access Control (FGAC) + Cognito integration
+    [switch]$EnableCognito,
+    [string]$UserPoolId,
+    [string]$IdentityPoolId,
+    [string]$CognitoServiceRoleArn,
+    [string[]]$CognitoAuthRoleArns,
+    # Master user: prefer IAM principal (role/user) via ARN; alternatively internal user database
+    [string]$MasterUserArn,
+    [string]$MasterUserName,
+    [string]$MasterUserPassword,
+    # App/automation principals that should be able to call the domain (e.g., Lambda role)
+    [string]$LambdaRoleArn
 )
 
 $ErrorActionPreference = "Stop"
@@ -30,14 +46,21 @@ $accountId = aws sts get-caller-identity --profile $Profile --query Account --ou
 if (-not $accountId) { throw "Unable to resolve AWS account. Check your --profile." }
 Write-Ok   "Account: $accountId"
 
-# Build access policy: allow account root by default
+# Build access policy
 $resourceArn = "arn:aws:es:${Region}:${accountId}:domain/${DomainName}/*"
-$policy = @{ 
+
+# Principals allowed to call the domain's HTTPS API. Start with account root for admin tasks.
+$principals = @("arn:aws:iam::${accountId}:root")
+if ($CognitoAuthRoleArns -and $CognitoAuthRoleArns.Count -gt 0) { $principals += $CognitoAuthRoleArns }
+if ($LambdaRoleArn) { $principals += $LambdaRoleArn }
+
+$policy = @{
     Version = "2012-10-17";
     Statement = @(@{
         Effect    = "Allow";
-        Principal = @{ AWS = "arn:aws:iam::${accountId}:root" };
-        Action    = "es:*";
+        Principal = @{ AWS = $principals };
+        # For Dashboards and general API calls we only need the ESHttp* actions
+        Action    = "es:ESHttp*";
         Resource  = $resourceArn;
     })
 } | ConvertTo-Json -Depth 5 -Compress
@@ -67,6 +90,32 @@ $spec = @{
 
 if ($KmsKeyId) {
     $spec.EncryptionAtRestOptions = @{ Enabled = $true; KmsKeyId = $KmsKeyId }
+}
+
+# Fine-Grained Access Control (with optional Cognito integration)
+if ($EnableCognito -or $MasterUserArn -or $MasterUserName) {
+    $aso = @{ Enabled = $true }
+
+    if ($MasterUserArn) {
+        # Master user as an IAM principal; internal DB not required
+        $aso.InternalUserDatabaseEnabled = $false
+        $aso.MasterUserOptions = @{ MasterUserARN = $MasterUserArn }
+    } elseif ($MasterUserName -and $MasterUserPassword) {
+        # Use the internal user database; create a master user
+        $aso.InternalUserDatabaseEnabled = $true
+        $aso.MasterUserOptions = @{ MasterUserName = $MasterUserName; MasterUserPassword = $MasterUserPassword }
+    } else {
+        throw "FGAC requested but no master user provided. Provide -MasterUserArn or (-MasterUserName and -MasterUserPassword)."
+    }
+
+    $spec.AdvancedSecurityOptions = $aso
+}
+
+if ($EnableCognito) {
+    if (-not ($UserPoolId -and $IdentityPoolId -and $CognitoServiceRoleArn)) {
+        throw "-EnableCognito requires -UserPoolId, -IdentityPoolId, and -CognitoServiceRoleArn."
+    }
+    $spec.CognitoOptions = @{ Enabled = $true; UserPoolId = $UserPoolId; IdentityPoolId = $IdentityPoolId; RoleArn = $CognitoServiceRoleArn }
 }
 
 if ($VpcId -and $SubnetIds -and $SubnetIds.Count -gt 0) {
