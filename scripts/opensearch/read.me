@@ -1,16 +1,42 @@
-# Add to open search (not AWS) permissiomn for the Lambda to access
-
-# fetch the Lambda execution role ARN for the master function
-aws lambda get-function-configuration --region ap-southeast-2 --function-name amplify-d2f5g7c9zxqcij-ma-opensearchproxylambda97D-qmL1ZxSsJ8FU --query Role --output text --profile aidev
-
-# Add the permission to open search
-curl -u osadmin: \
-  -H "Content-Type: application/json" \
-  -X PATCH "https://search-amplify-os-dev-ftjbm4vtz7fj6hr3kx3lpifdyu.ap-southeast-2.es.amazonaws.com/_plugins/_security/api/rolesmapping/all_access" \
-  -d '[{"op":"add","path":"/backend_roles","value":["arn:aws:iam::029109261863:role/amplify-d2f5g7c9zxqcij-ma-opensearchproxylambdaServ-raa8537HWomW"]}]'
+##### list opensearch fuctions
+aws lambda list-functions --region ap-southeast-2 --profile aidev --query 'Functions[?contains(FunctionName, `opensearchproxy`)].{Name:FunctionName,Role:Role}' --output table
 
 
-curl -u osadmin:<pw>\
-  -H "Content-Type: application/json" \
-  -X PATCH "https://search-amplify-os-dev-ftjbm4vtz7fj6hr3kx3lpifdyu.ap-southeast-2.es.amazonaws.com/_plugins/_security/api/rolesmapping/all_access" \
-  -d '[{"op":"add","path":"/backend_roles","value":["arn:aws:iam::029109261863:role/amplify-amplifybase-chris-opensearchproxylambdaServ-ZOuwpGn12VBS"]}]'
+
+##### Add to open search (not AWS) permissiomn for the Lambda to access
+curl -u "osadmin:<pw>" -H "Content-Type: application/json" -X PUT "https://search-amplify-os-dev-ftjbm4vtz7fj6hr3kx3lpifdyu.ap-southeast-2.es.amazonaws.com/_plugins/_security/api/rolesmapping/all_access" -d '{
+  "backend_roles": [
+    "arn:aws:iam::029109261863:role/amplify-amplifybase-chris-opensearchproxylambdaServ-ZOuwpGn12VBS",
+    "arn:aws:iam::029109261863:role/amplify-d2f5g7c9zxqcij-ma-opensearchproxylambdaServ-raa8537HWomW"
+  ]
+}'
+
+##### AWS OpenSearch Console Security
+In the AWS 
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DashboardsPublicButAuthnByFGAC",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "es:ESHttp*",
+      "Resource": "arn:aws:es:ap-southeast-2:029109261863:domain/amplify-os-dev/*"
+    },
+    {
+      "Sid": "OnlyTheseLambdas",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": [
+          "arn:aws:iam::029109261863:root",
+          "arn:aws:iam::029109261863:role/amplify-amplifybase-chris-opensearchproxylambdaServ-ZOuwpGn12VBS",
+          "arn:aws:iam::029109261863:role/amplify-d2f5g7c9zxqcij-ma-opensearchproxylambdaServ-raa8537HWomW"
+        ]
+      },
+      "Action": "es:ESHttp*",
+      "Resource": "arn:aws:es:ap-southeast-2:029109261863:domain/amplify-os-dev/*"
+    }
+  ]
+}
+

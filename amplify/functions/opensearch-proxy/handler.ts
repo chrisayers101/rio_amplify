@@ -76,6 +76,9 @@ export const handler = async (event: any) => {
         const body = typeof args === 'string' ? JSON.parse(args) : args;
         const op = body.operation || 'rawSearch';
 
+        // Get credentials once at the top
+        const creds = await defaultProvider()();
+
         console.log('[OpenSearchProxy] start', {
             op,
             endpointHost: host,
@@ -103,7 +106,6 @@ export const handler = async (event: any) => {
                 index,
                 bodyBytes: Buffer.byteLength(reqBody, 'utf8')
             });
-            const creds = await defaultProvider()();
             const signed = aws4.sign({
                 host,
                 method,
@@ -117,8 +119,30 @@ export const handler = async (event: any) => {
                 secretAccessKey: creds.secretAccessKey,
                 sessionToken: (creds as any).sessionToken
             });
+
+            // Debug: Log authentication details for rawSearch
+            console.log('[OpenSearchProxy] rawSearch auth debug', {
+                accessKeyId: creds.accessKeyId?.substring(0, 8) + '...',
+                region,
+                host,
+                signedHeaders: signed.headers,
+                hasSessionToken: !!(creds as any).sessionToken
+            });
+
             const res = await fetch(`${endpoint}${path}`, { method, headers: signed.headers as any, body: reqBody as any });
             console.log('[OpenSearchProxy] rawSearch response', { status: res.status, ok: res.ok });
+
+            // Debug: Log response details if it fails
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.log('[OpenSearchProxy] rawSearch error details', {
+                    status: res.status,
+                    statusText: res.statusText,
+                    headers: Object.fromEntries(res.headers.entries()),
+                    errorBody: errorText.substring(0, 500)
+                });
+            }
+
             const json = await res.json();
             console.log('[OpenSearchProxy] rawSearch hitsCount', { hits: json?.hits?.hits?.length ?? 0 });
             return JSON.stringify(json);
@@ -177,7 +201,6 @@ export const handler = async (event: any) => {
                 _source: [primaryField, ...fallbackFields, ...metadataFields]
             };
             const reqBody2 = JSON.stringify(searchBody);
-            const creds2 = await defaultProvider()();
             const signed2 = aws4.sign({
                 host,
                 method: 'POST',
@@ -187,12 +210,34 @@ export const handler = async (event: any) => {
                 service,
                 region
             }, {
-                accessKeyId: creds2.accessKeyId,
-                secretAccessKey: creds2.secretAccessKey,
-                sessionToken: (creds2 as any).sessionToken
+                accessKeyId: creds.accessKeyId,
+                secretAccessKey: creds.secretAccessKey,
+                sessionToken: (creds as any).sessionToken
             });
+
+            // Debug: Log authentication details
+            console.log('[OpenSearchProxy] auth debug', {
+                accessKeyId: creds.accessKeyId?.substring(0, 8) + '...',
+                region,
+                host,
+                signedHeaders: signed2.headers,
+                hasSessionToken: !!(creds as any).sessionToken
+            });
+
             const res = await fetch(`${endpoint}${searchPath}`, { method: 'POST', headers: signed2.headers as any, body: reqBody2 as any });
             console.log('[OpenSearchProxy] knn response', { status: res.status, ok: res.ok });
+
+            // Debug: Log response details if it fails
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.log('[OpenSearchProxy] knn error details', {
+                    status: res.status,
+                    statusText: res.statusText,
+                    headers: Object.fromEntries(res.headers.entries()),
+                    errorBody: errorText.substring(0, 500) // First 500 chars
+                });
+            }
+
             const json = await res.json();
 
             const chunks = (json.hits?.hits || []).map((hit: any) => {
