@@ -137,27 +137,57 @@ async function signOut() {
 const client = generateClient<Schema>()
 async function testOpenSearch() {
   try {
-    // Full flow: Titan embeddings -> kNN search -> Claude answer
+    console.log('Testing OpenSearch proxy function...');
+
+    // First, let's test if the function is even being invoked
+    console.log('Sending test request...');
+    const testRes = await client.queries.openSearchProxy({
+      operation: 'test',
+      test: true
+    });
+    console.log('Test response:', testRes);
+
+    // Now try the actual ask operation
+    console.log('Sending ask request...');
     const res = await client.queries.openSearchProxy({
       operation: 'ask',
       question: 'What is the environmental impact assessment?',
       generateAnswer: true,
-      topK: 5
+      topK: 5,
+      searchConfig: {
+        index: 'fs-openai-semantic-chunk-data-automation',
+        topK: 10,
+        maxTokens: 1500,
+        primaryContentField: 'text',
+        fallbackContentFields: ['markdown', 'summary'],
+        metadataFields: ['title','section_title','doc_name','chunk_type','chunk_subtype','page_indices','doc.application_usage_daily.timestamp','timestamp','application_usage_daily.timestamp'],
+        bedrockRegion: 'ap-southeast-2',
+        embeddingModelId: 'amazon.titan-embed-text-v2:0',
+        answerModelId: 'anthropic.claude-3-5-sonnet-20241022-v2:0'
+      }
     })
     const raw = (typeof res === 'string' ? res : res.data) as string
+    console.log('OpenSearch raw response:', raw)
     const parsed = JSON.parse(raw)
+    console.log('OpenSearch parsed response:', parsed)
     if (parsed?.error) {
       console.error('OpenSearch ask error:', parsed.error)
-    } else {
-      console.log('Answer:', parsed.answer)
-      console.log('Chunks:', parsed.chunks)
-      // Send the answer to the chat store so it appears in Conversation
-      try {
-        const messageId = chatStore.addMessage(parsed.answer, 'agent')
-        chatStore.updateMessageStatus(messageId, 'sent')
-      } catch (e) {
-        console.error('Failed to push answer to chat store:', e)
-      }
+      return // Exit early on error
+    }
+
+    if (!parsed?.answer) {
+      console.error('OpenSearch response missing answer:', parsed)
+      return // Exit early if no answer
+    }
+
+    console.log('Answer:', parsed.answer)
+    console.log('Chunks:', parsed.chunks)
+    // Send the answer to the chat store so it appears in Conversation
+    try {
+      const messageId = chatStore.addMessage(parsed.answer, 'agent')
+      chatStore.updateMessageStatus(messageId, 'sent')
+    } catch (e) {
+      console.error('Failed to push answer to chat store:', e)
     }
   } catch (e) {
     console.error('OpenSearch test failed:', e)

@@ -63,6 +63,7 @@ const schema = a.schema({
       query: a.json(),
       body: a.json(),
       topK: a.integer(),
+      searchConfig: a.json(), // Search configuration object to override defaults
     })
     .returns(a.string())
     .authorization(allow => [allow.authenticated()])
