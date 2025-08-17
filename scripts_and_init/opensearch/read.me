@@ -1,0 +1,93 @@
+##### LIST FUNCTION NAME & ARN
+aws lambda list-functions --region ap-southeast-2 --profile aidev --query 'Functions[?contains(FunctionName, `opensearchproxy`)].{Name:FunctionName,Role:Role}' --output table
+
+
+##### ADD PERMISSIONS TO AWS CONSOLE
+In the AWS 
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DashboardsPublicButAuthnByFGAC",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "es:ESHttp*",
+      "Resource": "arn:aws:es:ap-southeast-2:029109261863:domain/amplify-os-dev/*"
+    },
+    {
+      "Sid": "OnlyTheseLambdas",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": [
+          "arn:aws:iam::029109261863:root",
+          "arn:aws:iam::029109261863:role/amplify-amplifybase-chris-opensearchproxylambdaServ-ZOuwpGn12VBS",
+          "arn:aws:iam::029109261863:role/amplify-d2f5g7c9zxqcij-ma-opensearchproxylambdaServ-raa8537HWomW"
+        ]
+      },
+      "Action": "es:ESHttp*",
+      "Resource": "arn:aws:es:ap-southeast-2:029109261863:domain/amplify-os-dev/*"
+    }
+  ]
+}
+
+
+
+##### ADD TO OPEN SEARCH PERMISSIONS
+curl -u "osadmin:<pw>" -H "Content-Type: application/json" -X PUT "https://search-amplify-os-dev-ftjbm4vtz7fj6hr3kx3lpifdyu.ap-southeast-2.es.amazonaws.com/_plugins/_security/api/rolesmapping/all_access" -d '{
+  "backend_roles": [
+    "arn:aws:iam::029109261863:role/amplify-amplifybase-chris-opensearchproxylambdaServ-ZOuwpGn12VBS",
+    "arn:aws:iam::029109261863:role/amplify-d2f5g7c9zxqcij-ma-opensearchproxylambdaServ-raa8537HWomW"
+  ]
+}'
+
+
+##### ADD TO OPEN SEARCH PERMISSIONS (JUPYTER)
+
+```python
+# Merge multiple IAM role ARNs into OpenSearch `all_access` roles mapping (single PUT)
+# Uses SigV4 (requests-aws4auth). Run from an environment that can reach the VPC endpoint.
+# pip install requests requests-aws4auth boto3
+
+import json
+import requests
+import boto3
+from requests_aws4auth import AWS4Auth
+
+# --- Fill these in ---
+REGION = "ap-southeast-2"
+DOMAIN = "https://vpc-dnt-genai-aws-pal-openai-fqljqcy4iyrwbss6wppgjwtq3m.ap-southeast-2.es.amazonaws.com"  # no trailing slash
+ROLE_ARNS = [
+    "arn:aws:iam::962000089409:role/amplify-d2ken28hap91hw-de-opensearchproxylambdaServ-oGFLudXH7xX7",
+    "arn:aws:iam::962000089409:role/amplify-amplifybase-dtc12-opensearchproxylambdaServ-WB8N95mAVc2n",
+    "arn:aws:iam::962000089409:role/amplify-d2ken28hap91hw-ma-opensearchproxylambdaServ-FK1VEDjZ4U0d"
+]
+
+# SigV4 auth
+session = boto3.Session(region_name=REGION)
+creds = session.get_credentials().get_frozen_credentials()
+awsauth = AWS4Auth(creds.access_key, creds.secret_key, REGION, "es", session_token=creds.token)
+
+headers = {"content-type": "application/json"}
+mapping_url = f"{DOMAIN}/_plugins/_security/api/rolesmapping/all_access"
+
+# 1) Fetch current mapping
+resp = requests.get(mapping_url, auth=awsauth, headers=headers, timeout=20)
+try:
+    current = resp.json() if resp.content else {}
+except ValueError:
+    current = {}
+print("GET mapping status:", resp.status_code)
+
+# 2) Merge backend_roles
+existing = set(current.get("backend_roles", []) if isinstance(current, dict) else [])
+desired = set(arn for arn in ROLE_ARNS if arn)
+merged = sorted(existing.union(desired))
+payload = {"backend_roles": merged}
+
+# 3) PUT back the full merged set (single request; avoids overwrites)
+resp2 = requests.put(mapping_url, auth=awsauth, headers=headers, data=json.dumps(payload), timeout=20)
+print("PUT mapping status:", resp2.status_code)
+```
+
+
