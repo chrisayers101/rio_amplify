@@ -3,7 +3,7 @@ import { defaultProvider } from '@aws-sdk/credential-provider-node';
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 
 // Import types from the shared types file
-import { OpenSearchProxyParams, OpenSearchAskParams, SearchConfig } from '../../../shared/opensearch';
+import { OpenSearchProxyParams } from '../../../shared/opensearch';
 
 const service = 'es';
 
@@ -22,52 +22,15 @@ function buildConfigFromEnv(): { endpoint: string | undefined; region: string | 
 }
 
 /**
- * Validates and extracts search configuration from the request body
+ * Validates required fields for ask operation
  */
-function extractSearchConfig(body: any): SearchConfig | { error: string } {
-	// Get individual config parameters from body
-	const index = body.index;
-	const maxTokens = body.maxTokens;
-	const primaryContentField = body.primaryContentField;
-	const fallbackContentFields = body.fallbackContentFields?.split(',') || [];
-	const metadataFields = body.metadataFields?.split(',') || [];
-	const bedrockRegion = body.bedrockRegion;
-	const embeddingModelId = body.embeddingModelId;
-	const answerModelId = body.answerModelId;
-
-	console.log('[OpenSearchProxy] Config parameters loaded:', {
-		index, maxTokens, primaryContentField, fallbackContentFields, metadataFields,
-		bedrockRegion, embeddingModelId, answerModelId
-	});
-
-	// Validate required fields
-	if (!index) {
-		return { error: 'index is required' };
-	}
-	if (!embeddingModelId) {
-		return { error: 'embeddingModelId is required' };
-	}
-	if (!answerModelId) {
-		return { error: 'answerModelId is required' };
-	}
-	if (!primaryContentField) {
-		return { error: 'primaryContentField is required' };
-	}
-	if (!bedrockRegion) {
-		return { error: 'bedrockRegion is required' };
-	}
-
-	return {
-		index,
-		topK: body.topK || 10, // Default to 10 for ask operation
-		maxTokens: maxTokens || 1500,
-		primaryContentField,
-		fallbackContentFields,
-		metadataFields,
-		bedrockRegion,
-		embeddingModelId,
-		answerModelId
-	};
+function validateAskParams(body: any): { error: string } | null {
+	if (!body.index) return { error: 'index is required' };
+	if (!body.embeddingModelId) return { error: 'embeddingModelId is required' };
+	if (!body.answerModelId) return { error: 'answerModelId is required' };
+	if (!body.primaryContentField) return { error: 'primaryContentField is required' };
+	if (!body.bedrockRegion) return { error: 'bedrockRegion is required' };
+	return null;
 }
 
 export const handler = async (event: any): Promise<string> => {
@@ -204,50 +167,49 @@ export const handler = async (event: any): Promise<string> => {
                     return JSON.stringify({ error: 'question required' });
                 }
 
-                // Extract and validate search configuration
-                const searchConfigResult = extractSearchConfig(body);
-                if ('error' in searchConfigResult) {
-                    return JSON.stringify({ error: searchConfigResult.error });
+                // Validate required fields
+                const validationError = validateAskParams(body);
+                if (validationError) {
+                    return JSON.stringify(validationError);
                 }
-                const searchCfg = searchConfigResult;
 
                 console.log('[OpenSearchProxy] All required fields validated, proceeding with ask operation');
-                console.log('[OpenSearchProxy] Extracted config values:', {
-                    index: searchCfg.index,
-                    topK: searchCfg.topK,
-                    primaryField: searchCfg.primaryContentField,
-                    fallbackFields: searchCfg.fallbackContentFields,
-                    metadataFields: searchCfg.metadataFields,
-                    bedrockRegion: searchCfg.bedrockRegion,
-                    embeddingModelId: searchCfg.embeddingModelId,
-                    answerModelId: searchCfg.answerModelId
+                console.log('[OpenSearchProxy] Config values:', {
+                    index: body.index,
+                    topK: body.topK || 10,
+                    primaryField: body.primaryContentField,
+                    fallbackFields: body.fallbackContentFields,
+                    metadataFields: body.metadataFields,
+                    bedrockRegion: body.bedrockRegion,
+                    embeddingModelId: body.embeddingModelId,
+                    answerModelId: body.answerModelId
                 });
 
-                if (body.generateAnswer && !searchCfg.answerModelId) {
-                    return JSON.stringify({ error: 'answerModelId is not configured in searchConfig.' });
+                if (body.generateAnswer && !body.answerModelId) {
+                    return JSON.stringify({ error: 'answerModelId is required when generateAnswer is true' });
                 }
 
                 console.log('[OpenSearchProxy] ask params', {
-                    topK: searchCfg.topK,
-                    index: searchCfg.index,
+                    topK: body.topK || 10,
+                    index: body.index,
                     questionLen: question.length,
-                    embeddingModelId: searchCfg.embeddingModelId,
-                    answerModelId: searchCfg.answerModelId,
-                    bedrockRegion: searchCfg.bedrockRegion
+                    embeddingModelId: body.embeddingModelId,
+                    answerModelId: body.answerModelId,
+                    bedrockRegion: body.bedrockRegion
                 });
 
                 // 1) Get embedding
                 console.log('[OpenSearchProxy] ===== STARTING EMBEDDING GENERATION =====');
-                console.log('[OpenSearchProxy] Getting embedding with model:', searchCfg.embeddingModelId);
-                console.log('[OpenSearchProxy] Bedrock region:', searchCfg.bedrockRegion);
+                console.log('[OpenSearchProxy] Getting embedding with model:', body.embeddingModelId);
+                console.log('[OpenSearchProxy] Bedrock region:', body.bedrockRegion);
                 console.log('[OpenSearchProxy] Question length:', question.length);
 
-                const bedrock = new BedrockRuntimeClient({ region: searchCfg.bedrockRegion });
+                const bedrock = new BedrockRuntimeClient({ region: body.bedrockRegion });
                 const embedBody = JSON.stringify({ inputText: question });
                 console.log('[OpenSearchProxy] Embed request body:', embedBody);
 
                 const embedCmd = new InvokeModelCommand({
-                    modelId: searchCfg.embeddingModelId,
+                    modelId: body.embeddingModelId,
                     contentType: 'application/json',
                     accept: 'application/json',
                     body: embedBody
@@ -281,14 +243,14 @@ export const handler = async (event: any): Promise<string> => {
 
                 // 2) kNN search in OpenSearch
                 console.log('[OpenSearchProxy] ===== STARTING OPENSEARCH SEARCH =====');
-                console.log('[OpenSearchProxy] Search path:', `/${encodeURIComponent(searchCfg.index)}/_search`);
-                console.log('[OpenSearchProxy] Search parameters:', { topK: searchCfg.topK, primaryField: searchCfg.primaryContentField, fallbackFields: searchCfg.fallbackContentFields.length, metadataFields: searchCfg.metadataFields.length });
+                console.log('[OpenSearchProxy] Search path:', `/${encodeURIComponent(body.index)}/_search`);
+                console.log('[OpenSearchProxy] Search parameters:', { topK: body.topK || 10, primaryField: body.primaryContentField, fallbackFields: body.fallbackContentFields?.split(',').length || 0, metadataFields: body.metadataFields?.split(',').length || 0 });
 
-                const searchPath = `/${encodeURIComponent(searchCfg.index)}/_search`;
+                const searchPath = `/${encodeURIComponent(body.index)}/_search`;
                 const searchBody = {
-                    size: searchCfg.topK,
-                    query: { knn: { embedding: { vector, k: searchCfg.topK } } },
-                    _source: [searchCfg.primaryContentField, ...searchCfg.fallbackContentFields, ...searchCfg.metadataFields]
+                    size: body.topK || 10,
+                    query: { knn: { embedding: { vector, k: body.topK || 10 } } },
+                    _source: [body.primaryContentField, ...(body.fallbackContentFields?.split(',') || []), ...(body.metadataFields?.split(',') || [])]
                 };
                 console.log('[OpenSearchProxy] Search body:', JSON.stringify(searchBody, null, 2));
 
@@ -353,10 +315,10 @@ export const handler = async (event: any): Promise<string> => {
                     console.log(`[OpenSearchProxy] Processing hit ${index + 1}:`, { score: hit._score, hasSource: !!hit._source });
 
                     const src = hit._source || {};
-                    let content = src[searchCfg.primaryContentField];
+                    let content = src[body.primaryContentField];
                     if (!content) {
-                        console.log(`[OpenSearchProxy] Hit ${index + 1} missing primary field '${searchCfg.primaryContentField}', trying fallbacks...`);
-                        for (const f of searchCfg.fallbackContentFields) {
+                        console.log(`[OpenSearchProxy] Hit ${index + 1} missing primary field '${body.primaryContentField}', trying fallbacks...`);
+                        for (const f of (body.fallbackContentFields?.split(',') || [])) {
                             if (src[f]) {
                                 content = src[f];
                                 console.log(`[OpenSearchProxy] Hit ${index + 1} using fallback field '${f}'`);
@@ -389,7 +351,7 @@ export const handler = async (event: any): Promise<string> => {
 
                         // 3) Generate answer with Claude
                 console.log('[OpenSearchProxy] ===== STARTING ANSWER GENERATION =====');
-                console.log('[OpenSearchProxy] Generating answer with model:', searchCfg.answerModelId);
+                console.log('[OpenSearchProxy] Generating answer with model:', body.answerModelId);
                 console.log('[OpenSearchProxy] Context chunks available:', chunks.length);
 
                 const context = chunks.map((c: any, i: number) => {
@@ -403,12 +365,12 @@ export const handler = async (event: any): Promise<string> => {
 
                 const answerBody = JSON.stringify({
                     anthropic_version: 'bedrock-2023-05-31',
-                    max_tokens: searchCfg.maxTokens,
+                    max_tokens: body.maxTokens,
                     messages: [{ role: 'user', content: prompt }]
                 });
                 console.log('[OpenSearchProxy] Answer request body created, size:', answerBody.length);
 
-                const answerCmd = new InvokeModelCommand({ modelId: searchCfg.answerModelId!, contentType: 'application/json', accept: 'application/json', body: answerBody });
+                const answerCmd = new InvokeModelCommand({ modelId: body.answerModelId!, contentType: 'application/json', accept: 'application/json', body: answerBody });
                 console.log('[OpenSearchProxy] Answer command created, calling Bedrock...');
 
                 try {

@@ -72,7 +72,7 @@ import RioLogo from '@/assets/RioLogo.svg'
 import { ArrowLeftStartOnRectangleIcon, ChevronDownIcon, ChartBarIcon, CpuChipIcon, BeakerIcon } from '@heroicons/vue/24/outline'
 import type { Schema } from '../../amplify/data/resource'
 import { generateClient } from 'aws-amplify/api'
-import type { OpenSearchProxyFlatParams } from '../../shared/opensearch'
+import type { OpenSearchProxyParams } from '../../shared/opensearch'
 
 
 
@@ -152,7 +152,7 @@ async function testOpenSearch() {
     // Now try the actual ask operation
     console.log('Sending ask request...');
 
-    const askParams: OpenSearchProxyFlatParams = {
+    const askParams: OpenSearchProxyParams = {
       operation: 'ask' as const,
       question: 'What is the environmental impact assessment?',
       generateAnswer: true,
