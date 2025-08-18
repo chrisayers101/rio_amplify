@@ -38,7 +38,7 @@
             <div class="checkbox-custom"></div>
             <div class="section-number">{{ section.sectionId }}</div>
             <div class="section-info">
-              <div class="section-name">{{ getSectionDisplayName(section) }}</div>
+              <div class="section-name">{{ getSectionDisplayName(section).replace(/^\d+:\s*/, '') }}</div>
               <div class="section-meta">
                 <span class="completion">{{ section.percentComplete || 0 }}% complete</span>
                 <span class="status" :class="getStatusClass(section.status)">
@@ -80,7 +80,13 @@ const sectionStore = useFeasibilityStudySectionStore()
 const sidebarStore = useSidebarStore()
 
 // Computed properties from store
-const sections = computed(() => sectionStore.sections)
+const sections = computed(() => {
+  return [...sectionStore.sections].sort((a, b) => {
+    const aNum = parseInt(a.sectionId.toString())
+    const bNum = parseInt(b.sectionId.toString())
+    return aNum - bNum
+  })
+})
 const isLoading = computed(() => sectionStore.isLoading)
 const error = computed(() => sectionStore.error)
 
