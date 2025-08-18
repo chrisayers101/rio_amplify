@@ -35,13 +35,6 @@ export interface OpenSearchAskParams {
 }
 
 /**
- * Parameters for OpenSearch proxy test operation
- */
-export interface OpenSearchTestParams {
-  operation: 'test';
-}
-
-/**
  * Union type for all OpenSearch proxy operations
  */
-export type OpenSearchProxyParams = OpenSearchAskParams | OpenSearchTestParams;
+export type OpenSearchProxyParams = OpenSearchAskParams;

@@ -72,7 +72,7 @@ import RioLogo from '@/assets/RioLogo.svg'
 import { ArrowLeftStartOnRectangleIcon, ChevronDownIcon, ChartBarIcon, CpuChipIcon, BeakerIcon } from '@heroicons/vue/24/outline'
 import type { Schema } from '../../amplify/data/resource'
 import { generateClient } from 'aws-amplify/api'
-import type { SearchConfig } from '@/types/opensearch';
+
 
 const router = useRouter()
 const authStore = useAuthStore()
