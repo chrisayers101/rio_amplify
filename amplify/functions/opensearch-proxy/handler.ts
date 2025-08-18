@@ -24,16 +24,17 @@ function buildConfigFromEnv(): { endpoint: string | undefined; region: string | 
 /**
  * Validates required fields for ask operation
  */
-function validateAskParams(body: any): { error: string } | null {
-	if (!body.index) return { error: 'index is required' };
-	if (!body.embeddingModelId) return { error: 'embeddingModelId is required' };
-	if (!body.answerModelId) return { error: 'answerModelId is required' };
-	if (!body.primaryContentField) return { error: 'primaryContentField is required' };
-	if (!body.bedrockRegion) return { error: 'bedrockRegion is required' };
+function validateAskParams(body: OpenSearchProxyParams): { error: string } | null {
+	if (body.operation !== 'ask') return null;
+	if (!body.index) return { error: 'index is required for ask operation' };
+	if (!body.embeddingModelId) return { error: 'embeddingModelId is required for ask operation' };
+	if (!body.answerModelId) return { error: 'answerModelId is required for ask operation' };
+	if (!body.primaryContentField) return { error: 'primaryContentField is required for ask operation' };
+	if (!body.bedrockRegion) return { error: 'bedrockRegion is required for ask operation' };
 	return null;
 }
 
-export const handler = async (event: any): Promise<string> => {
+export const handler = async (event: { arguments?: OpenSearchProxyParams; test?: boolean }): Promise<string> => {
     try {
         console.log('[OpenSearchProxy] ===== FUNCTION START =====');
         console.log('[OpenSearchProxy] Node.js version:', process.version);
@@ -62,7 +63,7 @@ export const handler = async (event: any): Promise<string> => {
 
                 const host = new URL(endpoint).host;
         const args = (event && event.arguments);
-        const body: any = typeof args === 'string' ? JSON.parse(args) : args;
+        const body: OpenSearchProxyParams = typeof args === 'string' ? JSON.parse(args) : args;
         const op = body.operation;
 
         console.log('[OpenSearchProxy] Operation:', op, 'Body:', JSON.stringify(body, null, 2));
@@ -96,6 +97,9 @@ export const handler = async (event: any): Promise<string> => {
         });
 
         if (op === 'rawSearch') {
+            if (!body.method) return JSON.stringify({ error: 'method is required for rawSearch operation' });
+            if (!body.path) return JSON.stringify({ error: 'path is required for rawSearch operation' });
+
             const method = body.method.toUpperCase();
             const searchConfig = body.searchConfig;
             if (!searchConfig) {
@@ -161,11 +165,11 @@ export const handler = async (event: any): Promise<string> => {
             try {
                 console.log('[OpenSearchProxy] Starting ask operation');
 
-                const question: string = body.question;
-                if (!question) {
+                if (!body.question) {
                     console.log('[OpenSearchProxy] Missing question');
                     return JSON.stringify({ error: 'question required' });
                 }
+                const question: string = body.question;
 
                 // Validate required fields
                 const validationError = validateAskParams(body);
@@ -243,10 +247,10 @@ export const handler = async (event: any): Promise<string> => {
 
                 // 2) kNN search in OpenSearch
                 console.log('[OpenSearchProxy] ===== STARTING OPENSEARCH SEARCH =====');
-                console.log('[OpenSearchProxy] Search path:', `/${encodeURIComponent(body.index)}/_search`);
+                console.log('[OpenSearchProxy] Search path:', `/${encodeURIComponent(body.index!)}/_search`);
                 console.log('[OpenSearchProxy] Search parameters:', { topK: body.topK || 10, primaryField: body.primaryContentField, fallbackFields: body.fallbackContentFields?.split(',').length || 0, metadataFields: body.metadataFields?.split(',').length || 0 });
 
-                const searchPath = `/${encodeURIComponent(body.index)}/_search`;
+                const searchPath = `/${encodeURIComponent(body.index!)}/_search`;
                 const searchBody = {
                     size: body.topK || 10,
                     query: { knn: { embedding: { vector, k: body.topK || 10 } } },
@@ -315,7 +319,7 @@ export const handler = async (event: any): Promise<string> => {
                     console.log(`[OpenSearchProxy] Processing hit ${index + 1}:`, { score: hit._score, hasSource: !!hit._source });
 
                     const src = hit._source || {};
-                    let content = src[body.primaryContentField];
+                    let content = src[body.primaryContentField!];
                     if (!content) {
                         console.log(`[OpenSearchProxy] Hit ${index + 1} missing primary field '${body.primaryContentField}', trying fallbacks...`);
                         for (const f of (body.fallbackContentFields?.split(',') || [])) {
