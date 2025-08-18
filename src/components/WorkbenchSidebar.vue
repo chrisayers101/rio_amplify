@@ -237,8 +237,8 @@ onMounted(async () => {
 }
 
 .header-icon {
-  width: 22px;
-  height: 22px;
+  width: 36px;
+  height: 36px;
   color: white;
 }
 
