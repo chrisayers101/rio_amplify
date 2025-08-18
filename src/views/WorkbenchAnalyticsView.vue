@@ -31,10 +31,7 @@
       <!-- Chat Section (Left Half) -->
       <div class="chat-section" :style="{ width: chatWidth + '%' }">
         <Conversation :open="true" :embedded="true" @close="() => {}" />
-        <!-- Floating sidebar toggle over conversation -->
-        <button class="floating-sidebar-toggle" @click="sidebarStore.toggleSidebar()" title="Toggle sidebar">
-          <span class="chevron">{{ sidebarStore.collapsed ? '›' : '‹' }}</span>
-        </button>
+
       </div>
 
       <!-- Resizable Divider -->
@@ -1048,34 +1045,7 @@ onUnmounted(() => {
   border-right: 1px solid #e5e7eb;
 }
 
-/* Floating sidebar toggle like dashboard's grey pill */
-.floating-sidebar-toggle {
-  position: absolute;
-  left: -12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
-  border-radius: 9999px;
-  background: #f5f5f5;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #6b7280;
-  z-index: 5;
-}
 
-.floating-sidebar-toggle:hover {
-  background: #f0f0f0;
-}
-
-.floating-sidebar-toggle .chevron {
-  font-size: 14px;
-  line-height: 1;
-}
 
 /* Loading Overlay */
 .loading-overlay {

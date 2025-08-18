@@ -52,6 +52,11 @@
 
 
     </div>
+
+    <button class="sidebar-toggle" @click="sidebarStore.toggleSidebar()">
+      <ChevronLeftIcon v-if="sidebarStore.collapsed" class="toggle-icon" />
+      <ChevronRightIcon v-else class="toggle-icon" />
+    </button>
   </div>
 </template>
 
@@ -60,7 +65,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
 import type { ParsedFeasibilityStudySection } from '@/types/feasibilityStudy'
 import { useSidebarStore } from '@/stores/sidebarStore'
-import { DocumentTextIcon } from '@heroicons/vue/24/outline'
+import { DocumentTextIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/24/outline'
 
 interface Props {
   modelValue?: string[]
@@ -202,7 +207,7 @@ onMounted(async () => {
 }
 
 .workbench-sidebar.collapsed {
-  width: 72px;
+  width: 100px;
 }
 
 .workbench-sidebar.collapsed .sidebar-header h2,
@@ -488,5 +493,33 @@ onMounted(async () => {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.sidebar-toggle {
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.2s;
+}
+
+.sidebar-toggle:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.toggle-icon {
+  width: 12px;
+  height: 12px;
+  color: #888;
 }
 </style>
