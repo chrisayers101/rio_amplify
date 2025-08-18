@@ -72,6 +72,7 @@ import RioLogo from '@/assets/RioLogo.svg'
 import { ArrowLeftStartOnRectangleIcon, ChevronDownIcon, ChartBarIcon, CpuChipIcon, BeakerIcon } from '@heroicons/vue/24/outline'
 import type { Schema } from '../../amplify/data/resource'
 import { generateClient } from 'aws-amplify/api'
+import type { SearchConfig } from '@/types/opensearch';
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -142,52 +143,73 @@ async function testOpenSearch() {
     // First, let's test if the function is even being invoked
     console.log('Sending test request...');
     const testRes = await client.queries.openSearchProxy({
-      operation: 'test',
-      test: true
+      operation: 'test'
     });
     console.log('Test response:', testRes);
 
     // Now try the actual ask operation
     console.log('Sending ask request...');
-    const res = await client.queries.openSearchProxy({
-      operation: 'ask',
+
+    const askParams = {
+      operation: 'ask' as const,
       question: 'What is the environmental impact assessment?',
       generateAnswer: true,
       topK: 5,
-      searchConfig: {
-        index: 'fs-openai-semantic-chunk-data-automation',
-        topK: 10,
-        maxTokens: 1500,
-        primaryContentField: 'text',
-        fallbackContentFields: ['markdown', 'summary'],
-        metadataFields: ['title','section_title','doc_name','chunk_type','chunk_subtype','page_indices','doc.application_usage_daily.timestamp','timestamp','application_usage_daily.timestamp'],
-        bedrockRegion: 'ap-southeast-2',
-        embeddingModelId: 'amazon.titan-embed-text-v2:0',
-        answerModelId: 'anthropic.claude-3-5-sonnet-20241022-v2:0'
-      }
-    })
-    const raw = (typeof res === 'string' ? res : res.data) as string
-    console.log('OpenSearch raw response:', raw)
-    const parsed = JSON.parse(raw)
-    console.log('OpenSearch parsed response:', parsed)
-    if (parsed?.error) {
-      console.error('OpenSearch ask error:', parsed.error)
-      return // Exit early on error
-    }
+      // Individual config parameters instead of searchConfig object
+      index: 'fs-openai-semantic-chunk-data-automation',
+      maxTokens: 1500,
+      primaryContentField: 'text',
+      fallbackContentFields: 'markdown,summary',
+      metadataFields: 'title,section_title,doc_name',
+      bedrockRegion: 'ap-southeast-2',
+      embeddingModelId: 'amazon.titan-embed-text-v2:0',
+      answerModelId: 'anthropic.claude-3-5-sonnet-20241022-v2:0'
+    };
 
-    if (!parsed?.answer) {
-      console.error('OpenSearch response missing answer:', parsed)
-      return // Exit early if no answer
-    }
+    console.log('Ask parameters:', JSON.stringify(askParams, null, 2));
 
-    console.log('Answer:', parsed.answer)
-    console.log('Chunks:', parsed.chunks)
-    // Send the answer to the chat store so it appears in Conversation
     try {
-      const messageId = chatStore.addMessage(parsed.answer, 'agent')
-      chatStore.updateMessageStatus(messageId, 'sent')
-    } catch (e) {
-      console.error('Failed to push answer to chat store:', e)
+      const res = await client.queries.openSearchProxy(askParams);
+      console.log('Ask response received:', res);
+
+      // Check for GraphQL errors
+      if (res.errors && res.errors.length > 0) {
+        console.error('GraphQL errors:', res.errors);
+        console.error('First error details:', res.errors[0]);
+        return;
+      }
+
+      const raw = (typeof res === 'string' ? res : res.data) as string
+      console.log('OpenSearch raw response:', raw)
+      const parsed = JSON.parse(raw)
+      console.log('OpenSearch parsed response:', parsed)
+      if (parsed?.error) {
+        console.error('OpenSearch ask error:', parsed.error)
+        return // Exit early on error
+      }
+
+      if (!parsed?.answer) {
+        console.error('OpenSearch response missing answer:', parsed)
+        return // Exit early if no answer
+      }
+
+      console.log('Answer:', parsed.answer)
+      console.log('Chunks:', parsed.chunks)
+      // Send the answer to the chat store so it appears in Conversation
+      try {
+        const messageId = chatStore.addMessage(parsed.answer, 'agent')
+        chatStore.updateMessageStatus(messageId, 'sent')
+      } catch (e) {
+        console.error('Failed to push answer to chat store:', e)
+      }
+    } catch (askError) {
+      console.error('Ask operation failed with error:', askError);
+      console.error('Error details:', {
+        name: askError instanceof Error ? askError.name : 'Unknown',
+        message: askError instanceof Error ? askError.message : String(askError),
+        stack: askError instanceof Error ? askError.stack : 'No stack trace'
+      });
+      return;
     }
   } catch (e) {
     console.error('OpenSearch test failed:', e)

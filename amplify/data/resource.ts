@@ -55,15 +55,22 @@ const schema = a.schema({
     .query()
     .arguments({
       operation: a.string().required(), // 'rawSearch' | 'ask'
-      index: a.string(),
       question: a.string(),
       generateAnswer: a.boolean(),
+      topK: a.integer(),
       method: a.string(),
       path: a.string(),
       query: a.json(),
       body: a.json(),
-      topK: a.integer(),
-      searchConfig: a.json(), // Search configuration object to override defaults
+      // Individual config fields instead of searchConfig object
+      index: a.string(),
+      maxTokens: a.integer(),
+      primaryContentField: a.string(),
+      fallbackContentFields: a.string(),
+      metadataFields: a.string(),
+      bedrockRegion: a.string(),
+      embeddingModelId: a.string(),
+      answerModelId: a.string(),
     })
     .returns(a.string())
     .authorization(allow => [allow.authenticated()])

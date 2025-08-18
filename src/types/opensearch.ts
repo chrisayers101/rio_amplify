@@ -1,0 +1,47 @@
+/**
+ * Search configuration for OpenSearch proxy operations
+ * Must match the interface defined in the Lambda function
+ */
+export interface SearchConfig {
+  /** OpenSearch index name */
+  index: string;
+  /** Number of top results to return */
+  topK: number;
+  /** Maximum tokens for answer generation */
+  maxTokens: number;
+  /** Primary content field to extract from search results */
+  primaryContentField: string;
+  /** Fallback content fields if primary field is missing */
+  fallbackContentFields: string[];
+  /** Metadata fields to include in search results */
+  metadataFields: string[];
+  /** AWS region for Bedrock services */
+  bedrockRegion: string;
+  /** Bedrock model ID for generating embeddings */
+  embeddingModelId: string;
+  /** Bedrock model ID for generating answers */
+  answerModelId: string;
+}
+
+/**
+ * Parameters for OpenSearch proxy ask operation
+ */
+export interface OpenSearchAskParams {
+  operation: 'ask';
+  question: string;
+  generateAnswer: boolean;
+  topK?: number;
+  searchConfig: SearchConfig;
+}
+
+/**
+ * Parameters for OpenSearch proxy test operation
+ */
+export interface OpenSearchTestParams {
+  operation: 'test';
+}
+
+/**
+ * Union type for all OpenSearch proxy operations
+ */
+export type OpenSearchProxyParams = OpenSearchAskParams | OpenSearchTestParams;
