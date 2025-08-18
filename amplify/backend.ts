@@ -23,6 +23,12 @@ const backend = defineBackend({
   s3ProxyFunction,
   openSearchProxyFunction,
 });
+
+//////////////////////////////////////////
+/////////OPEN SEARCH CONFIGURATION/////////
+// backend.openSearchProxyFunction.resources.lambda.role?.addManagedPolicy( ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaVPCAccessExecutionRole') );
+// const cfn = backend.openSearchProxyFunction.resources.cfnResources.cfnFunction; cfn.vpcConfig = { subnetIds: [ 'subnet-05f88037dc10c0873', 'subnet-0ab4716cb11409b4f', 'subnet-0de74d4e1afdea070', ], securityGroupIds: [ 'sg-00d72a863a170cba3', 'sg-088193fe6037fc397', 'sg-0cf9f1bad389498de', 'sg-0f2ccf02dd1e279dc', ], };
+
 // Explicitly allow the Lambda to call the dev OpenSearch domain (does not modify the domain resource policy)
 backend.openSearchProxyFunction.resources.lambda.addToRolePolicy(
   new PolicyStatement({
@@ -31,6 +37,9 @@ backend.openSearchProxyFunction.resources.lambda.addToRolePolicy(
     resources: ['arn:aws:es:ap-southeast-2:029109261863:domain/amplify-os-dev/*'],
   }),
 );
+
+//////////////////////////////////////////
+/////////OPEN SEARCH CONFIGURATION/////////
 
 // Look up the pre-existing S3 buckets by name
 const airisBucket = Bucket.fromBucketName(
