@@ -59,10 +59,16 @@ export function prepareChatContext(
     return undefined;
   }
 
-  return {
+  const context = {
     selectedEntity,
     matchingGuideline
   };
+
+  // Log the exact context object that will be sent to the handler
+  console.log('[ChatApi] CONTEXT OBJECT FOR HANDLER:', JSON.stringify(context, null, 2))
+  console.log('[ChatApi] Context will be stringified as:', JSON.stringify(context))
+
+  return context;
 }
 
 export class ChatApi {
@@ -87,6 +93,15 @@ export class ChatApi {
     onComplete: () => void
   ): Promise<void> {
     try {
+      // Log the exact request being sent to the handler
+      console.log('[ChatApi] REQUEST BEING SENT TO HANDLER:', {
+        message: request.message,
+        threadId: request.threadId || 'default',
+        context: request.context,
+        contextStringified: JSON.stringify(request.context || {}),
+        messages: request.messages
+      })
+
       // Use the Data client to invoke the function as a query
       const result = await this.getClient().queries.chatOrchestrator({
         message: request.message,

@@ -254,6 +254,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
       // Log the loaded sections
       console.log(`[EntityStore] Loaded ${sections.value.length} sections:`, sections.value.map((s: ParsedFeasibilityStudySection) => ({ projectId: s.projectId, sectionId: s.sectionId, status: s.status })))
+      console.log(`[EntityStore] Full sections data:`, JSON.stringify(sections.value, null, 2))
 
     } catch (err) {
       console.error('Error loading sections:', err)
@@ -303,6 +304,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
       // Log the loaded project sections
       console.log(`[EntityStore] Loaded ${parsedProjectSections.length} sections for project ${projectId}:`, parsedProjectSections.map((s: ParsedFeasibilityStudySection) => ({ sectionId: s.sectionId, status: s.status })))
+      console.log(`[EntityStore] Full project sections data:`, JSON.stringify(parsedProjectSections, null, 2))
       console.log(`[EntityStore] Total sections in store: ${sections.value.length}`)
 
     } catch (err) {
@@ -471,7 +473,9 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
 
       // Update the section with the new entity (as JSON string)
+      console.log('[EntityStore] About to update database with entity:', entityJsonString)
       const result = await updateSection(projectId, sectionId, { entity: entityJsonString })
+      console.log('[EntityStore] Database update result:', result ? 'success' : 'failed')
 
       // Log selected entity after update for debugging
       try {
@@ -484,6 +488,9 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
             entityKeys: Object.keys(selected.entity || {}),
             entitySample: selected.entity
           })
+
+          // Log the full entity object that will be used by the handler
+          console.log('[EntityStore] FULL ENTITY OBJECT FOR HANDLER:', JSON.stringify(selected.entity, null, 2))
         }
       } catch (_) {
         // no-op
