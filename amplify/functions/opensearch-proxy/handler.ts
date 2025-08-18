@@ -87,14 +87,7 @@ export const handler = async (event: { arguments?: OpenSearchProxyParams; test?:
         // Get credentials once at the top
         const creds = await defaultProvider()();
 
-        console.log('[OpenSearchProxy] start', {
-            op,
-            endpointHost: host,
-            region,
-            hasQuery: !!body.query,
-            hasBody: !!body.body,
-            argKeys: Object.keys(body)
-        });
+        console.log('[OpenSearchProxy] Starting operation:', { op, endpointHost: host, region });
 
         if (op === 'rawSearch') {
             if (!body.method) return JSON.stringify({ error: 'method is required for rawSearch operation' });
@@ -105,8 +98,6 @@ export const handler = async (event: { arguments?: OpenSearchProxyParams; test?:
             if (!searchConfig) {
                 return JSON.stringify({ error: 'searchConfig is required for rawSearch operation' });
             }
-            const index = body.index;
-            const path = body.path;
             let reqBody = '';
             if (body.body) {
                 reqBody = typeof body.body === 'string' ? body.body : JSON.stringify(body.body);
@@ -115,14 +106,13 @@ export const handler = async (event: { arguments?: OpenSearchProxyParams; test?:
             }
             console.log('[OpenSearchProxy] rawSearch', {
                 method,
-                path,
-                index,
+                path: body.path,
                 bodyBytes: Buffer.byteLength(reqBody, 'utf8')
             });
             const signed = aws4.sign({
                 host,
                 method,
-                path,
+                path: body.path!,
                 headers: { 'content-type': 'application/json' },
                 body: reqBody,
                 service,
@@ -133,27 +123,14 @@ export const handler = async (event: { arguments?: OpenSearchProxyParams; test?:
                 sessionToken: (creds as any).sessionToken
             });
 
-            // Debug: Log authentication details for rawSearch
-            console.log('[OpenSearchProxy] rawSearch auth debug', {
-                accessKeyId: creds.accessKeyId?.substring(0, 8) + '...',
-                region,
-                host,
-                signedHeaders: signed.headers,
-                hasSessionToken: !!(creds as any).sessionToken
-            });
 
-            const res = await fetch(`${endpoint}${path}`, { method, headers: signed.headers as any, body: reqBody as any });
+
+            const res = await fetch(`${endpoint}${body.path!}`, { method, headers: signed.headers as any, body: reqBody as any });
             console.log('[OpenSearchProxy] rawSearch response', { status: res.status, ok: res.ok });
 
-            // Debug: Log response details if it fails
             if (!res.ok) {
                 const errorText = await res.text();
-                console.log('[OpenSearchProxy] rawSearch error details', {
-                    status: res.status,
-                    statusText: res.statusText,
-                    headers: Object.fromEntries(res.headers.entries()),
-                    errorBody: errorText.substring(0, 500)
-                });
+                console.log('[OpenSearchProxy] rawSearch error:', res.status, res.statusText);
             }
 
             const json = await res.json();
@@ -178,16 +155,6 @@ export const handler = async (event: { arguments?: OpenSearchProxyParams; test?:
                 }
 
                 console.log('[OpenSearchProxy] All required fields validated, proceeding with ask operation');
-                console.log('[OpenSearchProxy] Config values:', {
-                    index: body.index,
-                    topK: body.topK || 10,
-                    primaryField: body.primaryContentField,
-                    fallbackFields: body.fallbackContentFields,
-                    metadataFields: body.metadataFields,
-                    bedrockRegion: body.bedrockRegion,
-                    embeddingModelId: body.embeddingModelId,
-                    answerModelId: body.answerModelId
-                });
 
                 if (body.generateAnswer && !body.answerModelId) {
                     return JSON.stringify({ error: 'answerModelId is required when generateAnswer is true' });
@@ -195,11 +162,9 @@ export const handler = async (event: { arguments?: OpenSearchProxyParams; test?:
 
                 console.log('[OpenSearchProxy] ask params', {
                     topK: body.topK || 10,
-                    index: body.index,
                     questionLen: question.length,
                     embeddingModelId: body.embeddingModelId,
-                    answerModelId: body.answerModelId,
-                    bedrockRegion: body.bedrockRegion
+                    answerModelId: body.answerModelId
                 });
 
                 // 1) Get embedding
@@ -248,7 +213,7 @@ export const handler = async (event: { arguments?: OpenSearchProxyParams; test?:
                 // 2) kNN search in OpenSearch
                 console.log('[OpenSearchProxy] ===== STARTING OPENSEARCH SEARCH =====');
                 console.log('[OpenSearchProxy] Search path:', `/${encodeURIComponent(body.index!)}/_search`);
-                console.log('[OpenSearchProxy] Search parameters:', { topK: body.topK || 10, primaryField: body.primaryContentField, fallbackFields: body.fallbackContentFields?.split(',').length || 0, metadataFields: body.metadataFields?.split(',').length || 0 });
+                console.log('[OpenSearchProxy] Search parameters:', { topK: body.topK || 10, primaryField: body.primaryContentField });
 
                 const searchPath = `/${encodeURIComponent(body.index!)}/_search`;
                 const searchBody = {
@@ -277,14 +242,7 @@ export const handler = async (event: { arguments?: OpenSearchProxyParams; test?:
                 });
                 console.log('[OpenSearchProxy] Request signed successfully');
 
-                // Debug: Log authentication details
-                console.log('[OpenSearchProxy] auth debug', {
-                    accessKeyId: creds.accessKeyId?.substring(0, 8) + '...',
-                    region,
-                    host,
-                    signedHeaders: signed2.headers,
-                    hasSessionToken: !!(creds as any).sessionToken
-                });
+
 
                 console.log('[OpenSearchProxy] Searching OpenSearch at:', `${endpoint}${searchPath}`);
                 console.log('[OpenSearchProxy] Making fetch request...');
@@ -292,15 +250,9 @@ export const handler = async (event: { arguments?: OpenSearchProxyParams; test?:
                 const res = await fetch(`${endpoint}${searchPath}`, { method: 'POST', headers: signed2.headers as any, body: reqBody2 as any });
                 console.log('[OpenSearchProxy] Fetch completed, response status:', res.status, 'ok:', res.ok);
 
-                // Debug: Log response details if it fails
                 if (!res.ok) {
                     const errorText = await res.text();
-                    console.log('[OpenSearchProxy] knn error details', {
-                        status: res.status,
-                        statusText: res.statusText,
-                        headers: Object.fromEntries(res.headers.entries()),
-                        errorBody: errorText.substring(0, 500) // First 500 chars
-                    });
+                    console.log('[OpenSearchProxy] knn error:', res.status, res.statusText);
                     return JSON.stringify({ error: `OpenSearch search failed: ${res.status} ${res.statusText}` });
                 }
 
@@ -316,22 +268,18 @@ export const handler = async (event: { arguments?: OpenSearchProxyParams; test?:
 
                 console.log('[OpenSearchProxy] Processing hits, count:', json.hits.hits.length);
                 const chunks = json.hits.hits.map((hit: any, index: number) => {
-                    console.log(`[OpenSearchProxy] Processing hit ${index + 1}:`, { score: hit._score, hasSource: !!hit._source });
-
                     const src = hit._source || {};
                     let content = src[body.primaryContentField!];
                     if (!content) {
-                        console.log(`[OpenSearchProxy] Hit ${index + 1} missing primary field '${body.primaryContentField}', trying fallbacks...`);
                         for (const f of (body.fallbackContentFields?.split(',') || [])) {
                             if (src[f]) {
                                 content = src[f];
-                                console.log(`[OpenSearchProxy] Hit ${index + 1} using fallback field '${f}'`);
                                 break;
                             }
                         }
                     }
 
-                    const chunk = {
+                    return {
                         content: content || '',
                         score: hit._score,
                         title: src.title || '',
@@ -341,9 +289,6 @@ export const handler = async (event: { arguments?: OpenSearchProxyParams; test?:
                         chunk_subtype: src.chunk_subtype || '',
                         page_indices: src.page_indices || []
                     };
-
-                    console.log(`[OpenSearchProxy] Hit ${index + 1} processed, content length:`, chunk.content.length);
-                    return chunk;
                 });
 
                 console.log('[OpenSearchProxy] ===== OPENSEARCH SEARCH COMPLETE =====');
@@ -363,19 +308,15 @@ export const handler = async (event: { arguments?: OpenSearchProxyParams; test?:
                     return `${header}:\n${c.content}`;
                 }).join('\n\n');
 
-                console.log('[OpenSearchProxy] Context built, length:', context.length);
                 const prompt = `Based on the following context chunks, please answer the question.\n\nContext:\n${context}\n\nQuestion: ${question}\n\nPlease provide a clear and concise answer based only on the information provided. If the context doesn't contain enough information, please say so.`;
-                console.log('[OpenSearchProxy] Prompt created, length:', prompt.length);
 
                 const answerBody = JSON.stringify({
                     anthropic_version: 'bedrock-2023-05-31',
                     max_tokens: body.maxTokens,
                     messages: [{ role: 'user', content: prompt }]
                 });
-                console.log('[OpenSearchProxy] Answer request body created, size:', answerBody.length);
 
                 const answerCmd = new InvokeModelCommand({ modelId: body.answerModelId!, contentType: 'application/json', accept: 'application/json', body: answerBody });
-                console.log('[OpenSearchProxy] Answer command created, calling Bedrock...');
 
                 try {
                     console.log('[OpenSearchProxy] Calling Bedrock for answer generation...');
@@ -383,13 +324,8 @@ export const handler = async (event: { arguments?: OpenSearchProxyParams; test?:
                     console.log('[OpenSearchProxy] Bedrock answer response received, processing...');
 
                     const answerText = await answerResp.body!.transformToString();
-                    console.log('[OpenSearchProxy] Answer response text length:', answerText.length);
-
                     const answerJson = JSON.parse(answerText);
-                    console.log('[OpenSearchProxy] Answer response parsed, extracting text...');
-
                     const answer = answerJson.content?.[0]?.text;
-                    console.log('[OpenSearchProxy] Answer extracted, length:', answer?.length || 0);
 
                     console.log('[OpenSearchProxy] ===== ANSWER GENERATION COMPLETE =====');
                     console.log('[OpenSearchProxy] Returning final response with answer and chunks');
