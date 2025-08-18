@@ -72,6 +72,8 @@ import RioLogo from '@/assets/RioLogo.svg'
 import { ArrowLeftStartOnRectangleIcon, ChevronDownIcon, ChartBarIcon, CpuChipIcon, BeakerIcon } from '@heroicons/vue/24/outline'
 import type { Schema } from '../../amplify/data/resource'
 import { generateClient } from 'aws-amplify/api'
+import type { OpenSearchProxyFlatParams } from '../../shared/opensearch'
+
 
 
 const router = useRouter()
@@ -150,12 +152,12 @@ async function testOpenSearch() {
     // Now try the actual ask operation
     console.log('Sending ask request...');
 
-    const askParams = {
+    const askParams: OpenSearchProxyFlatParams = {
       operation: 'ask' as const,
       question: 'What is the environmental impact assessment?',
       generateAnswer: true,
       topK: 5,
-      // Individual config parameters instead of searchConfig object
+      // Individual config parameters for GraphQL compatibility
       index: 'fs-openai-semantic-chunk-data-automation',
       maxTokens: 1500,
       primaryContentField: 'text',

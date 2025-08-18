@@ -62,7 +62,7 @@ const schema = a.schema({
       path: a.string(),
       query: a.json(),
       body: a.json(),
-      // Individual config fields instead of searchConfig object
+      // Individual config fields for type safety
       index: a.string(),
       maxTokens: a.integer(),
       primaryContentField: a.string(),

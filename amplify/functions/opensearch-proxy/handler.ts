@@ -224,7 +224,7 @@ export const handler = async (event: any): Promise<string> => {
                 });
 
                 if (body.generateAnswer && !searchCfg.answerModelId) {
-                    return JSON.stringify({ error: 'answerModelId is not configured in parameters.' });
+                    return JSON.stringify({ error: 'answerModelId is not configured in searchConfig.' });
                 }
 
                 console.log('[OpenSearchProxy] ask params', {

@@ -35,6 +35,25 @@ export interface OpenSearchAskParams {
 }
 
 /**
+ * Frontend interface for OpenSearch proxy operations (flat structure for GraphQL compatibility)
+ */
+export interface OpenSearchProxyFlatParams {
+  operation: 'ask';
+  question: string;
+  generateAnswer: boolean;
+  topK?: number;
+  // Individual config parameters for GraphQL compatibility
+  index: string;
+  maxTokens: number;
+  primaryContentField: string;
+  fallbackContentFields: string; // Comma-separated string
+  metadataFields: string; // Comma-separated string
+  bedrockRegion: string;
+  embeddingModelId: string;
+  answerModelId: string;
+}
+
+/**
  * Union type for all OpenSearch proxy operations
  */
 export type OpenSearchProxyParams = OpenSearchAskParams;
