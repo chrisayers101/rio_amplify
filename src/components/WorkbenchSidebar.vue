@@ -103,6 +103,7 @@ const emit = defineEmits<{
   'update:modelValue': [value: string[]]
   'context-selected': [sections: typeof sections.value]
   'sections-selected': [sections: typeof sections.value]
+  'summary-item-selected': [item: string]
 }>()
 
 // Use the store
@@ -148,7 +149,7 @@ const selectSummaryItem = (item: string) => {
   sectionStore.setSelectedSections([])
   selectedSummaryItem.value = item
   // Emit the selected summary item for the canvas
-  emit('sections-selected', [])
+  emit('summary-item-selected', item)
 }
 
 const getSectionDisplayName = (section: ParsedFeasibilityStudySection): string => {

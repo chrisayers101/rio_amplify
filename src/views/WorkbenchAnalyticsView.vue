@@ -24,6 +24,7 @@
       v-model="selectedSections"
       @context-selected="handleContextSelected"
       @sections-selected="handleSectionsSelected"
+      @summary-item-selected="handleSummaryItemSelected"
     />
 
     <!-- Main Content Area - Split between Canvas and Chat -->
@@ -44,7 +45,13 @@
       </div>
 
       <!-- Canvas Section (Right Half) -->
+      <div v-if="selectedSummaryItem" class="summary-content">
+        <ProjectSummary v-if="selectedSummaryItem === 'summary'" />
+        <ProjectRisks v-if="selectedSummaryItem === 'risks'" />
+        <ProjectIssues v-if="selectedSummaryItem === 'issues'" />
+      </div>
       <WorkbenchCanvas
+        v-else
         :selected-section-objects="selectedSectionObjects"
         :chat-width="chatWidth"
         @update:selected-section-objects="handleCanvasUpdate"
@@ -60,6 +67,9 @@ import type { ParsedFeasibilityStudySection } from '@/types/feasibilityStudy'
 import WorkbenchSidebar from '@/components/WorkbenchSidebar.vue'
 import WorkbenchCanvas from '@/components/WorkbenchCanvas.vue'
 import Conversation from '@/components/Conversation.vue'
+import ProjectSummary from '@/components/ProjectSummary.vue'
+import ProjectRisks from '@/components/ProjectRisks.vue'
+import ProjectIssues from '@/components/ProjectIssues.vue'
 import { useSidebarStore } from '@/stores/sidebarStore'
 
 // Canvas update handler
@@ -74,6 +84,7 @@ const sidebarStore = useSidebarStore()
 // State
 const selectedSections = ref<string[]>([])
 const selectedSectionObjects = ref<readonly ParsedFeasibilityStudySection[]>([])
+const selectedSummaryItem = ref<string>('')
 const chatWidth = ref(50) // Default 50% split
 const isResizing = ref(false)
 const isLoading = ref(true)
@@ -103,6 +114,12 @@ const handleContextSelected = (sections: readonly ParsedFeasibilityStudySection[
 
 const handleSectionsSelected = (sections: readonly ParsedFeasibilityStudySection[]) => {
   selectedSectionObjects.value = sections
+  selectedSummaryItem.value = '' // Clear summary item when sections are selected
+}
+
+const handleSummaryItemSelected = (item: string) => {
+  selectedSummaryItem.value = item
+  selectedSectionObjects.value = [] // Clear sections when summary item is selected
 }
 
 const startResize = (event: MouseEvent | TouchEvent) => {
@@ -405,6 +422,14 @@ onUnmounted(() => {
 }
 
 
+
+/* Summary Content Styles */
+.summary-content {
+  background: #f8fafc;
+  overflow-y: auto;
+  height: calc(100vh - 84px);
+  width: 100%;
+}
 
 /* Mobile responsive styles */
 @media (max-width: 768px) {
