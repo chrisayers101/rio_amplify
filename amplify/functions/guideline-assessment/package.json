@@ -1,0 +1,12 @@
+{
+  "name": "guideline-assessment",
+  "version": "1.0.0",
+  "description": "Guideline assessment function for comparing content against guidelines",
+  "main": "handler.ts",
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.622.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  }
+}

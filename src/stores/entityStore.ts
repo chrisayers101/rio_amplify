@@ -7,7 +7,9 @@ import type {
   FeasibilityStudySectionStatus,
   ParsedFeasibilityStudySection,
   FeasibilityStudySectionEntity
-} from '@/types/feasibilityStudy'
+} from '../../../shared/feasibilityStudy.types'
+import type { GuidelineSection } from '../../../shared/guidelines.types'
+import { useGuidelinesStore } from './guidelinesStore'
 // Lazy initialization of Amplify Data client
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let client: any = null
@@ -71,6 +73,65 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
       error.value = 'Authentication required'
       return false
+    }
+  }
+
+    // Helper function to find matching guideline for a section
+  const findMatchingGuideline = (sectionId: string): GuidelineSection | null => {
+    try {
+      console.log(`[EntityStore] 🔍 Attempting to access guidelines store for section: ${sectionId}`)
+      const guidelinesStore = useGuidelinesStore()
+      console.log(`[EntityStore] 📚 Guidelines store accessed successfully:`, guidelinesStore)
+
+      // Try to match by ID first (both are now strings)
+      console.log(`[EntityStore] 🔢 Searching by ID: ${sectionId}`)
+      const matchingGuideline = guidelinesStore.getSectionById(sectionId)
+      console.log(`[EntityStore] 🎯 Guideline search by ID result:`, matchingGuideline)
+
+      if (matchingGuideline) {
+        return matchingGuideline
+      }
+
+      // Fallback: try to match by name
+      console.log(`[EntityStore] 🔤 Fallback: searching by section name`)
+      const matchingByName = guidelinesStore.getSectionByName(sectionId)
+      console.log(`[EntityStore] 🎯 Guideline search by name result:`, matchingByName)
+
+      return matchingByName || null
+    } catch (error) {
+      console.error(`[EntityStore] 💥 Error accessing guidelines store:`, error)
+      console.error(`[EntityStore] Error details:`, error)
+      return null
+    }
+  }
+
+  // Helper function to run guideline assessment
+  const runGuidelineAssessment = async (
+    content: string,
+    guideline: string,
+    sectionName: string
+  ): Promise<{
+    qualityAssessment?: string
+    percentComplete: number
+    status: FeasibilityStudySectionStatus
+  } | null> => {
+    try {
+      // Call the guideline assessment function via Amplify Data
+      const { data: assessmentResult, errors } = await getClient().queries.guidelineAssessment({
+        content,
+        guideline,
+        sectionName
+      })
+
+      if (errors) {
+        console.error('Errors running guideline assessment:', errors)
+        return null
+      }
+
+      return assessmentResult
+    } catch (error) {
+      console.error('Error running guideline assessment:', error)
+      return null
     }
   }
 
@@ -541,19 +602,110 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     error.value = null
   }
 
-  const setSelectedSections = (sections: readonly ParsedFeasibilityStudySection[]): void => {
+  const setSelectedSections = async (sections: readonly ParsedFeasibilityStudySection[]): Promise<void> => {
+    console.log(`[EntityStore] 🔄 setSelectedSections called with ${sections.length} sections`)
+    console.log(`[EntityStore] 📋 Sections:`, sections.map(s => ({ sectionId: s.sectionId, sectionName: s.sectionName })))
+
     // Enforce single selection: keep only the first item if provided
     selectedSections.value = sections.length > 0 ? [sections[0]] : []
+
+    // If a section is selected, trigger automatic assessment
+    if (sections.length > 0) {
+      const section = sections[0]
+      console.log(`[EntityStore] 🎯 Section selected: ${section.sectionId} (${section.sectionName || 'Unnamed'})`)
+      console.log(`[EntityStore] 📊 Current section data:`, {
+        projectId: section.projectId,
+        sectionId: section.sectionId,
+        percentComplete: section.percentComplete,
+        status: section.status,
+        hasContent: !!section.entity?.content,
+        hasQualityAssessment: !!section.entity?.qualityAssessment,
+        contentLength: section.entity?.content?.length || 0
+      })
+
+      // Check if automatic guideline assessment should run
+      if (section.entity?.content && !section.entity?.qualityAssessment) {
+        console.log(`🚀 [EntityStore] AUTO-TRIGGERING GUIDELINE ASSESSMENT!`)
+        console.log(`[EntityStore] 📝 Section has content (${section.entity.content.length} chars) but NO quality assessment`)
+        console.log(`[EntityStore] 🔍 Starting assessment process for section: ${section.sectionId}`)
+
+        try {
+          // Find matching guideline
+          console.log(`[EntityStore] 🔎 Searching for matching guideline...`)
+          const matchingGuideline = findMatchingGuideline(section.sectionId)
+
+          if (matchingGuideline) {
+            console.log(`✅ [EntityStore] Found matching guideline: "${matchingGuideline.sectionName}" (ID: ${matchingGuideline.id})`)
+            console.log(`[EntityStore] 📋 Guideline markdown length: ${matchingGuideline.markdown.length} chars`)
+
+            // Run guideline assessment
+            console.log(`🤖 [EntityStore] Calling AI guideline assessment function...`)
+            const assessmentResult = await runGuidelineAssessment(
+              section.entity.content,
+              matchingGuideline.markdown,
+              section.sectionName || section.sectionId
+            )
+
+            if (assessmentResult) {
+              console.log(`🎉 [EntityStore] GUIDELINE ASSESSMENT COMPLETED SUCCESSFULLY!`)
+              console.log(`[EntityStore] 📊 Assessment Results:`, {
+                qualityAssessment: assessmentResult.qualityAssessment?.substring(0, 100) + '...',
+                percentComplete: assessmentResult.percentComplete,
+                status: assessmentResult.status
+              })
+
+              // Update the section with the assessment results
+              console.log(`[EntityStore] 💾 Updating section in database...`)
+              await updateSection(section.projectId, section.sectionId, {
+                percentComplete: assessmentResult.percentComplete,
+                status: assessmentResult.status,
+                entity: JSON.stringify({
+                  ...section.entity,
+                  qualityAssessment: assessmentResult.qualityAssessment
+                })
+              })
+
+              console.log(`✅ [EntityStore] Section successfully updated with assessment results!`)
+              console.log(`[EntityStore] 🎯 New status: ${assessmentResult.status}, Completion: ${assessmentResult.percentComplete}%`)
+            } else {
+              console.warn(`❌ [EntityStore] Guideline assessment FAILED for section: ${section.sectionId}`)
+              console.warn(`[EntityStore] No assessment result returned from AI function`)
+            }
+          } else {
+            console.log(`⚠️ [EntityStore] No matching guideline found for section: ${section.sectionId}`)
+            console.log(`[EntityStore] This section will not be automatically assessed`)
+          }
+        } catch (error) {
+          console.error(`💥 [EntityStore] ERROR during automatic guideline assessment:`, error)
+          console.error(`[EntityStore] Section: ${section.sectionId}, Error details:`, error)
+        }
+      } else {
+        console.log(`⏭️ [EntityStore] Skipping guideline assessment`)
+        console.log(`[EntityStore] Reason:`, {
+          hasContent: !!section.entity?.content,
+          hasQualityAssessment: !!section.entity?.qualityAssessment,
+          contentLength: section.entity?.content?.length || 0,
+          qualityAssessmentLength: section.entity?.qualityAssessment?.length || 0
+        })
+
+        if (!section.entity?.content) {
+          console.log(`[EntityStore] ℹ️ No content to assess`)
+        } else if (section.entity?.qualityAssessment) {
+          console.log(`[EntityStore] ℹ️ Quality assessment already exists`)
+        }
+      }
+
+      console.log(`[EntityStore] 🏁 Section selection and assessment process completed for: ${section.sectionId}`)
+    } else {
+      console.log(`[EntityStore] ℹ️ No sections provided, clearing selection`)
+    }
   }
 
   const clearSelectedSections = (): void => {
     selectedSections.value = []
   }
 
-  const addSelectedSection = (section: ParsedFeasibilityStudySection): void => {
-    // Enforce single selection by replacing any existing selection
-    selectedSections.value = [section]
-  }
+
 
   const removeSelectedSection = (projectId: string, sectionId: string): void => {
     selectedSections.value = selectedSections.value.filter(s =>
@@ -592,7 +744,6 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     clearSections,
     setSelectedSections,
     clearSelectedSections,
-    addSelectedSection,
     removeSelectedSection,
 
     // Utility functions
@@ -601,6 +752,10 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     getStatusClass,
     formatTabName,
     formatPropertyName,
-    getCompletionStatus
+    getCompletionStatus,
+
+    // Helper functions
+    findMatchingGuideline,
+    runGuidelineAssessment
   }
 })

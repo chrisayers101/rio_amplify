@@ -1,151 +1,151 @@
 [
     {
-      "id": 1,
+      "id": "1",
       "sectionName": "Summary & Recommendations",
       "markdown": "## 1  Summary & Recommendations\n\n### 1.1  Executive Summary  \nConcise (< 20 pp) business-case synopsis: resource, technology, approvals, risks removed, execution plan.\n\n### 1.2  Capital Costs  \nNominal-$ CAPEX breakdown, accuracy band, escalation, contingency; LOM view if staged.\n\n### 1.3  Economic Valuation  \nNPV / IRR vs ‘do-nothing’; closure-cost update; alternate valuation if relevant.\n\n### 1.4  Stakeholder Analysis  \nLikely reactions of market, government, communities, CSOs, competitors.\n\n### 1.5  Health, Safety, Environmental & Social Impacts  \nKey HSES findings, EIS status, residual impacts & mitigations.\n\n### 1.6  Commercial Evaluation  \nMarketing assumptions, procurement strategy, tax position.\n\n### 1.7  Implementation Plan  \nTimeline, milestones, owner’s team, operational-readiness work plan, EPCM/contract strategy.\n\n### 1.8  Risk Analysis  \nTop threats & opportunities; fatal flaws eliminated; mitigation actions listed.\n\n### 1.9  Timeline of Decisions & Commitments  \nMilestone chart (sanction → ramp-up); 3rd-party decision points.\n\n### 1.10  Key Measures of Success  \nKPIs for safety, cost, schedule, capacity, zero-impact ops, etc.\n\n### 1.11  Request for Approval  \nExplicit ask to IC/Board, including full funds and co-commitments."
     },
     {
-      "id": 2,
+      "id": "2",
       "sectionName": "Business Strategy",
       "markdown": "## 2  Business Strategy\n\n### 2.1  Summary  \nDescribe the process used to develop an **optimised production capacity** underpinning the business case.\n\n### 2.2  Project Shaping  \nConfirm chosen option aligns with shaping decisions; list unresolved tasks & plans.\n\n### 2.3  Business Structure  \n* Ownership, partners, equity splits, tech rights, funding.  \n* How the entity interfaces with other Rio Tinto assets.\n\n### 2.4  Key Performance Indicators (KPIs)  \nCapital, opex, NPV, schedule, FX, price lines; compare with PFS benchmarks.\n\n### 2.5  Strategic Fit  \nAlignment with corporate strategy; future stages/spin-offs noted.\n\n### 2.6  Resources & Technology  \nTechnology package and resource commitments secured.\n\n### 2.7  Strategic Production Planning  \nChosen planning scenario; potential future options.\n\n### 2.8  Capital Effectiveness  \nNPV, IRR, capital intensity, unit opex; value-engineering efforts described.\n\n### 2.9  Alignment to Marketing Strategy  \nDistribution & logistics integrated with Product-Group supply chain.\n\n### 2.10  Next-Stage Scope  \nDetailed-engineering tasks, trade-offs, owners."
     },
     {
-      "id": 3,
+      "id": "3",
       "sectionName": "Marketing",
       "markdown": "## 3  Marketing\n\n### 3.1  Summary  \nFinal marketing plan: volumes, specs, logistics, key customers.\n\n### 3.2  Product Specification  \nTarget quality validated by test work.\n\n### 3.3  Supply & Demand Forecasts  \nShort-/mid-/long-term outlook with upside & downside scenarios.\n\n### 3.4  Product Marketing Synergies  \nShared sales orgs, freight synergies, marketing intelligence.\n\n### 3.5  Product Marketing Strategy  \nHandling, packaging, transport requirements; market acceptability.\n\n### 3.6  Product Price & Pricing Strategy  \nContract vs spot mix, mechanisms, trading activities.\n\n### 3.7  Customers, Sales Contracts, Off-take  \nTarget markets, draft agreements, expressions of interest.\n\n### 3.8  Revenue Forecasting  \nBase & alternate cases, ramp-up, sensitivity, risk analysis.\n\n### 3.9  Specific Risks & Opportunities  \nList and mitigation/opportunity plans.\n\n### 3.10  Next-Stage Scope  \nRemaining studies or negotiations."
     },
     {
-      "id": 4,
+      "id": "4",
       "sectionName": "Country & Regional Settings",
       "markdown": "## 4  Country & Regional Settings\n\n### 4.1  Summary  \nUpdate on political, social, cultural, and physical context.\n\n### 4.2  Demographics & Labour  \nLabour profile vs project needs; execution plan.\n\n### 4.3  Political, Socio-economic & Cultural Characteristics  \nImpact assessment and mitigation plan.\n\n### 4.4  Geography & Climate  \nIssues affecting project implementation and management plan.\n\n### 4.5  Protected Areas  \nIBAT review, CSO/government stakeholders, reputational risk.\n\n### 4.6  Specific Risks & Opportunities  \nList & mitigation/opportunity actions.\n\n### 4.7  Next-Stage Scope  \nFurther regional studies or engagement."
     },
     {
-      "id": 5,
+      "id": "5",
       "sectionName": "Security",
       "markdown": "## 5  Security\n\n### 5.1  Summary  \nMaterial security, resilience, and cyber risks; execution security plan.\n\n### 5.2  Intelligence (ex-Cyber)  \nSite visits, stakeholder engagement, risk-mitigation partnerships.\n\n### 5.3  Emergency Response & Business Resilience  \nER plans covering physical and data assets.\n\n### 5.4  Security Risk Analysis & Management  \nMacro & micro threat assessments; controls design.\n\n### 5.5  Security Providers  \nPublic/private provider strategy and contracts.\n\n### 5.6  Information & Cyber Security  \nSystem-access controls and cyber-risk mitigation.\n\n### 5.7  Incident Management & Investigation  \nProcesses for reporting & investigation, incl. human-rights incidents.\n\n### 5.8  Next-Stage Scope  \nRemaining specialist studies or trade-offs."
     },
     {
-      "id": 6,
+      "id": "6",
       "sectionName": "Government, Stakeholders & Communication",
       "markdown": "## 6  Government, Stakeholders & Communication\n\n### 6.1  Summary  \nConfirm stakeholder list, priorities, influence, and risks.\n\n### 6.2  Stakeholder Identification  \nGovernment bodies, JV partners, statutory authorities.\n\n### 6.3  Stakeholder Management  \nPlan aligning all parties to project objectives; responsibilities assigned.\n\n### 6.4  Communications  \nExternal & internal comms matrix; channel effectiveness.\n\n### 6.5  Government Interfaces  \nApprovals obtained/outstanding and mitigation plans.\n\n### 6.6  Media  \nAssessment of local/regional/national media views.\n\n### 6.7  Civil Society Organisations (CSOs)  \nEngagement status and future mitigation.\n\n### 6.8  Cumulative Impacts  \nOther regional developments and combined risks.\n\n### 6.9  Specific Risks & Opportunities  \nList & mitigation/opportunity actions.\n\n### 6.10  Next-Stage Scope  \nFurther engagement or studies."
     },
     {
-      "id": 7,
+      "id": "7",
       "sectionName": "Communities & Social Performance (CSP)",
       "markdown": "## 7  Communities & Social Performance (CSP)\n\n### 7.1  Summary  \nSEIA submitted; outstanding risks and mitigation.\n\n### 7.2  Planning  \nCSP requirements embedded; action plans for construction through closure.\n\n### 7.3  Socio-economic Knowledge Base  \nCommunity analysis and baseline data integration.\n\n### 7.4  CSP Risk Analysis  \nKey risks elevated to project register.\n\n### 7.5  Consultation & Engagement  \nConcerns addressed in design.\n\n### 7.6  Land Access  \nNegotiations, field work, compensation framework.\n\n### 7.7  Resettlement, Compensation & Livelihoods  \nRAP status and findings.\n\n### 7.8  Cultural Heritage Management  \nClearance surveys and mitigation plans.\n\n### 7.9  Social Impact Assessment  \nStandards applied and outcomes.\n\n### 7.10  Local Participation & Economic Development  \nIndigenous participation plan; performance to date.\n\n### 7.11  Land Owner & Community Agreements  \nKey terms and operational impacts.\n\n### 7.12  Complex/Site-specific Issues  \nPlans for in-migration, resettlement, etc.\n\n### 7.13  CSP Management System  \nConstruction & operations management, complaints process.\n\n### 7.14  Next-Stage Scope  \nFurther CSP work."
     },
     {
-      "id": 8,
+      "id": "8",
       "sectionName": "Human Resources & Industrial Relations",
       "markdown": "## 8  Human Resources & Industrial Relations (Project)\n\n### 8.1  Summary  \nOrg model, ER/LR policies, recruitment & training plans for execution.\n\n### 8.2  Contextual Assessment  \nPESTLE factors, statutory requirements, performance targets.\n\n### 8.3  Organisational Design & Model  \nOwner-team structure, roles, interfaces.\n\n### 8.4  Workforce Planning  \nExecution & commissioning manpower plan.\n\n### 8.5  Attraction, Sourcing, Mobilisation & Retention  \nRecruitment timelines & strategies.\n\n### 8.6  Capability Development  \nTraining to close remaining gaps.\n\n### 8.7  Employee & Labour Relations  \nFinal ER plan reflected in PEP.\n\n### 8.8  Remuneration, Rewards & Benefits  \nCompensation framework & working conditions.\n\n### 8.9  Specific Risks & Opportunities  \nList & mitigation/opportunity actions.\n\n### 8.10  Next-Stage Scope  \nAdditional HR studies or trade-offs."
     },
     {
-      "id": 9,
+      "id": "9",
       "sectionName": "Tax, Legal & Commercial",
       "markdown": "## 9  Tax, Legal & Commercial\n\n### 9.1  Summary  \nTax, duty, royalty modelling; key legal agreements & contracts.\n\n### 9.2  Economy  \nCountry/regional economic outlook update.\n\n### 9.3  Taxes, Duties & Royalties  \nFinal assessment incl. stabilisation agreements.\n\n### 9.4  Title  \nConfirmation of land/resource title and state participation.\n\n### 9.5  Freight Terms / Costs  \nQuotes or internal estimates; freight capacity secured.\n\n### 9.6  Commercial Structure  \nOwnership & funding structure; co-commitments.\n\n### 9.7  Legal Due Diligence  \nSummary informing implementation strategies.\n\n### 9.8  Specific Risks & Opportunities  \nList & mitigation/opportunity actions.\n\n### 9.9  Next-Stage Scope  \nFurther legal/commercial work."
     },
     {
-      "id": 10,
+      "id": "10",
       "sectionName": "Permits & Approvals",
       "markdown": "## 10  Permits & Approvals\n\n### 10.1  Summary  \nStatus of all permits; no significant impediments.\n\n### 10.2  Tenure  \nLicence monitoring processes and responsibilities.\n\n### 10.3  Regulatory Environment  \nCompliance confirmation (licences, EIA, EMP, constraints).\n\n### 10.4  Permits & Approvals  \nAll approved or high-confidence; agreements in place or path clear.\n\n### 10.5  Specific Risks & Opportunities  \nList & mitigation/opportunity actions.\n\n### 10.6  Next-Stage Scope  \nRemaining approvals work."
     },
     {
-      "id": 11,
+      "id": "11",
       "sectionName": "Health & Safety",
       "markdown": "## 11  Health & Safety\n\n### 11.1  Summary  \nDraft H&S Management Plan produced per Rio Tinto HSEQ.\n\n### 11.2  Statutory Requirements  \nCompliance with all relevant H&S laws/regulations.\n\n### 11.3  H&S Management Systems  \nImplementation plan for construction and operations.\n\n### 11.4  H&S Risk Analysis  \nUpdates to risk register; specialist reviews completed.\n\n### 11.5  Execution Strategy  \nHSEC execution approach including local training and culture.\n\n### 11.6  Health & Safety in Design  \nHazard Study III results; functional-safety plan.\n\n### 11.7  Next-Stage Scope  \nFurther H&S studies or reviews."
     },
     {
-      "id": 12,
+      "id": "12",
       "sectionName": "Environment",
       "markdown": "## 12  Environment\n\n### 12.1  Summary  \nEnvironmental assessment and EMP finalised.\n\n### 12.2  Baseline Data  \nFlora/fauna, dust, seasonal variation, community impacts.\n\n### 12.3  Design & Performance Criteria  \nEnvironmental criteria embedded in design & specs.\n\n### 12.4  Technical Environmental Studies  \nBiodiversity mitigation, mineral-waste calculations, hazardous wastes.\n\n### 12.5  Environmental Risk & Impact Assessment  \nModelling results and management measures.\n\n### 12.6  Environmental Management  \nConstruction & operations EMS, disturbance control, data management.\n\n### 12.7  Specific Risks & Opportunities  \nList & mitigation/opportunity actions.\n\n### 12.8  Next-Stage Scope  \nRemaining baseline work or permits."
     },
     {
-      "id": 13,
+      "id": "13",
       "sectionName": "Energy & Climate Change",
       "markdown": "## 13  Energy & Climate Change\n\n### 13.1  Summary  \nOptimised plan for climate compliance, GHG inventory, secure energy supply.\n\n### 13.2  Policy & Regulatory Context  \nManagement of carbon costs and adaptation risks.\n\n### 13.3  Climate Change Adaptation  \nDesign parameters adjusted for climate resilience.\n\n### 13.4  Greenhouse Gas Emissions  \nQuantified inventory and uncertainties.\n\n### 13.5  Energy Demand  \nBottom-up load profile for all phases.\n\n### 13.6  Energy Supply & Delivery Options  \nSelected solution with agreements; environmental/community issues addressed.\n\n### 13.7  Specific Risks & Opportunities  \nList & mitigation/opportunity actions.\n\n### 13.8  Next-Stage Scope  \nFurther energy/commercial work."
     },
     {
-      "id": 14,
+      "id": "14",
       "sectionName": "Geology",
       "markdown": "## 14  Geology\n\n### 14.1  Summary  \nRegional setting, deposit style, OBK status.\n\n### 14.2  Survey & Topography  \nMethod and QC; supports engineering.\n\n### 14.3  Geophysics  \nUse and validation results.\n\n### 14.4  Drill-hole Location & Surveys  \nDeviation control, storage, integration.\n\n### 14.5  Sampling & Data Quality  \nAuditable database; QA/QC.\n\n### 14.6  Assays & Product Quality  \nError limits and further work.\n\n### 14.7  Bulk Density  \nDry density, moisture, dumps/stockpiles.\n\n### 14.8  Geological Mapping  \n3-D mapping of critical structures.\n\n### 14.9  Mineralogy  \nStudies supporting process, EHS, product.\n\n### 14.10  Exploration  \nWork on satellite targets.\n\n### 14.11  Geology & Mineralisation Controls  \nValidated interpretations.\n\n### 14.12  Geological Interpretation  \nUpdates since PFS.\n\n### 14.13  Geological Model  \nDetailed model presented.\n\n### 14.14  Resource Estimation  \nCentral estimate; confidence limits.\n\n### 14.15  Resource Model Verification  \nQualitative & quantitative checks.\n\n### 14.16  Audit & Reviews  \nOutcomes recorded.\n\n### 14.17  Resource Classification  \nProcess vs JORC requirements.\n\n### 14.18  Resource Statements & Reporting  \nR1 standard, CP sign-off.\n\n### 14.19  Mine Geology & Operational Readiness  \nGrade-control & reconciliation strategy.\n\n### 14.20  Specific Risks & Opportunities  \nList & mitigation/opportunity actions.\n\n### 14.21  Next-Stage Scope  \nFurther drilling or modelling."
     },
     {
-      "id": 15,
+      "id": "15",
       "sectionName": "Geotechnical",
       "markdown": "## 15  Geotechnical\n\n### 15.1  Summary  \nModel confirmations and long-term monitoring.\n\n### 15.2  Data Acquisition  \nSupplementary geotech data for design support.\n\n### 15.3  Seismic Risk  \nAssessment and mitigation.\n\n### 15.4  Rock Mass Strength Assessment  \nCalibrated models and lab testing.\n\n### 15.5  Stress Assessment  \nOrientations and magnitudes for mine design.\n\n### 15.6  Structural Assessment  \nRefined models of structures.\n\n### 15.7  Geotechnical Modelling & Characterisation  \n3-D model and domains.\n\n### 15.8  Response to Hazard Assessments  \nControls engineered and costed.\n\n### 15.9  Monitoring Programme  \nInstrumentation plan, schedule & cost.\n\n### 15.10  Geotechnical Design  \nFinal parameters frozen for infra design.\n\n### 15.11  Specific Risks & Opportunities  \nList & mitigation/opportunity actions.\n\n### 15.12  Next-Stage Scope  \nFurther geotech work or instrumentation."
     },
     {
-      "id": 16,
+      "id": "16",
       "sectionName": "Hydrology & Hydrogeology",
       "markdown": "## 16  Hydrology & Hydrogeology\n\n### 16.1  Summary  \nModel validation and dewatering/monitoring.\n\n### 16.2  Orebody & Catchment Knowledge  \nWater risks and needs overview.\n\n### 16.3  Surface Water Management  \nStormwater plan, monitoring, design input.\n\n### 16.4  Groundwater Management  \nDesign, approvals, sustainable outcomes.\n\n### 16.5  Water Balance  \nModel used in site-water design.\n\n### 16.6  Pit Slope Stability / Underground Excavations  \nDewatering or pumping design and approvals.\n\n### 16.7  Specific Risks & Opportunities  \nList & mitigation/opportunity actions.\n\n### 16.8  Next-Stage Scope  \nRemaining hydro studies."
     },
     {
-      "id": 17,
+      "id": "17",
       "sectionName": "Mining",
       "markdown": "## 17  Mining\n\n### 17.1  Summary  \nFinal mine design and optimised schedules.\n\n### 17.2  Mining Inventory & Ore Reserves  \nProven/probable reserves; optimisation studies.\n\n### 17.3  Method Selection  \nFinal method and production-rate rationale.\n\n### 17.4  Design Constraints  \nInput parameters and compliance.\n\n### 17.5  Mine Design  \nLife-of-mine plan, grade distribution, inventories.\n\n### 17.6  Engineering Design Basis  \nGeotech-derived design parameters.\n\n### 17.7  Cut-off & Specification  \nOptimised strategy.\n\n### 17.8  Selectivity, Recovery & Dilution  \nFinal assumptions.\n\n### 17.9  Drill & Blast Design  \nParameters and modelling.\n\n### 17.10  Waste Dump & Stockpile Design  \nSequencing and ROM design.\n\n### 17.11  Roads & Ramps  \nAccess design per equipment and safety.\n\n### 17.12  Underground Access Design  \nIf applicable, detailed layout and schedule.\n\n### 17.13  Pumping Systems  \nEquipment and costed layout.\n\n### 17.14  Ventilation (incl. Refrigeration)  \nAir-volume calculations and layout.\n\n### 17.15  Surface & Underground Facilities  \nDetailed facility plan.\n\n### 17.16  Production Strategy  \nContractor/owner principles.\n\n### 17.17  Production Schedules  \nDetailed schedule with quarterly breakdown.\n\n### 17.18  Mining Equipment  \nFleet list with quotes and capex/opex.\n\n### 17.19  Value Optimisation & Sensitivity  \nDesign/schedule optimisations and sensitivities.\n\n### 17.20  Specific Risks & Opportunities  \nList & mitigation/opportunity actions.\n\n### 17.21  Next-Stage Scope  \nFurther mine planning or trade-offs."
     },
     {
-      "id": 18,
+      "id": "18",
       "sectionName": "Process",
       "markdown": "## 18  Process\n\n### 18.1  Summary  \nFinal flow sheet with mass, energy & water balances.\n\n### 18.2  Data Acquisition  \nPilot & lab programmes.\n\n### 18.3  Ore Characterisation  \nResults and confirmation of recoveries.\n\n### 18.4  Product Physical Characteristics  \nAdditional validation test work.\n\n### 18.5  Product Chemical Characteristics  \nOptimised reagent types and rates.\n\n### 18.6  Process Selection  \nFrozen flow sheet and balances.\n\n### 18.7  Technology & Digitisation  \nChosen technology, supply agreements.\n\n### 18.8  Raw Material & Equipment Supplies  \nNegotiated supply agreements.\n\n### 18.9  Water Resource Assurance  \nAccess agreements and storage design.\n\n### 18.10  Water Efficiency & Recycling  \nEfficiency measures vs water balance.\n\n### 18.11  Products  \nFinal spec and market‐acceptance work.\n\n### 18.12  Specific Risks & Opportunities  \nList & mitigation/opportunity actions.\n\n### 18.13  Next-Stage Scope  \nDetailed-engineering studies."
     },
     {
-      "id": 19,
+      "id": "19",
       "sectionName": "Process Plant",
       "markdown": "## 19  Process Plant\n\n### 19.1  Summary  \nEngineering developed to cost-accuracy level; signed off by operations.\n\n### 19.2  Production Schedule  \nAligned with mine schedule; stockpile/blend strategy.\n\n### 19.3  Process Plant Design  \nCriteria for quality, availability, capacity, life.\n\n### 19.4  Flow Sheets & Specifications  \nPFDs/P&IDs complete; validated balances.\n\n### 19.5  Dynamic Plant Simulation  \nResults supporting sizing and production.\n\n### 19.6  Process Control & Automation  \nControl strategies and logical-unit packages.\n\n### 19.7  Process Safety  \nHierarchy of controls and compliance path.\n\n### 19.8  Metallurgical Accounting & Reconciliation  \nSampler and analytical requirements.\n\n### 19.9  Site Layout  \nFinal GA drawings; foundation plans.\n\n### 19.10  Waste & Recycle Stream Evaluation  \nTSF design and effluent classification.\n\n### 19.11  Specific Risks & Opportunities  \nList & mitigation/opportunity actions.\n\n### 19.12  Next-Stage Scope  \nFurther detailed-design packages."
     },
     {
-      "id": 20,
+      "id": "20",
       "sectionName": "Infrastructure & Services",
       "markdown": "## 20  Infrastructure & Services\n\n### 20.1  Summary  \nInfrastructure designs developed and approved.\n\n### 20.2  Design & Engineering  \nLayouts for major elements (roads, power, ports…).\n\n### 20.3  Access Roads  \nPreliminary designs, bridges, upgrades.\n\n### 20.4  Water Management Facilities  \nIntegrated system and licence applications.\n\n### 20.5  Site Transport Options  \nRoutes for people, materials, ore, explosives.\n\n### 20.6  Product Transport  \nCommercial negotiation summary.\n\n### 20.7  Waste Disposal Facilities  \nSelected facility design and volumes.\n\n### 20.8  Support Infrastructure  \nAll non-process facilities.\n\n### 20.9  Rail Infrastructure  \nTrack, rolling stock, contracts.\n\n### 20.10  Port Facilities  \nBerths, storage, contracts.\n\n### 20.11  Communications & Information Systems  \nDesigns per strategy.\n\n### 20.12  Accommodation (Camps & Housing)  \nAccommodation strategy and facility designs.\n\n### 20.13  Hospital, Medical & Social Infrastructure  \nNew or amended facility designs.\n\n### 20.14  Specific Risks & Opportunities  \nList & mitigation/opportunity actions.\n\n### 20.15  Next-Stage Scope  \nRemaining infrastructure work."
     },
     {
-      "id": 21,
+      "id": "21",
       "sectionName": "Tailings & Water Facilities",
       "markdown": "## 21  Tailings & Water Facilities\n\n### 21.1  Summary  \nHigh-level TSF design inputs and specs.\n\n### 21.2  Data Acquisition & Design Criteria  \nField/lab programmes and criteria summary.\n\n### 21.3  Tailings Flow Sheet  \nSelected transport route and process design.\n\n### 21.4  TSF Location  \nFinal location justification.\n\n### 21.5  TSF Design Basis Studies  \nSeismic, climatic, material balance, hazard category.\n\n### 21.6  TSF Design  \nLayout, ultimate height, construction approach.\n\n### 21.7  Tailings Transport & Recovered Water  \nDrawings and tech evaluation.\n\n### 21.8  Surface & Groundwater Management  \nCapture, divert, store and treat strategy.\n\n### 21.9  Infrastructure & Services  \nRoads, power, pipelines, support facilities.\n\n### 21.10  Operational Readiness  \nPreliminary operations plan with schedule & cost.\n\n### 21.11  Next-Stage Scope  \nDetail design, trade-offs."
     },
     {
-      "id": 22,
+      "id": "22",
       "sectionName": "New Technologies",
       "markdown": "## 22  New Technologies\n\n### 22.1  Summary  \nOverview of technologies considered and selected.\n\n### 22.2  Development Planning & Delivery  \nPrototype → industrial-scale pathway; TRL assessment.\n\n### 22.3  Functional Safety  \nHAZID/HAZOP results; safety performance testing.\n\n### 22.4  External Suppliers & Commercial Agreements  \nPotential suppliers and deal structures.\n\n### 22.5  Intellectual Property  \nIP management and rights.\n\n### 22.6  Operational Readiness  \nSupport requirements included in OR plan.\n\n### 22.7  Regulatory Framework  \nConstraints to implementation and mitigation.\n\n### 22.8  Specific Risks & Opportunities  \nList & mitigation/opportunity actions.\n\n### 22.9  Next-Stage Scope  \nFurther tech development or trials."
     },
     {
-      "id": 23,
+      "id": "23",
       "sectionName": "Project Execution Planning",
       "markdown": "## 23  Project Execution Planning\n\n### 23.1  Summary  \nPEP finalised; scope tied to baseline estimate and schedule.\n\n### 23.2  Scope & Project Approach  \nExecution strategy (EPCM/EPC/turnkey), owner-team policy.\n\n### 23.3  Project Organisation  \nFinal org structure for owner, EPCM, support functions.\n\n### 23.4  Project Readiness  \nOutstanding readiness tasks.\n\n### 23.5  Work Breakdown Structure (WBS)  \nIntegrated cost & schedule control framework.\n\n### 23.6  Cost Management  \nSystems covering all direct & indirect costs.\n\n### 23.7  Planning & Scheduling  \nLevel-3 schedule with milestones & resources.\n\n### 23.8  Engineering  \nManagement plan (standards, QA, HAZOP).\n\n### 23.9  Procurement & Contracts  \nProcurement plan and commercial terms.\n\n### 23.10  EPCM Selection  \nBasis for selection and draft contract.\n\n### 23.11  Construction  \nMethodology, HSE, HR/IR, constructability review.\n\n### 23.12  Commissioning  \nResponsibilities, methodology, hand-over points.\n\n### 23.13  Ramp-up & Handover  \nBudget, schedule, milestones.\n\n### 23.14  Specific Risks & Opportunities  \nList & mitigation/opportunity actions."
     },
     {
-      "id": 24,
+      "id": "24",
       "sectionName": "Construction Management",
       "markdown": "## 24  Construction Management\n\n### 24.1  Summary  \nDetailed construction methodology (modularisation, logistics, labour plan, permits).\n\n### 24.2  Health, Safety, Environment & Community  \nConstruction-specific HSEC controls.\n\n### 24.3  Risk & Opportunity Analysis  \nConstruction risks, off-site supply-chain issues, mitigations.\n\n### 24.4  Infrastructure  \nPower, logistics, comms, water, accommodation, warehousing.\n\n### 24.5  Geography & Climate  \nClimatic data affecting schedule and fabrication choices.\n\n### 24.6  Security  \nSite-security and asset-protection plan.\n\n### 24.7  Communications & Information Systems  \nComms backbone and site IT requirements.\n\n### 24.8  Off-site Facilities  \nFabrication yards, pre-assembly, training centres.\n\n### 24.9  Organisation Design & Model  \nConstruction-management org chart and integration with EPCM.\n\n### 24.10  Construction Workforce Planning  \nManpower curves, local/expatriate mix, mobilisation schedule.\n\n### 24.11  Attraction, Sourcing, Mobilisation & Retention  \nRecruitment plan and retention incentives.\n\n### 24.12  Workforce Capability Development  \nTraining & competency programmes.\n\n### 24.13  Remuneration, Rewards & Benefits  \nPay structures, working hours, travel & accommodation.\n\n### 24.14  Employee & Labour Relations  \nConstruction ER strategy and dispute resolution.\n\n### 24.15  Next-Stage Scope  \nRemaining construction contracts and decision dates."
     },
     {
-      "id": 25,
+      "id": "25",
       "sectionName": "Operational Readiness",
       "markdown": "## 25  Operational Readiness\n\n### 25.1  Summary  \nOperating strategy, workforce requirements, training plans established.\n\n### 25.2  Scope & Approach for Operational Readiness  \nOR scope, resourcing, budget, schedule alignment.\n\n### 25.3  Organisational Change Management  \nChange-impact assessments and stakeholder communications.\n\n### 25.4  Mining & Processing  \nMine-plan hand-over, equipment, plant operations philosophy.\n\n### 25.5  Asset Management & Engineering  \nAsset-management strategy, maintenance systems, statutory engineering.\n\n### 25.6  Procurement, Inventory & Contracts Management  \nSupply-chain organisation and inventory strategy.\n\n### 25.7  Business & Technical Systems  \nERP, production reporting, control systems roadmap.\n\n### 25.8  Human Resources  \nFinal org design, recruitment schedule, training matrix, IR and remuneration strategies.\n\n### 25.9  Health, Safety, Environment & Community  \nHSEC systems for operations; hand-over from construction.\n\n### 25.10  Finance, Accounting & Cost Management  \nFinance systems and reporting setup.\n\n### 25.11  Commissioning, Ramp-up & Handover  \nReadiness, performance criteria, responsibility matrix.\n\n### 25.12  Port & Rail Operations  \nOperating philosophy for logistics network; dynamic-simulation risks.\n\n### 25.13  Specific Risks & Opportunities  \nList & mitigation/opportunity actions.\n\n### 25.14  Next-Stage Scope  \nRemaining OR tasks and critical-path items."
     },
     {
-      "id": 26,
+      "id": "26",
       "sectionName": "Closure",
       "markdown": "## 26  Closure\n\n### 26.1  Milestone Summary  \nClosure planning completed to date and future requirements.\n\n### 26.2  Regulatory Requirements  \nStatutory closure obligations and performance criteria.\n\n### 26.3  Knowledge Base  \nStatus of closure data repository; gaps and plans.\n\n### 26.4  Asset Lifecycle Closure Strategy & Plan  \nStrategy linking operational, rehab, and relinquishment phases.\n\n### 26.5  Closure Scope & Development Options  \nInventory of closure elements and options assessment.\n\n### 26.6  Closure Work Programme  \nTimeline of studies, rehabilitation, decommissioning, monitoring."
     },
     {
-      "id": 27,
+      "id": "27",
       "sectionName": "Cost Estimation",
       "markdown": "## 27  Cost Estimation\n\n### 27.1  Milestone Summary  \nFinal CAPEX/OPEX estimate with required design maturity.\n\n### 27.2  Estimate Methodology  \nQuantification methods and data sources.\n\n### 27.3  Capital Cost Estimation Basis  \nEquipment quotes, unit rates, productivity factors.\n\n#### 27.3.1  Deferred, Sustaining & Replacement Capital  \nLOM calculation including expansions.\n\n#### 27.3.2  Other Indirect & EPCM Costs  \nRates and assumptions for indirects and working capital.\n\n#### 27.3.3  Owners Cost Estimate  \nMethodology and parameters.\n\n### 27.4  Capital Cost Estimate  \nCentral estimate (-10/+15 %) at 90 % confidence; WBS breakdown.\n\n### 27.5  Operating Cost Estimation Basis  \nAssumptions, exclusions, exchange rates, escalation.\n\n### 27.6  Operating Cost Estimate  \nDetailed breakdown; accuracy -5/+10 %.\n\n### 27.7  Closure Costs  \nEstimate aligned with closure plan.\n\n### 27.8  Contingency  \nAnalysis and allocation (10-15 %).\n\n### 27.9  Escalation  \nThree-step escalation calculation.\n\n### 27.10  Specific Risks & Opportunities  \nList & mitigation/opportunity actions.\n\n### 27.11  Next-Stage Scope  \nFurther estimating or market testing."
     },
     {
-      "id": 28,
+      "id": "28",
       "sectionName": "Project Risk",
       "markdown": "## 28  Project Risk\n\n### 28.1  Summary  \nRisk assessment overview and management strategy.\n\n### 28.2  Scope & Context  \nIdentification/evaluation of execution and ramp-up risks, including brownfield interfaces.\n\n### 28.3  Activities  \nDiscipline-level risk inputs consolidated into project register.\n\n### 28.4  Preparation for Execution  \nRisk-management plan highlighting remaining Class III/IV risks and readiness actions."
     },
     {
-      "id": 29,
+      "id": "29",
       "sectionName": "Business Analysis",
       "markdown": "## 29  Business Analysis\n\n### 29.1  Summary  \nValuation supporting final approval in line with PEG.\n\n### 29.2  Financial Model Structure & Assumptions  \nModel layout; pricing, cost, FX, tax, escalation, equity assumptions.\n\n### 29.3  Financial Analysis & Business-Unit Impacts  \nCash-flow, NPV, IRR, ROE, sensitivities; cost-curve position.\n\n### 29.4  Sensitivity & Scenario Analysis  \nUpside/downside tests for key drivers and FX.\n\n### 29.5  Business Case  \nCore of Investment Proposal (IC Paper).\n\n### 29.6  Specific Risks & Opportunities  \nList & mitigation/opportunity actions.\n\n### 29.7  Next-Stage Scope  \nFurther financial modelling or assurance."
     },
     {
-      "id": 30,
+      "id": "30",
       "sectionName": "Next Study Stage Execution Planning",
       "markdown": "## 30  Next Study Stage Execution Planning\n\n### 30.1  Interim Plan Scope  \nWork between FS completion and execution sanction (approvals, funding, early works).\n\n### 30.2  Cost, Schedule & Resources  \nFully scoped, costed, and resourced plan with deliverables and metrics.\n\n### 30.3  Governance & Approvals  \nInternal/external approvals required, including IC/Board and regulators.\n\n### 30.4  Risk Management  \nRisks specific to interim period and mitigations.\n\n### 30.5  Deliverables & Success Criteria  \nOutputs needed to achieve Full Funds sanction."
     }

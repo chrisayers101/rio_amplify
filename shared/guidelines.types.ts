@@ -3,7 +3,7 @@
 // ============================================================================
 
 export interface GuidelineSection {
-  id: number
+  id: string
   sectionName: string
   markdown: string
 }
@@ -18,11 +18,11 @@ export interface GuidelinesState {
 export type GuidelineCategory = 'summary' | 'business' | 'technical' | 'execution' | 'analysis'
 
 export interface GuidelineCategoryRanges {
-  summary: [number, number]      // Summary & Recommendations
-  business: [number, number]     // Business Strategy through Tax, Legal & Commercial
-  technical: [number, number]    // Permits & Approvals through New Technologies
-  execution: [number, number]    // Project Execution through Closure
-  analysis: [number, number]     // Cost Estimation through Next Study Stage
+  summary: [string, string]      // Summary & Recommendations
+  business: [string, string]     // Business Strategy through Tax, Legal & Commercial
+  technical: [string, string]    // Permits & Approvals through New Technologies
+  execution: [string, string]    // Project Execution through Closure
+  analysis: [string, string]     // Cost Estimation through Next Study Stage
 }
 
 export interface GuidelineSearchResult {

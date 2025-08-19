@@ -14,7 +14,7 @@ export const useGuidelinesStore = defineStore('guidelines', () => {
   const sections = ref<GuidelineSection[]>([])
   const isLoading = ref(false)
   const error = ref<string | null>(null)
-  const selectedSectionId = ref<number | null>(null)
+  const selectedSectionId = ref<string | null>(null)
 
   // Computed
   const sectionCount = computed(() => sections.value.length)
@@ -24,7 +24,7 @@ export const useGuidelinesStore = defineStore('guidelines', () => {
   )
 
   // Get section by ID
-  const getSectionById = (id: number): GuidelineSection | undefined => {
+  const getSectionById = (id: string): GuidelineSection | undefined => {
     return sections.value.find(section => section.id === id)
   }
 
@@ -43,20 +43,23 @@ export const useGuidelinesStore = defineStore('guidelines', () => {
   }
 
   // Get sections by ID range
-  const getSectionsByIdRange = (startId: number, endId: number): GuidelineSection[] => {
-    return sections.value.filter(section =>
-      section.id >= startId && section.id <= endId
-    )
+  const getSectionsByIdRange = (startId: string, endId: string): GuidelineSection[] => {
+    return sections.value.filter(section => {
+      const sectionId = parseInt(section.id, 10)
+      const start = parseInt(startId, 10)
+      const end = parseInt(endId, 10)
+      return sectionId >= start && sectionId <= end
+    })
   }
 
   // Get sections by category (based on ID ranges)
   const getSectionsByCategory = (category: GuidelineCategory): GuidelineSection[] => {
     const categoryRanges: GuidelineCategoryRanges = {
-      summary: [1, 1],      // Summary & Recommendations
-      business: [2, 9],     // Business Strategy through Tax, Legal & Commercial
-      technical: [10, 22],  // Permits & Approvals through New Technologies
-      execution: [23, 26],  // Project Execution through Closure
-      analysis: [27, 30]    // Cost Estimation through Next Study Stage
+      summary: ['1', '1'],      // Summary & Recommendations
+      business: ['2', '9'],     // Business Strategy through Tax, Legal & Commercial
+      technical: ['10', '22'],  // Permits & Approvals through New Technologies
+      execution: ['23', '26'],  // Project Execution through Closure
+      analysis: ['27', '30']    // Cost Estimation through Next Study Stage
     }
 
     const [startId, endId] = categoryRanges[category]
@@ -165,11 +168,11 @@ export const useGuidelinesStore = defineStore('guidelines', () => {
     }
   }
 
-  const setSelectedSection = (sectionId: number | null): void => {
+  const setSelectedSection = (sectionId: string | null): void => {
     selectedSectionId.value = sectionId
   }
 
-  const selectSectionById = (id: number): void => {
+  const selectSectionById = (id: string): void => {
     const section = getSectionById(id)
     if (section) {
       selectedSectionId.value = id

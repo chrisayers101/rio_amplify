@@ -11,6 +11,7 @@ import { storage } from './storage/resource';
 import { chatOrchestratorFunction } from './functions/chat-orchestrator/resource';
 import { s3ProxyFunction } from './functions/s3-proxy/resource';
 import { openSearchProxyFunction } from './functions/opensearch-proxy/resource';
+import { guidelineAssessmentFunction } from './functions/guideline-assessment/resource';
 
 /**
  * @see https://docs.amplify.aws/react/build-a-backend/ to add storage, functions, and more
@@ -22,6 +23,7 @@ const backend = defineBackend({
   chatOrchestratorFunction,
   s3ProxyFunction,
   openSearchProxyFunction,
+  guidelineAssessmentFunction,
 });
 
 //////////////////////////////////////////
@@ -89,6 +91,19 @@ backend.s3ProxyFunction.resources.lambda.addToRolePolicy(
 
 // Give the chat orchestrator Lambda role the Bedrock rights it needs
 backend.chatOrchestratorFunction.resources.lambda.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: [
+      'bedrock:InvokeModel'
+    ],
+    resources: [
+      'arn:aws:bedrock:ap-southeast-2::foundation-model/anthropic.claude-3-5-sonnet-20241022-v2:0'
+    ],
+  }),
+);
+
+// Give the guideline assessment Lambda role the Bedrock rights it needs
+backend.guidelineAssessmentFunction.resources.lambda.addToRolePolicy(
   new PolicyStatement({
     effect: Effect.ALLOW,
     actions: [

@@ -1,7 +1,7 @@
 import { defineFunction } from '@aws-amplify/backend';
 
-export const chatOrchestratorFunction = defineFunction({
-  name: 'chat-orchestrator',
+export const guidelineAssessmentFunction = defineFunction({
   entry: './handler.ts',
+  name: 'guideline-assessment',
   timeoutSeconds: 900 // 15 minutes
 });
