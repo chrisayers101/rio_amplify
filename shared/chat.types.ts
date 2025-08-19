@@ -29,7 +29,7 @@ export interface ChatState {
   context: {
     projects: string[]
     minerals: string[]
-    audience: string[]
+    audience?: string[]
   }
 }
 
@@ -47,7 +47,20 @@ export interface ChatRequest<T = Record<string, unknown>, U = Record<string, unk
   messages?: unknown[] // Conversation history from Pinia store
 }
 
+export interface ChatChunk {
+  type: 'chunk'
+  content: string
+  threadId: string
+}
+
 export interface ChatResponse {
+  chunks: ChatChunk[]
+  success: boolean
+  error?: string
+}
+
+// Alternative single response format for compatibility
+export interface ChatSingleResponse {
   type: 'chunk' | 'error'
   content: string
   threadId: string

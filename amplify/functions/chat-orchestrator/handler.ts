@@ -1,23 +1,5 @@
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
-
-interface ChatRequest {
-  message: string;
-  threadId?: string;
-  context?: string;
-  messages?: string;
-}
-
-interface ChatChunk {
-  type: 'chunk';
-  content: string;
-  threadId: string;
-}
-
-interface ChatResponse {
-  chunks: ChatChunk[];
-  success: boolean;
-  error?: string;
-}
+import { ChatRequest, ChatResponse, ChatChunk } from '../../../shared';
 
 const AWS_REGION = "ap-southeast-2";
 const MODEL_ID = "anthropic.claude-3-5-sonnet-20241022-v2:0";
@@ -32,9 +14,9 @@ export const handler = async (event: any) => {
 
     const client = new BedrockRuntimeClient({ region: AWS_REGION });
 
-    // Parse context and messages
-    const parsedContext = context ? JSON.parse(context) : {};
-    const parsedMessages = messages ? JSON.parse(messages) : [];
+    // Parse context and messages - handle both string and object formats for backward compatibility
+    const parsedContext = typeof context === 'string' ? JSON.parse(context) : context || {};
+    const parsedMessages = Array.isArray(messages) ? messages : (typeof messages === 'string' ? JSON.parse(messages) : []);
 
     // Convert conversation history to Claude format
     const conversationHistory = parsedMessages.map((msg: any) => ({
