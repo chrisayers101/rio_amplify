@@ -7,4 +7,5 @@ export interface S3Object {
   size?: number
   lastModified?: Date
   eTag?: string
+  contentType?: string
 }

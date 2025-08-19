@@ -2,15 +2,10 @@ import { S3Client, ListObjectsV2Command, PutObjectCommand, GetObjectCommand, Del
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { S3ProxyRequest, S3ProxyResponse, S3Object, BucketConfig } from '../../../shared';
 
 // Initialize S3 client
 const s3Client = new S3Client({ region: 'ap-southeast-2' });
-
-// Define bucket config type
-interface BucketConfig {
-  name: string;
-  region: string;
-}
 
 // Load bucket configurations from config file
 const loadBucketConfigs = (): Record<string, BucketConfig> => {
@@ -22,34 +17,6 @@ const loadBucketConfigs = (): Record<string, BucketConfig> => {
 };
 
 const BUCKET_CONFIGS = loadBucketConfigs();
-
-// Type definitions
-interface S3ProxyRequest {
-  operation: 'list' | 'upload' | 'download' | 'delete' | 'getSignedUrl' | 'getFileContent';
-  bucketName: string;
-  key?: string;
-  prefix?: string;
-  maxKeys?: number;
-  continuationToken?: string;
-  contentType?: string;
-  contentLength?: number;
-  expiresIn?: number;
-}
-
-interface S3ProxyResponse {
-  success: boolean;
-  data?: any;
-  error?: string;
-  continuationToken?: string;
-}
-
-interface S3Object {
-  key: string;
-  size?: number;
-  lastModified?: Date;
-  eTag?: string;
-  contentType?: string;
-}
 
 export const handler = async (event: any): Promise<string> => {
   try {
