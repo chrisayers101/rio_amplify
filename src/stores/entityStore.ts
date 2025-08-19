@@ -206,10 +206,11 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       })
 
       // Update the section using Amplify Data
+      // Convert entity object to JSON string for database storage
       const { data: updatedSection, errors } = await getClient().models.FeasibilityStudySections.update({
-            projectId,
-            sectionId,
-        entity: updatedEntity
+        projectId,
+        sectionId,
+        entity: JSON.stringify(updatedEntity)
       })
 
       if (errors) {
