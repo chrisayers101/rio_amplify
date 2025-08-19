@@ -104,8 +104,13 @@
                   </div>
 
                   <div v-else class="simple-content">
-                    <!-- Render all content as markdown -->
-                    <div class="markdown-content scrollable">
+                    <!-- Show loading spinner when quality assessment is running -->
+                    <div v-if="activeTab === 'qualityAssessment' && sectionStore.isAssessmentRunning" class="loading-container">
+                      <div class="loading-spinner-large"></div>
+                      <p class="loading-text">Running quality assessment...</p>
+                    </div>
+                    <!-- Render all content as markdown when not loading -->
+                    <div v-else class="markdown-content scrollable">
                       <VueMarkdown
                         class="markdown-body"
                         :source="formatMarkdownSource(section.entity[activeTab] || '')"
@@ -649,6 +654,33 @@ onMounted(() => {
   border-top-color: transparent;
   animation: spin 1s linear infinite;
   margin-right: 8px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+  padding: 40px;
+}
+
+.loading-spinner-large {
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e5e7eb;
+  border-radius: 50%;
+  border-top-color: #3b82f6;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  color: #6b7280;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
 }
 
 @keyframes spin {

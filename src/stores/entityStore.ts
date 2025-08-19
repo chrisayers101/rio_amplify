@@ -77,6 +77,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
   const isLoading = ref(false)
   const error = ref<string | null>(null)
   const selectedSections = ref<ParsedFeasibilityStudySection[]>([])
+  const isAssessmentRunning = ref(false)
 
   // Helper function to check authentication
   const checkAuthentication = async (): Promise<boolean> => {
@@ -374,6 +375,10 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         console.log(`[EntityStore] 📝 Section has content (${section.entity!.content!.length} chars) but quality assessment is "no data available"`)
         console.log(`[EntityStore] 🔍 Starting assessment process for section: ${section.sectionId}`)
 
+        // Set loading state
+        isAssessmentRunning.value = true
+        console.log(`[EntityStore] 🔄 Loading state set to: ${isAssessmentRunning.value}`)
+
         const matchingGuideline = findMatchingGuideline(section.sectionId)
         console.log(`[EntityStore] 🔎 Searching for matching guideline...`)
 
@@ -453,13 +458,27 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
             selectedSections.value = []
             await nextTick()
             selectedSections.value = [refreshedSection]
+
+            // Force another tick to ensure UI updates
+            await nextTick()
             console.log(`[EntityStore] ✅ Selected sections updated with refreshed data`)
+
+            // Trigger a manual reactivity update by temporarily modifying and restoring
+            const temp = selectedSections.value
+            selectedSections.value = []
+            await nextTick()
+            selectedSections.value = temp
+            console.log(`[EntityStore] 🔄 Forced reactivity update`)
           } else {
             console.warn(`[EntityStore] ⚠️ Could not find refreshed section data`)
           }
         } else {
           console.warn(`⚠️ [EntityStore] Failed to update section entity via updateSectionEntity`)
         }
+
+        // Reset loading state
+        isAssessmentRunning.value = false
+        console.log(`[EntityStore] 🔄 Loading state reset to: ${isAssessmentRunning.value} (success)`)
       } else {
         console.log(`⏭️ [EntityStore] Skipping guideline assessment`)
         const qaDone = isQualityAssessmentCompleted(section.entity)
@@ -475,10 +494,18 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         } else if (qaDone) {
           console.log(`[EntityStore] ℹ️ Quality assessment already completed (not "no data available")`)
         }
+
+        // Reset loading state
+        isAssessmentRunning.value = false
+        console.log(`[EntityStore] 🔄 Loading state reset to: ${isAssessmentRunning.value} (skip)`)
       }
     } catch (error) {
       console.error(`💥 [EntityStore] ERROR during automatic guideline assessment:`, error)
       console.error(`[EntityStore] Section: ${section.sectionId}, Error details:`, error)
+
+      // Reset loading state on error
+      isAssessmentRunning.value = false
+      console.log(`[EntityStore] 🔄 Loading state reset to: ${isAssessmentRunning.value} (error)`)
     }
   }
 
@@ -488,6 +515,7 @@ sections: sections,
 isLoading: isLoading,
 error: error,
 selectedSections: selectedSections,
+isAssessmentRunning: isAssessmentRunning,
 
 // Actions
 fetchSections,
@@ -500,6 +528,6 @@ getSectionDisplayName,
 formatStatus,
 getStatusClass,
 formatTabName,
-    formatPropertyName
+formatPropertyName
 }
 })
