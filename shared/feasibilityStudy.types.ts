@@ -1,3 +1,7 @@
+// ============================================================================
+// FEASIBILITY STUDY INTERFACES
+// ============================================================================
+
 // Feasibility Study Section Status Enum
 export type FeasibilityStudySectionStatus = 'not_started' | 'in_progress' | 'complete';
 
