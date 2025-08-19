@@ -1,5 +1,5 @@
 import { list, uploadData, getUrl, remove } from 'aws-amplify/storage';
-import type { S3Object } from '@/interfaces/s3';
+import type { S3Object } from '../../shared/interfaces';
 
 /**
  * List all objects in the S3 bucket

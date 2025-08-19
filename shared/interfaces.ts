@@ -48,6 +48,73 @@ export interface ChatState {
 }
 
 // ============================================================================
+// CHAT API INTERFACES
+// ============================================================================
+
+export interface ChatRequest<T = Record<string, unknown>, U = Record<string, unknown>> {
+  message: string
+  threadId?: string
+  context?: {
+    selectedEntity?: T
+    matchingGuideline?: U
+  }
+  messages?: unknown[] // Conversation history from Pinia store
+}
+
+export interface ChatResponse {
+  type: 'chunk' | 'error'
+  content: string
+  threadId: string
+}
+
+// ============================================================================
+// S3 AND STORAGE INTERFACES
+// ============================================================================
+
+export interface S3Object {
+  key: string
+  size?: number
+  lastModified?: Date
+  eTag?: string
+}
+
+export interface S3ProxyListResponse {
+  objects: S3Object[]
+  isTruncated: boolean
+  nextContinuationToken?: string
+}
+
+export interface S3ProxyUploadResponse {
+  uploadUrl: string
+  key: string
+  bucketName: string
+}
+
+export interface S3ProxyDownloadResponse {
+  downloadUrl: string
+  key: string
+  bucketName: string
+}
+
+export interface S3ProxySignedUrlResponse {
+  signedUrl: string
+  key: string
+  bucketName: string
+}
+
+export interface S3ProxyDeleteResponse {
+  message: string
+  key: string
+  bucketName: string
+}
+
+export interface ExistingBucketConfig {
+  name: string
+  displayName: string
+  bucketName: string
+}
+
+// ============================================================================
 // PROJECT INTERFACES
 // ============================================================================
 

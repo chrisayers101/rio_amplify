@@ -1,4 +1,4 @@
-import type { S3Object } from '@/interfaces/s3';
+import type { S3Object, ExistingBucketConfig } from '../../shared/interfaces';
 import {
   listObjectsFromExistingBucket as listObjectsFromProxy,
   listAllObjectsFromExistingBucket as listAllObjectsFromProxy,
@@ -7,12 +7,6 @@ import {
   deleteFileFromExistingBucket as deleteFileFromProxy,
   downloadFolderFromExistingBucket as downloadFolderFromProxy
 } from './s3Proxy';
-
-export interface ExistingBucketConfig {
-  name: string;
-  displayName: string;
-  bucketName: string;
-}
 
 export const existingBuckets: ExistingBucketConfig[] = [
   {

@@ -2,22 +2,7 @@ import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
 import type { FeasibilityStudySectionEntity } from '@/types/feasibilityStudy';
 import type { GuidelineSection } from '@/types/guidelines';
-
-interface ChatRequest {
-  message: string
-  threadId?: string
-  context?: {
-    selectedEntity?: FeasibilityStudySectionEntity
-    matchingGuideline?: GuidelineSection
-  }
-  messages?: unknown[] // Conversation history from Pinia store
-}
-
-interface ChatResponse {
-  type: 'chunk' | 'error'
-  content: string
-  threadId: string
-}
+import type { ChatRequest, ChatResponse } from '../../shared/interfaces';
 
 // Utility function to find matching guideline by section ID
 export function findMatchingGuideline(sectionId: string, guidelines: readonly GuidelineSection[]): GuidelineSection | null {
@@ -48,7 +33,7 @@ export function prepareChatContext(
   selectedEntity: FeasibilityStudySectionEntity | null,
   sectionId: string | null,
   guidelines: readonly GuidelineSection[]
-): ChatRequest['context'] | undefined {
+): ChatRequest<FeasibilityStudySectionEntity, GuidelineSection>['context'] | undefined {
   if (!selectedEntity || !sectionId) {
     return undefined;
   }
@@ -87,7 +72,7 @@ export class ChatApi {
   }
 
   async streamChat(
-    request: ChatRequest,
+    request: ChatRequest<FeasibilityStudySectionEntity, GuidelineSection>,
     onChunk: (chunk: ChatResponse) => void,
     onError: (error: string) => void,
     onComplete: () => void
@@ -153,10 +138,7 @@ export class ChatApi {
 
   async sendMessage(
     message: string,
-    context?: {
-      selectedEntity?: FeasibilityStudySectionEntity
-      matchingGuideline?: GuidelineSection
-    },
+    context?: ChatRequest<FeasibilityStudySectionEntity, GuidelineSection>['context'],
     threadId?: string,
     messages?: unknown[]
   ): Promise<string> {

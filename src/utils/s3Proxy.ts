@@ -1,36 +1,12 @@
 import { generateClient } from 'aws-amplify/api';
-import type { S3Object } from '@/interfaces/s3';
-
-// Type definitions for S3 proxy operations
-export interface S3ProxyListResponse {
-  objects: S3Object[];
-  isTruncated: boolean;
-  nextContinuationToken?: string;
-}
-
-export interface S3ProxyUploadResponse {
-  uploadUrl: string;
-  key: string;
-  bucketName: string;
-}
-
-export interface S3ProxyDownloadResponse {
-  downloadUrl: string;
-  key: string;
-  bucketName: string;
-}
-
-export interface S3ProxySignedUrlResponse {
-  signedUrl: string;
-  key: string;
-  bucketName: string;
-}
-
-export interface S3ProxyDeleteResponse {
-  message: string;
-  key: string;
-  bucketName: string;
-}
+import type {
+  S3Object,
+  S3ProxyListResponse,
+  S3ProxyUploadResponse,
+  S3ProxyDownloadResponse,
+  S3ProxySignedUrlResponse,
+  S3ProxyDeleteResponse
+} from '../../shared/interfaces';
 
 /**
  * List objects in an existing S3 bucket with automatic pagination
