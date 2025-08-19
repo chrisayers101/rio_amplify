@@ -9,7 +9,9 @@
     <div class="sections-list">
       <div class="section-item" @click="selectSummaryItem('summary')" :class="{ 'selected': selectedSummaryItem === 'summary' }">
         <div class="section-content">
-          <div class="section-number">S</div>
+          <div class="section-icon">
+            <DocumentTextIcon class="icon" />
+          </div>
           <div class="section-info">
             <div class="section-name">Summary</div>
           </div>
@@ -17,7 +19,9 @@
       </div>
       <div class="section-item" @click="selectSummaryItem('risks')" :class="{ 'selected': selectedSummaryItem === 'risks' }">
         <div class="section-content">
-          <div class="section-number">R</div>
+          <div class="section-icon">
+            <ExclamationTriangleIcon class="icon" />
+          </div>
           <div class="section-info">
             <div class="section-name">Risks</div>
           </div>
@@ -25,7 +29,9 @@
       </div>
       <div class="section-item" @click="selectSummaryItem('issues')" :class="{ 'selected': selectedSummaryItem === 'issues' }">
         <div class="section-content">
-          <div class="section-number">I</div>
+          <div class="section-icon">
+            <ExclamationCircleIcon class="icon" />
+          </div>
           <div class="section-info">
             <div class="section-name">Issues</div>
           </div>
@@ -90,7 +96,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
 import type { ParsedFeasibilityStudySection } from '@/types/feasibilityStudy'
 import { useSidebarStore } from '@/stores/sidebarStore'
-import { DocumentTextIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/24/outline'
+import { DocumentTextIcon, ChevronLeftIcon, ChevronRightIcon, ExclamationTriangleIcon, ExclamationCircleIcon } from '@heroicons/vue/24/outline'
 
 interface Props {
   modelValue?: string[]
@@ -234,6 +240,12 @@ onMounted(async () => {
 .workbench-sidebar.collapsed .sections-container .section-number {
   display: block;
 }
+
+.workbench-sidebar.collapsed .section-info {
+  display: none;
+}
+
+
 
 .sidebar-header {
   padding: 24px;
@@ -390,6 +402,21 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   margin-top: 0;
+}
+
+.section-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0;
+}
+
+.section-icon .icon {
+  width: 16px;
+  height: 16px;
+  color: #6b7280;
 }
 
 .section-info {
