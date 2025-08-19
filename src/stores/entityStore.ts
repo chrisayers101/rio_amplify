@@ -64,6 +64,15 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     return section?.entity || null
   }
 
+
+
+
+
+  // Helper function to check if qualityAssessment is completed (not "no data available")
+  const isQualityAssessmentCompleted = (entity: any): boolean => {
+    return entity?.qualityAssessment !== "no data available"
+  }
+
   // Helper function to check authentication
   const checkAuthentication = async (): Promise<boolean> => {
     try {
@@ -79,14 +88,14 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     // Helper function to find matching guideline for a section
   const findMatchingGuideline = (sectionId: string): GuidelineSection | null => {
     try {
-      console.log(`[EntityStore] 🔍 Attempting to access guidelines store for section: ${sectionId}`)
-      const guidelinesStore = useGuidelinesStore()
-      console.log(`[EntityStore] 📚 Guidelines store accessed successfully:`, guidelinesStore)
 
-      // Try to match by ID first (both are now strings)
-      console.log(`[EntityStore] 🔢 Searching by ID: ${sectionId}`)
+      const guidelinesStore = useGuidelinesStore()
+
+
+
+
       const matchingGuideline = guidelinesStore.getSectionById(sectionId)
-      console.log(`[EntityStore] 🎯 Guideline search by ID result:`, matchingGuideline)
+
 
       if (matchingGuideline) {
         return matchingGuideline
@@ -100,7 +109,6 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       return matchingByName || null
     } catch (error) {
       console.error(`[EntityStore] 💥 Error accessing guidelines store:`, error)
-      console.error(`[EntityStore] Error details:`, error)
       return null
     }
   }
@@ -109,28 +117,70 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
   const runGuidelineAssessment = async (
     content: string,
     guideline: string,
-    sectionName: string
+    sectionName: string,
+    projectId: string,
+    sectionId: string
   ): Promise<{
+    projectId: string
+    sectionId: string
     qualityAssessment?: string
-    percentComplete: number
-    status: FeasibilityStudySectionStatus
   } | null> => {
     try {
+
+
       // Call the guideline assessment function via Amplify Data
       const { data: assessmentResult, errors } = await getClient().queries.guidelineAssessment({
         content,
         guideline,
-        sectionName
+        sectionName,
+        projectId,
+        sectionId
       })
 
+
+
       if (errors) {
-        console.error('Errors running guideline assessment:', errors)
+        console.error('❌ Errors running guideline assessment:', errors)
         return null
       }
 
-      return assessmentResult
+      console.log(`[EntityStore] 📥 Raw assessment result:`, assessmentResult)
+
+
+      // Handle the response - it might already be parsed by Amplify Data
+      let parsedResult = assessmentResult
+
+      // If it's a string, try to parse it
+      if (typeof assessmentResult === 'string') {
+        try {
+          parsedResult = JSON.parse(assessmentResult)
+          console.log(`[EntityStore] ✅ Parsed JSON string result:`, parsedResult)
+        } catch (parseError) {
+          console.error(`❌ Failed to parse assessment result:`, parseError)
+          console.error(`📄 Raw result:`, assessmentResult)
+          return null
+        }
+      } else {
+        console.log(`[EntityStore] ✅ Assessment result already parsed:`, parsedResult)
+      }
+
+      // Validate the parsed result
+      if (!parsedResult || typeof parsedResult !== 'object') {
+        console.error(`❌ Invalid assessment result structure:`, parsedResult)
+        return null
+      }
+
+      // Ensure required fields are present
+      const result = {
+        projectId: parsedResult.projectId || '',
+        sectionId: parsedResult.sectionId || '',
+        qualityAssessment: parsedResult.qualityAssessment || ''
+      }
+
+      console.log(`[EntityStore] 🎯 Final assessment result:`, result)
+      return result
     } catch (error) {
-      console.error('Error running guideline assessment:', error)
+      console.error('💥 Error running guideline assessment:', error)
       return null
     }
   }
@@ -207,23 +257,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
   // Utility functions for formatting and display
   const getSectionDisplayName = (section: ParsedFeasibilityStudySection): string => {
-    // Use the sectionName field if available
-    if (section.sectionName) {
-      return `${section.sectionId}: ${section.sectionName}`
-    }
-
-    // Fallback to extracting from content if sectionName is not available
-    if (section.entity && typeof section.entity === 'object' && section.entity.content) {
-      const content = section.entity.content as string
-      // Extract section name from the first heading (e.g., "# Executive Summary" -> "Executive Summary")
-      const headingMatch = content.match(/^#\s+(.+)$/m)
-      if (headingMatch) {
-        return `${section.sectionId}: ${headingMatch[1].trim()}`
-      }
-    }
-
-    // Final fallback
-    return `Section ${section.sectionId}`
+    return section.sectionName ? `${section.sectionId}: ${section.sectionName}` : `Section ${section.sectionId}`
   }
 
   const formatStatus = (status: string): string => {
@@ -293,19 +327,10 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       }
 
       // Parse and validate all sections
-
-      sections.value = sectionsList.map((section: FeasibilityStudySection) => {
-
-        const parsedEntity = parseEntityData(section.entity)
-
-        // Use the parsed entity directly since it only contains fields that exist
-        const finalEntity = parsedEntity
-
-        return {
-          ...section,
-          entity: finalEntity
-        } as ParsedFeasibilityStudySection
-      })
+      sections.value = sectionsList.map((section: FeasibilityStudySection) => ({
+        ...section,
+        entity: parseEntityData(section.entity)
+      } as ParsedFeasibilityStudySection))
 
       // Log the loaded sections
       console.log(`[EntityStore] Loaded ${sections.value.length} sections:`, sections.value.map((s: ParsedFeasibilityStudySection) => ({ projectId: s.projectId, sectionId: s.sectionId, status: s.status })))
@@ -341,17 +366,10 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       }
 
       // Parse and validate project sections
-      const parsedProjectSections = sectionsList.map((section: FeasibilityStudySection) => {
-        const parsedEntity = parseEntityData(section.entity)
-
-        // Use the parsed entity directly since it only contains fields that exist
-        const finalEntity = parsedEntity
-
-        return {
-          ...section,
-          entity: finalEntity
-        } as ParsedFeasibilityStudySection
-      })
+      const parsedProjectSections = sectionsList.map((section: FeasibilityStudySection) => ({
+        ...section,
+        entity: parseEntityData(section.entity)
+      } as ParsedFeasibilityStudySection))
 
       // Update sections for this project
       const otherSections = sections.value.filter(s => s.projectId !== projectId)
@@ -411,10 +429,9 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
 
       // Parse and add to local state
-      const parsedEntity = parseEntityData(newSection.entity)
       const parsedSection: ParsedFeasibilityStudySection = {
         ...newSection,
-        entity: parsedEntity
+        entity: parseEntityData(newSection.entity)
       }
 
       sections.value.push(parsedSection)
@@ -460,22 +477,21 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
 
 
 
-      // Parse and update in local state
-      const parsedEntity = parseEntityData(updatedSection.entity)
-      const parsedSection: ParsedFeasibilityStudySection = {
+      // Update in local state
+      const updatedSectionData: ParsedFeasibilityStudySection = {
         ...updatedSection,
-        entity: parsedEntity
+        entity: parseEntityData(updatedSection.entity)
       }
 
       const index = sections.value.findIndex(s => s.projectId === projectId && s.sectionId === sectionId)
       if (index !== -1) {
-        sections.value[index] = parsedSection
+        sections.value[index] = updatedSectionData
       }
 
       // Keep selectedSections in sync to avoid stale object references
       const isSelected = selectedSections.value.some(s => s.projectId === projectId && s.sectionId === sectionId)
       if (isSelected) {
-        selectedSections.value = [parsedSection]
+        selectedSections.value = [updatedSectionData]
         // Log the selected entity after update for debugging
         try {
           console.log('[EntityStore] Selected entity after updateSection:', {
@@ -489,7 +505,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         }
       }
 
-      return parsedSection
+      return updatedSectionData
     } catch (err) {
       console.error('Error updating section:', err)
       error.value = err instanceof Error ? err.message : 'Failed to update section'
@@ -516,20 +532,33 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         return false
       }
 
+      // Get the current entity data
+      const currentEntity = currentSection.entity || {}
+
+      console.log(`[EntityStore] 🔍 Current entity before update:`, {
+        type: typeof currentEntity,
+        keys: Object.keys(currentEntity || {}),
+        hasContent: !!currentEntity?.content,
+        hasQualityAssessment: isQualityAssessmentCompleted(currentEntity)
+      })
+
       // Create updated entity with the new field value
       const updatedEntity = {
-        ...currentSection.entity,
+        ...currentEntity,
         [fieldName]: newValue
       }
 
+      console.log(`[EntityStore] 🔍 Updated entity after merge:`, {
+        keys: Object.keys(updatedEntity),
+        hasContent: !!updatedEntity.content,
+        hasQualityAssessment: isQualityAssessmentCompleted(updatedEntity),
+        contentLength: updatedEntity.content?.length || 0,
+        qualityAssessmentLength: updatedEntity.qualityAssessment?.length || 0
+      })
 
-      // Convert entity object to JSON string for DynamoDB
-      const entityJsonString = JSON.stringify(updatedEntity)
-
-
-      // Update the section with the new entity (as JSON string)
-      console.log('[EntityStore] About to update database with entity:', entityJsonString)
-      const result = await updateSection(projectId, sectionId, { entity: entityJsonString })
+      // Store the entity object directly - DynamoDB will handle the structure
+      console.log('[EntityStore] About to update database with entity:', updatedEntity)
+      const result = await updateSection(projectId, sectionId, { entity: updatedEntity })
       console.log('[EntityStore] Database update result:', result ? 'success' : 'failed')
 
       // Log selected entity after update for debugging
@@ -619,143 +648,306 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         percentComplete: section.percentComplete,
         status: section.status,
         hasContent: !!section.entity?.content,
-        hasQualityAssessment: !!section.entity?.qualityAssessment,
+        hasQualityAssessment: isQualityAssessmentCompleted(section.entity),
         contentLength: section.entity?.content?.length || 0
       })
 
-      // Check if automatic guideline assessment should run
-      if (section.entity?.content && !section.entity?.qualityAssessment) {
-        console.log(`🚀 [EntityStore] AUTO-TRIGGERING GUIDELINE ASSESSMENT!`)
-        console.log(`[EntityStore] 📝 Section has content (${section.entity.content.length} chars) but NO quality assessment`)
-        console.log(`[EntityStore] 🔍 Starting assessment process for section: ${section.sectionId}`)
+    //   // Check if automatic guideline assessment should run
+    //   if (section.entity?.content && !isQualityAssessmentCompleted(section.entity)) {
+    //     console.log(`🚀 [EntityStore] AUTO-TRIGGERING GUIDELINE ASSESSMENT!`)
+    //     console.log(`[EntityStore] 📝 Section has content (${section.entity.content.length} chars) but NO quality assessment`)
+    //     console.log(`[EntityStore] 🔍 Starting assessment process for section: ${section.sectionId}`)
 
-        try {
-          // Find matching guideline
-          console.log(`[EntityStore] 🔎 Searching for matching guideline...`)
-          const matchingGuideline = findMatchingGuideline(section.sectionId)
+    //     try {
+    //       // Find matching guideline
+    //       console.log(`[EntityStore] 🔎 Searching for matching guideline...`)
+    //       const matchingGuideline = findMatchingGuideline(section.sectionId)
 
-          if (matchingGuideline) {
-            console.log(`✅ [EntityStore] Found matching guideline: "${matchingGuideline.sectionName}" (ID: ${matchingGuideline.id})`)
-            console.log(`[EntityStore] 📋 Guideline markdown length: ${matchingGuideline.markdown.length} chars`)
+    //       if (matchingGuideline) {
+    //         console.log(`✅ [EntityStore] Found matching guideline: "${matchingGuideline.sectionName}" (ID: ${matchingGuideline.id})`)
+    //         console.log(`[EntityStore] 📋 Guideline markdown length: ${matchingGuideline.markdown.length} chars`)
 
-            // Run guideline assessment
-            console.log(`🤖 [EntityStore] Calling AI guideline assessment function...`)
-            const assessmentResult = await runGuidelineAssessment(
-              section.entity.content,
-              matchingGuideline.markdown,
-              section.sectionName || section.sectionId
-            )
+    //         // Ensure we have the content properly extracted
+    //         let contentToAssess = section.entity.content
+    //         if (typeof contentToAssess === 'string') {
+    //           // If content is a string, it might be JSON-encoded, try to parse it
+    //           try {
+    //             const parsedContent = JSON.parse(contentToAssess)
+    //             if (parsedContent && typeof parsedContent === 'object' && parsedContent.content) {
+    //               contentToAssess = parsedContent.content
+    //             }
+    //           } catch (parseError) {
+    //             // If parsing fails, use the string as-is
+    //             console.log(`[EntityStore] Content is already a string, using as-is`)
+    //           }
+    //         }
 
-            if (assessmentResult) {
-              console.log(`🎉 [EntityStore] GUIDELINE ASSESSMENT COMPLETED SUCCESSFULLY!`)
-              console.log(`[EntityStore] 📊 Assessment Results:`, {
-                qualityAssessment: assessmentResult.qualityAssessment?.substring(0, 100) + '...',
-                percentComplete: assessmentResult.percentComplete,
-                status: assessmentResult.status
-              })
+    //         // Run guideline assessment
+    //         console.log(`🤖 [EntityStore] Calling AI guideline assessment function...`)
+    //         const assessmentResult = await runGuidelineAssessment(
+    //           contentToAssess,
+    //           matchingGuideline.markdown,
+    //           section.sectionName || section.sectionId,
+    //           section.projectId,
+    //           section.sectionId
+    //         )
 
-              // Update the section with the assessment results
-              console.log(`[EntityStore] 💾 Updating section in database...`)
-              await updateSection(section.projectId, section.sectionId, {
-                percentComplete: assessmentResult.percentComplete,
-                status: assessmentResult.status,
-                entity: JSON.stringify({
-                  ...section.entity,
-                  qualityAssessment: assessmentResult.qualityAssessment
-                })
-              })
+    //                     if (assessmentResult) {
+    //                       console.log(`🎉 [EntityStore] GUIDELINE ASSESSMENT COMPLETED SUCCESSFULLY!`)
+    //                       console.log(`[EntityStore] 📊 Assessment Results:`, {
+    //                         projectId: assessmentResult.projectId,
+    //                         sectionId: assessmentResult.sectionId,
+    //                         qualityAssessment: assessmentResult.qualityAssessment?.substring(0, 100) + '...'
+    //                       })
 
-              console.log(`✅ [EntityStore] Section successfully updated with assessment results!`)
-              console.log(`[EntityStore] 🎯 New status: ${assessmentResult.status}, Completion: ${assessmentResult.percentComplete}%`)
-            } else {
-              console.warn(`❌ [EntityStore] Guideline assessment FAILED for section: ${section.sectionId}`)
-              console.warn(`[EntityStore] No assessment result returned from AI function`)
-            }
-          } else {
-            console.log(`⚠️ [EntityStore] No matching guideline found for section: ${section.sectionId}`)
-            console.log(`[EntityStore] This section will not be automatically assessed`)
-          }
-        } catch (error) {
-          console.error(`💥 [EntityStore] ERROR during automatic guideline assessment:`, error)
-          console.error(`[EntityStore] Section: ${section.sectionId}, Error details:`, error)
-        }
-      } else {
-        console.log(`⏭️ [EntityStore] Skipping guideline assessment`)
-        console.log(`[EntityStore] Reason:`, {
-          hasContent: !!section.entity?.content,
-          hasQualityAssessment: !!section.entity?.qualityAssessment,
-          contentLength: section.entity?.content?.length || 0,
-          qualityAssessmentLength: section.entity?.qualityAssessment?.length || 0
-        })
+    //                       // Update the section with the assessment results
+    //                       console.log(`[EntityStore] 💾 Updating section in database...`)
 
-        if (!section.entity?.content) {
-          console.log(`[EntityStore] ℹ️ No content to assess`)
-        } else if (section.entity?.qualityAssessment) {
-          console.log(`[EntityStore] ℹ️ Quality assessment already exists`)
-        }
-      }
+    //                       // Get the current entity data, handling both string and object formats
+    //                       let currentEntity = section.entity
+    //                       if (typeof currentEntity === 'string') {
+    //                         try {
+    //                           currentEntity = JSON.parse(currentEntity)
+    //                         } catch (parseError) {
+    //                           console.warn(`[EntityStore] Could not parse existing entity, creating new one:`, parseError)
+    //                           currentEntity = {}
+    //                         }
+    //                       }
 
-      console.log(`[EntityStore] 🏁 Section selection and assessment process completed for: ${section.sectionId}`)
-    } else {
-      console.log(`[EntityStore] ℹ️ No sections provided, clearing selection`)
-    }
-  }
+    //                       // Create updated entity with ONLY the fields that belong in the entity
+    //                       // Filter out percentComplete and status - these don't belong in the entity
+    //                       const updatedEntity: FeasibilityStudySectionEntity = {
+    //                         content: currentEntity.content || '',
+    //                         qualityAssessment: assessmentResult.qualityAssessment || ''
+    //                       }
 
-  const clearSelectedSections = (): void => {
-    selectedSections.value = []
-  }
+    //                       // Double-check: ensure ONLY allowed fields exist
+    //                       const allowedFields = ['content', 'qualityAssessment']
+    //                       const filteredEntity: FeasibilityStudySectionEntity = {}
+
+    //                       allowedFields.forEach(field => {
+    //                         if (updatedEntity[field as keyof FeasibilityStudySectionEntity]) {
+    //                           filteredEntity[field as keyof FeasibilityStudySectionEntity] = updatedEntity[field as keyof FeasibilityStudySectionEntity]
+    //                         }
+    //                       })
+
+    //                       console.log(`[EntityStore] 🔍 Filtered entity keys:`, Object.keys(filteredEntity))
+    //                       console.log(`[EntityStore] 🔍 Filtered entity has content:`, !!filteredEntity.content)
+    //                       console.log(`[EntityStore] 🔍 Filtered entity has qualityAssessment:`, isQualityAssessmentCompleted(filteredEntity))
+
+    //                       console.log(`[EntityStore] 📝 Updated entity structure:`, {
+    //                         hasContent: !!filteredEntity.content,
+    //                         hasQualityAssessment: isQualityAssessmentCompleted(filteredEntity),
+    //                         contentLength: filteredEntity.content?.length || 0,
+    //                         qualityAssessmentLength: filteredEntity.qualityAssessment?.length || 0
+    //                       })
+
+    //                       // Debug: Check the entity structure before sending to database
+    //                       console.log(`[EntityStore] 🔍 Entity keys:`, Object.keys(filteredEntity))
+    //                       console.log(`[EntityStore] 🔍 Quality assessment preview:`, filteredEntity.qualityAssessment?.substring(0, 100))
+
+    //                       // Update the section using the same function that handles user edits
+    //                       console.log(`[EntityStore] 🔄 Using updateSection to update entity directly...`)
+
+    //                       if (assessmentResult.qualityAssessment) {
+    //                         // Send entity as object directly (Amplify expects a.json())
+    //                         console.log(`[EntityStore] 🔍 Sending entity object to Amplify:`, {
+    //                           keys: Object.keys(filteredEntity),
+    //                           contentLength: filteredEntity.content?.length || 0,
+    //                           qualityAssessmentLength: filteredEntity.qualityAssessment?.length || 0
+    //                         })
+
+    //                         // Debug: Log the exact entity being sent
+    //                         console.log(`[EntityStore] 🔍 FULL ENTITY OBJECT BEING SENT:`, JSON.stringify(filteredEntity, null, 2))
+    //                         console.log(`[EntityStore] 🔍 ENTITY TYPE:`, typeof filteredEntity)
+    //                         console.log(`[EntityStore] 🔍 ENTITY KEYS:`, Object.keys(filteredEntity))
+
+    //                         // Update the section with the filtered entity object
+    //                         const result = await updateSection(section.projectId, section.sectionId, {
+    //                           entity: filteredEntity
+    //                         })
+
+    //                         if (result) {
+    //                           console.log(`✅ [EntityStore] Section entity updated successfully via updateSection`)
+
+    //                           // Log the store state after the update - COMPREHENSIVE
+    //                           console.log(`[EntityStore] 🔍 STORE STATE AFTER QUALITY ASSESSMENT UPDATE:`)
+    //                           if (selectedSections.value && selectedSections.value.length > 0) {
+    //                             const selectedSection = selectedSections.value[0]
+    //                             console.log(`[EntityStore] 📊 SELECTED SECTION STORE OBJECT (FULL):`, selectedSection)
+    //                             console.log(`[EntityStore] 📊 Selected section details:`, {
+    //                               projectId: selectedSection.projectId,
+    //                               sectionId: selectedSection.sectionId,
+    //                               hasEntity: !!selectedSection.entity,
+    //                               entityType: typeof selectedSection.entity,
+    //                               entityKeys: selectedSection.entity && typeof selectedSection.entity === 'string' ?
+    //                                 'STRING_NEEDS_PARSING' :
+    //                                 Object.keys(selectedSection.entity || {}),
+    //                               hasQualityAssessment: selectedSection.entity && typeof selectedSection.entity === 'string' ?
+    //                                 selectedSection.entity.includes('qualityAssessment') :
+    //                                 isQualityAssessmentCompleted(selectedSection.entity),
+    //                               entityPreview: selectedSection.entity && typeof selectedSection.entity === 'string' ?
+    //                                 selectedSection.entity.substring(0, 200) + '...' :
+    //                                 JSON.stringify(selectedSection.entity).substring(0, 200) + '...'
+    //                             })
+    //                           } else {
+    //                             console.log(`[EntityStore] 📊 No selected sections`)
+    //                           }
+
+    //                           // Log the specific updated section
+    //                           const updatedSection = getSection(section.projectId, section.sectionId)
+    //                           if (updatedSection) {
+    //                             // Safely handle entity data that might be a string or object
+    //                             let entityKeys = []
+    //                             let hasQualityAssessment = false
+    //                             let qualityAssessmentPreview = 'N/A'
+
+    //                             if (updatedSection.entity) {
+    //                               if (typeof updatedSection.entity === 'string') {
+    //                                 try {
+    //                                   const parsedEntity = JSON.parse(updatedSection.entity)
+    //                                   entityKeys = Object.keys(parsedEntity)
+    //                                   hasQualityAssessment = !!parsedEntity.qualityAssessment
+    //                                   qualityAssessmentPreview = parsedEntity.qualityAssessment ?
+    //                                     parsedEntity.qualityAssessment.substring(0, 100) + '...' : 'N/A'
+    //                                 } catch (parseError) {
+    //                                   console.warn(`[EntityStore] Could not parse updated section entity:`, parseError)
+    //                                   entityKeys = ['<parse_error>']
+    //                                   hasQualityAssessment = false
+    //                                   qualityAssessmentPreview = 'N/A'
+    //                                 }
+    //                               } else if (typeof updatedSection.entity === 'object') {
+    //                                 entityKeys = Object.keys(updatedSection.entity)
+    //                                 hasQualityAssessment = isQualityAssessmentCompleted(updatedSection.entity)
+    //                                 qualityAssessmentPreview = updatedSection.entity.qualityAssessment ?
+    //                                   updatedSection.entity.qualityAssessment.substring(0, 100) + '...' : 'N/A'
+    //                               }
+    //                             }
+
+    //                             console.log(`[EntityStore] 📝 UPDATED SECTION DETAILS:`, {
+    //                               projectId: updatedSection.projectId,
+    //                               sectionId: updatedSection.sectionId,
+    //                               hasEntity: !!updatedSection.entity,
+    //                               entityType: typeof updatedSection.entity,
+    //                               entityKeys: entityKeys,
+    //                               hasQualityAssessment: hasQualityAssessment,
+    //                               qualityAssessmentPreview: qualityAssessmentPreview
+    //                             })
+    //                           }
+
+    //                           // Log all sections to see the full store state - SIMPLIFIED
+    //                           if (sections.value && Array.isArray(sections.value)) {
+    //                             console.log(`[EntityStore] 📚 ALL SECTIONS IN STORE:`, sections.value.length, 'sections')
+    //                             sections.value.forEach((s: ParsedFeasibilityStudySection) => {
+    //                               console.log(`[EntityStore] 📋 Section ${s.sectionId}:`, {
+    //                                 hasEntity: !!s.entity,
+    //                                 entityType: typeof s.entity,
+    //                                 hasQualityAssessment: s.entity && typeof s.entity === 'string' ?
+    //                                   s.entity.includes('qualityAssessment') :
+    //                                   isQualityAssessmentCompleted(s.entity)
+    //                               })
+    //                             })
+    //                           } else {
+    //                             console.log(`[EntityStore] 📚 ALL SECTIONS IN STORE: sections.value is`, typeof sections.value)
+    //                           }
+
+    //                         } else {
+    //                           console.warn(`⚠️ [EntityStore] Failed to update section entity via updateSectionEntity`)
+    //                         }
+    //                       } else {
+    //                         console.warn(`⚠️ [EntityStore] No quality assessment to update`)
+    //                       }
+
+    //                       console.log(`✅ [EntityStore] Section successfully updated with assessment results!`)
+    //                       console.log(`[EntityStore] 🎯 Quality assessment added for section: ${assessmentResult.sectionId}`)
+    //                     } else {
+    //                       console.warn(`❌ [EntityStore] Guideline assessment FAILED for section: ${section.sectionId}`)
+    //                       console.warn(`[EntityStore] No assessment result returned from AI function`)
+    //                     }
+    //                   } else {
+    //                     console.log(`⚠️ [EntityStore] No matching guideline found for section: ${section.sectionId}`)
+    //                     console.log(`[EntityStore] This section will not be automatically assessed`)
+    //                   }
+    //                 } catch (error) {
+    //                   console.error(`💥 [EntityStore] ERROR during automatic guideline assessment:`, error)
+    //                   console.error(`[EntityStore] Section: ${section.sectionId}, Error details:`, error)
+    //                 }
+    //               } else {
+    //                 console.log(`⏭️ [EntityStore] Skipping guideline assessment`)
+    //                 console.log(`[EntityStore] Reason:`, {
+    //                   hasContent: !!section.entity?.content,
+    //                   hasQualityAssessment: isQualityAssessmentCompleted(section.entity),
+    //                   contentLength: section.entity?.content?.length || 0,
+    //                   qualityAssessmentLength: section.entity?.qualityAssessment?.length || 0
+    //                 })
+
+    //                 if (!section.entity?.content) {
+    //                   console.log(`[EntityStore] ℹ️ No content to assess`)
+    //                 } else if (isQualityAssessmentCompleted(section.entity)) {
+    //                   console.log(`[EntityStore] ℹ️ Quality assessment already exists`)
+    //                 }
+    //               }
+
+                } else {
+                  console.log(`[EntityStore] ℹ️ No sections provided, clearing selection`)
+                }
+              }
+
+              const clearSelectedSections = (): void => {
+                selectedSections.value = []
+              }
 
 
 
-  const removeSelectedSection = (projectId: string, sectionId: string): void => {
-    selectedSections.value = selectedSections.value.filter(s =>
-      !(s.projectId === projectId && s.sectionId === sectionId)
-    )
-  }
+              const removeSelectedSection = (projectId: string, sectionId: string): void => {
+                selectedSections.value = selectedSections.value.filter(s =>
+                  !(s.projectId === projectId && s.sectionId === sectionId)
+                )
+              }
 
-  return {
-    // State
-    sections: sections,
-    isLoading: isLoading,
-    error: error,
-    selectedSections: selectedSections,
+              return {
+                // State
+                sections: sections,
+                isLoading: isLoading,
+                error: error,
+                selectedSections: selectedSections,
 
-    // Computed
-    sectionCount,
-    hasSections,
-    selectedSectionCount,
-    hasSelectedSections,
-    selectedSection,
-    getSectionsByProject,
-    getSectionsByStatus,
+                // Computed
+                sectionCount,
+                hasSections,
+                selectedSectionCount,
+                hasSelectedSections,
+                selectedSection,
+                getSectionsByProject,
+                getSectionsByStatus,
 
-    // Getters
-    getSection,
-    getEntity,
+                // Getters
+                getSection,
+                getEntity,
 
-    // Actions
-    fetchSections,
-    fetchSectionsByProject,
-    createSection,
-    updateSection,
-    updateSectionEntity,
-    deleteSection,
-    clearError,
-    clearSections,
-    setSelectedSections,
-    clearSelectedSections,
-    removeSelectedSection,
+                // Actions
+                fetchSections,
+                fetchSectionsByProject,
+                createSection,
+                updateSection,
+                updateSectionEntity,
+                deleteSection,
+                clearError,
+                clearSections,
+                setSelectedSections,
+                clearSelectedSections,
+                removeSelectedSection,
 
-    // Utility functions
-    getSectionDisplayName,
-    formatStatus,
-    getStatusClass,
-    formatTabName,
-    formatPropertyName,
-    getCompletionStatus,
+                // Utility functions
+                getSectionDisplayName,
+                formatStatus,
+                getStatusClass,
+                formatTabName,
+                formatPropertyName,
+                getCompletionStatus,
 
-    // Helper functions
-    findMatchingGuideline,
-    runGuidelineAssessment
-  }
-})
+                // Helper functions
+                findMatchingGuideline,
+                runGuidelineAssessment
+              }
+            })

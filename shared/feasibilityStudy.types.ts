@@ -7,9 +7,8 @@ export type FeasibilityStudySectionStatus = 'not_started' | 'in_progress' | 'com
 
 // Main section entity interface (what goes in the 'entity' field)
 export interface FeasibilityStudySectionEntity {
-    content?: string; // Markdown string content
-    qualityAssessment?: string;  // Markdown string
-  [key: string]: unknown; // Allow dynamic property access
+    content: string; // Markdown string content
+    qualityAssessment: string;  // Markdown string
 }
 
 // Main DynamoDB table record interface (raw from database)

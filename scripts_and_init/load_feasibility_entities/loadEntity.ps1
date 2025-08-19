@@ -1,8 +1,9 @@
 # Simple script to load testEntity.json into DynamoDB
 # Array of table names to update
 $tableNames = @(
-    "FeasibilityStudySections-jb4g3t63b5f23jcybwv27gzg7y-NONE",
-    "FeasibilityStudySections-mddsehxfbjhadgf4uyybg5ecna-NONE"
+        "FeasibilityStudySections-mddsehxfbjhadgf4uyybg5ecna-NONE",
+    "FeasibilityStudySections-jb4g3t63b5f23jcybwv27gzg7y-NONE"
+
     # Add more table names as needed
 )
 
@@ -16,6 +17,17 @@ foreach ($tableName in $tableNames) {
     foreach ($item in $data) {
         Write-Host "Loading: $($item.sectionName)" -ForegroundColor Yellow
         
+        # Build the entity map structure properly for DynamoDB
+        $entityMap = @{
+            "content" = @{ "S" = $item.entity.content }
+        }
+        
+        if ($null -eq $item.entity.qualityAssessment) {
+            $entityMap["qualityAssessment"] = @{ "NULL" = $true }
+        } else {
+            $entityMap["qualityAssessment"] = @{ "S" = $item.entity.qualityAssessment }
+        }
+        
         $dynamoItem = @{
             "projectId" = @{ "S" = $item.projectId }
             "sectionId" = @{ "S" = $item.sectionId }
@@ -25,7 +37,7 @@ foreach ($tableName in $tableNames) {
             "qualityRating" = @{ "S" = $item.qualityRating }
             "createdAt" = @{ "S" = $item.createdAt }
             "updatedAt" = @{ "S" = $item.updatedAt }
-            "entity" = @{ "S" = ($item.entity | ConvertTo-Json -Depth 10 -Compress) }
+            "entity" = @{ "M" = $entityMap }
         }
         
         try {

@@ -2,6 +2,7 @@ import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
 import { chatOrchestratorFunction } from '../functions/chat-orchestrator/resource';
 import { s3ProxyFunction } from '../functions/s3-proxy/resource';
 import { openSearchProxyFunction } from '../functions/opensearch-proxy/resource';
+import { guidelineAssessmentFunction } from '../functions/guideline-assessment/resource';
 
 const schema = a.schema({
   FeasibilityStudySections: a
@@ -75,6 +76,20 @@ const schema = a.schema({
     .returns(a.string())
     .authorization(allow => [allow.authenticated()])
     .handler(a.handler.function(openSearchProxyFunction)),
+
+  // Add guideline assessment function as a query
+  guidelineAssessment: a
+    .query()
+    .arguments({
+      content: a.string().required(),
+      guideline: a.string().required(),
+      sectionName: a.string(),
+      projectId: a.string().required(),
+      sectionId: a.string().required(),
+    })
+    .returns(a.string())
+    .authorization(allow => [allow.authenticated()])
+    .handler(a.handler.function(guidelineAssessmentFunction)),
 });
 
 export type Schema = ClientSchema<typeof schema>;
