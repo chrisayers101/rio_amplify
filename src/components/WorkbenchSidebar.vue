@@ -36,7 +36,7 @@
     <div class="sidebar-header">
       <div class="header-row">
         <DocumentTextIcon class="header-icon" />
-        <h2>Feasibility Study Sections</h2>
+        <h2>Feasibility Study</h2>
       </div>
     </div>
 
