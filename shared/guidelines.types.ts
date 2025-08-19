@@ -15,6 +15,12 @@ export interface GuidelinesState {
   selectedSectionId: number | null
 }
 
+export interface GuidelineAssessmentResponse {
+  projectId: string
+  sectionId: string
+  qualityAssessment: string
+}
+
 export type GuidelineCategory = 'summary' | 'business' | 'technical' | 'execution' | 'analysis'
 
 export interface GuidelineCategoryRanges {

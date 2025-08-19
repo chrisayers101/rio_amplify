@@ -7,6 +7,7 @@ import type {
   ParsedFeasibilityStudySection,
   FeasibilityStudySectionEntity
 } from '../../shared/feasibilityStudy.types'
+import type { GuidelineAssessmentResponse } from '../../shared/guidelines.types'
 import { useGuidelinesStore } from './guidelinesStore'
 
 // Lazy initialization of Amplify Data client
@@ -44,7 +45,7 @@ const runGuidelineAssessment = async (
   sectionName: string,
   projectId: string,
   sectionId: string
-): Promise<Record<string, unknown>> => {
+): Promise<GuidelineAssessmentResponse> => {
   try {
     const { data: result, errors } = await getClient().queries.guidelineAssessment({
       content,
@@ -63,11 +64,11 @@ const runGuidelineAssessment = async (
       throw new Error('No result from guideline assessment')
     }
 
-    // Parse the JSON response from the Lambda
-    return JSON.parse(result)
-  } catch (error) {
+    // The Lambda now returns an object directly, no need to parse JSON
+    return result as GuidelineAssessmentResponse
+  } catch {
     // Error in runGuidelineAssessment
-    throw error
+    throw new Error('Failed to call guideline assessment')
   }
 }
 
@@ -303,16 +304,11 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       const hasContent = !!section.entity?.content
 
       if (hasContent && !alreadyAssessed) {
-        console.log(`🚀 [EntityStore] AUTO-TRIGGERING GUIDELINE ASSESSMENT!`)
-        console.log(`[EntityStore] 📝 Section has content (${section.entity!.content!.length} chars) but quality assessment is "no data available"`)
-        console.log(`[EntityStore] 🔍 Starting assessment process for section: ${section.sectionId}`)
 
         // Set loading state
         isAssessmentRunning.value = true
-        console.log(`[EntityStore] 🔄 Loading state set to: ${isAssessmentRunning.value}`)
 
         const matchingGuideline = findMatchingGuideline(section.sectionId)
-        console.log(`[EntityStore] 🔎 Searching for matching guideline...`)
 
         if (!matchingGuideline) {
           console.log(`⚠️ [EntityStore] No matching guideline found for section: ${section.sectionId}`)
@@ -336,8 +332,8 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
           }
         }
 
-        console.log(`🤖 [EntityStore] Calling AI guideline assessment function...`)
-        const assessmentResult: Record<string, unknown> = await runGuidelineAssessment(
+
+        const assessmentResult: GuidelineAssessmentResponse = await runGuidelineAssessment(
           contentToAssess as string,
           matchingGuideline.markdown,
           section.sectionName || section.sectionId,
@@ -351,17 +347,18 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
           return
         }
 
+        // Defensive check: ensure qualityAssessment exists and is not empty
+        if (!assessmentResult.qualityAssessment || assessmentResult.qualityAssessment.trim() === '') {
+          console.warn(`⚠️ [EntityStore] No qualityAssessment in result or it's empty; nothing to update`)
+          return
+        }
+
         console.log(`🎉 [EntityStore] GUIDELINE ASSESSMENT COMPLETED SUCCESSFULLY!`)
         console.log(`[EntityStore] 📊 Assessment Results:`, {
           projectId: assessmentResult.projectId,
           sectionId: assessmentResult.sectionId,
-          qualityAssessment: (assessmentResult.qualityAssessment as string)?.substring(0, 100) + '...'
+          qualityAssessment: assessmentResult.qualityAssessment.substring(0, 100) + '...'
         })
-
-        if (!assessmentResult.qualityAssessment) {
-          console.warn(`⚠️ [EntityStore] No qualityAssessment in result; nothing to update`)
-          return
-        }
 
         // ✅ Reuse the existing update method to write qualityAssessment only
         console.log(`[EntityStore] 🔄 Updating via updateSectionEntity('qualityAssessment')...`)
@@ -369,7 +366,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
           section.projectId,
           section.sectionId,
           'qualityAssessment',
-          assessmentResult.qualityAssessment as string
+          assessmentResult.qualityAssessment
         )
 
         if (ok) {
@@ -408,9 +405,8 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
           console.warn(`⚠️ [EntityStore] Failed to update section entity via updateSectionEntity`)
         }
 
-        // Reset loading state
-        isAssessmentRunning.value = false
-        console.log(`[EntityStore] 🔄 Loading state reset to: ${isAssessmentRunning.value} (success)`)
+        // Loading state will be reset in finally block
+        console.log(`[EntityStore] ✅ Assessment process completed successfully`)
       } else {
         console.log(`⏭️ [EntityStore] Skipping guideline assessment`)
         const qaDone = isQualityAssessmentCompleted(section.entity)
@@ -421,23 +417,21 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
           qualityAssessmentLength: section.entity?.qualityAssessment?.length || 0
         })
 
-        if (!hasContent) {
-          console.log(`[EntityStore] ℹ️ No content to assess`)
-        } else if (qaDone) {
-          console.log(`[EntityStore] ℹ️ Quality assessment already completed (not "no data available")`)
-        }
 
-        // Reset loading state
-        isAssessmentRunning.value = false
-        console.log(`[EntityStore] 🔄 Loading state reset to: ${isAssessmentRunning.value} (skip)`)
+
+        // Loading state will be reset in finally block
+        console.log(`[EntityStore] ℹ️ Assessment skipped`)
       }
-    } catch (error) {
-      console.error(`💥 [EntityStore] ERROR during automatic guideline assessment:`, error)
-      console.error(`[EntityStore] Section: ${section.sectionId}, Error details:`, error)
+    } catch {
+      console.error(`💥 [EntityStore] ERROR during automatic guideline assessment`)
+      console.error(`[EntityStore] Section: ${section.sectionId}`)
 
-      // Reset loading state on error
+      // Loading state will be reset in finally block
+      console.log(`[EntityStore] ❌ Assessment failed with error`)
+    } finally {
+      // Always reset loading state to avoid sticky spinners
       isAssessmentRunning.value = false
-      console.log(`[EntityStore] 🔄 Loading state reset to: ${isAssessmentRunning.value} (error)`)
+      console.log(`[EntityStore] 🔄 Loading state reset in finally block to: ${isAssessmentRunning.value}`)
     }
   }
 

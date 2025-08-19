@@ -87,7 +87,11 @@ const schema = a.schema({
       projectId: a.string().required(),
       sectionId: a.string().required(),
     })
-    .returns(a.string())
+    .returns(a.customType({
+      projectId: a.string().required(),
+      sectionId: a.string().required(),
+      qualityAssessment: a.string().required(),
+    }))
     .authorization(allow => [allow.authenticated()])
     .handler(a.handler.function(guidelineAssessmentFunction)),
 });
