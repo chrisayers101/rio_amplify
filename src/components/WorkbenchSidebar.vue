@@ -3,9 +3,41 @@
     <div class="sidebar-header">
       <div class="header-row">
         <DocumentTextIcon class="header-icon" />
+        <h2>Project Summary</h2>
+      </div>
+    </div>
+    <div class="sections-list">
+      <div class="section-item" @click="selectSummaryItem('summary')" :class="{ 'selected': selectedSummaryItem === 'summary' }">
+        <div class="section-content">
+          <div class="section-number">S</div>
+          <div class="section-info">
+            <div class="section-name">Summary</div>
+          </div>
+        </div>
+      </div>
+      <div class="section-item" @click="selectSummaryItem('risks')" :class="{ 'selected': selectedSummaryItem === 'risks' }">
+        <div class="section-content">
+          <div class="section-number">R</div>
+          <div class="section-info">
+            <div class="section-name">Risks</div>
+          </div>
+        </div>
+      </div>
+      <div class="section-item" @click="selectSummaryItem('issues')" :class="{ 'selected': selectedSummaryItem === 'issues' }">
+        <div class="section-content">
+          <div class="section-number">I</div>
+          <div class="section-info">
+            <div class="section-name">Issues</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-header">
+      <div class="header-row">
+        <DocumentTextIcon class="header-icon" />
         <h2>Feasibility Study Sections</h2>
       </div>
-
     </div>
 
 
@@ -91,6 +123,9 @@ const error = computed(() => sectionStore.error)
 // Sync with store's selected sections
 const storeSelectedSections = computed(() => sectionStore.selectedSections)
 
+// Track selected summary item
+const selectedSummaryItem = ref<string>('')
+
 
 // Methods
 const isSectionSelected = (section: ParsedFeasibilityStudySection): boolean => {
@@ -100,10 +135,20 @@ const isSectionSelected = (section: ParsedFeasibilityStudySection): boolean => {
 }
 
 const selectSection = (section: ParsedFeasibilityStudySection) => {
+  // Clear any selected summary item when selecting a section
+  selectedSummaryItem.value = ''
   // Update the store's selected sections (single selection)
   sectionStore.setSelectedSections([section])
   // Emit the selected section for the canvas
   emit('sections-selected', [section])
+}
+
+const selectSummaryItem = (item: string) => {
+  // Clear any selected sections when selecting a summary item
+  sectionStore.setSelectedSections([])
+  selectedSummaryItem.value = item
+  // Emit the selected summary item for the canvas
+  emit('sections-selected', [])
 }
 
 const getSectionDisplayName = (section: ParsedFeasibilityStudySection): string => {
@@ -220,6 +265,67 @@ onMounted(async () => {
   opacity: 0.9;
 }
 
+.project-summary-header {
+  padding: 24px;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, #008C8E, #009688);
+  color: white;
+}
+
+.project-summary-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+}
+
+.summary-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.summary-items .section-item {
+  border: none !important;
+  outline: none !important;
+}
+
+.project-summary-header .section-item {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.project-summary-header .section-item * {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.summary-item {
+  margin: 0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  background: white;
+  border: none;
+}
+
+.summary-item:hover {
+  background: #f0f9fa;
+}
+
+.summary-item.selected {
+  background: #e6f7f8;
+  border-right: 3px solid #008C8E;
+}
+
+.summary-item .section-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
 .section-controls {
   padding: 16px 24px;
   border-bottom: 1px solid #e5e7eb;
@@ -241,11 +347,11 @@ onMounted(async () => {
 
 .sections-container {
   flex: 1;
-  overflow-y: auto;
 }
 
 .sections-list {
   padding: 16px 0;
+  flex: 1;
 }
 
 .section-item {
