@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed, readonly } from 'vue'
 import { rioTintoProjects } from '@/mockdata/mockData'
-import type { Evaluation, Project } from '../../shared/interfaces'
+import type { Evaluation, Project } from '../../shared'
 
 export const useProjectStore = defineStore('project', () => {
   // State

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed, readonly } from 'vue'
-import type { ChatMessage, ChatState } from '../../shared/interfaces'
+import type { ChatMessage, ChatState } from '../../shared'
 
 export const useChatStore = defineStore('chat', () => {
   // State

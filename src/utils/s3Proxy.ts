@@ -6,7 +6,7 @@ import type {
   S3ProxyDownloadResponse,
   S3ProxySignedUrlResponse,
   S3ProxyDeleteResponse
-} from '../../shared/interfaces';
+} from '../../shared';
 
 /**
  * List objects in an existing S3 bucket with automatic pagination

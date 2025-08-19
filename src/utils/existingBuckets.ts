@@ -1,4 +1,4 @@
-import type { S3Object, ExistingBucketConfig } from '../../shared/interfaces';
+import type { S3Object, ExistingBucketConfig } from '../../shared';
 import {
   listObjectsFromExistingBucket as listObjectsFromProxy,
   listAllObjectsFromExistingBucket as listAllObjectsFromProxy,

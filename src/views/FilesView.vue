@@ -215,7 +215,7 @@ import {
   deleteFileFromExistingBucket,
   downloadFolderFromExistingBucket
 } from '@/utils/existingBuckets';
-import type { S3Object } from '../../shared/interfaces';
+import type { S3Object } from '../../shared';
 
 // Reactive state for files
 const files = ref<S3Object[]>([]);

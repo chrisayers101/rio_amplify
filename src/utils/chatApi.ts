@@ -2,7 +2,7 @@ import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
 import type { FeasibilityStudySectionEntity } from '@/types/feasibilityStudy';
 import type { GuidelineSection } from '@/types/guidelines';
-import type { ChatRequest, ChatResponse } from '../../shared/interfaces';
+import type { ChatRequest, ChatResponse } from '../../shared';
 
 // Utility function to find matching guideline by section ID
 export function findMatchingGuideline(sectionId: string, guidelines: readonly GuidelineSection[]): GuidelineSection | null {
