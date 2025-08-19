@@ -123,19 +123,19 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     // Only include fields that actually exist in the original data
     const parsedEntity: FeasibilityStudySectionEntity = {}
 
-    if (entityObject.assessment) {
+    if (entityObject.hasOwnProperty('assessment')) {
       parsedEntity.assessment = entityObject.assessment as string
     }
-    if (entityObject.qualityAssessment) {
+    if (entityObject.hasOwnProperty('qualityAssessment')) {
       parsedEntity.qualityAssessment = entityObject.qualityAssessment as string
     }
-    if (entityObject.content) {
+    if (entityObject.hasOwnProperty('content')) {
       parsedEntity.content = entityObject.content as string
     }
-    if (entityObject.issues) {
+    if (entityObject.hasOwnProperty('issues')) {
       parsedEntity.issues = entityObject.issues as string
     }
-    if (entityObject.observations) {
+    if (entityObject.hasOwnProperty('observations')) {
       parsedEntity.observations = entityObject.observations as string
     }
 
