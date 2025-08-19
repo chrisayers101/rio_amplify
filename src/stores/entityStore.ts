@@ -8,7 +8,6 @@ import type {
   ParsedFeasibilityStudySection,
   FeasibilityStudySectionEntity
 } from '@/types/feasibilityStudy'
-
 // Lazy initialization of Amplify Data client
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let client: any = null
@@ -26,12 +25,7 @@ const getClient = () => {
   return client
 }
 
-export interface FeasibilityStudySectionState {
-  sections: ParsedFeasibilityStudySection[]
-  isLoading: boolean
-  error: string | null
-  selectedSections: ParsedFeasibilityStudySection[]
-}
+
 
 export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySection', () => {
   // State
@@ -429,8 +423,8 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
             entityKeys: Object.keys(selectedSections.value[0]?.entity || {}),
             entitySample: selectedSections.value[0]?.entity
           })
-        } catch (_) {
-          // no-op
+        } catch (error) {
+          console.warn('Error logging selected entity:', error)
         }
       }
 
@@ -492,8 +486,8 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
           // Log the full entity object that will be used by the handler
           console.log('[EntityStore] FULL ENTITY OBJECT FOR HANDLER:', JSON.stringify(selected.entity, null, 2))
         }
-      } catch (_) {
-        // no-op
+      } catch (error) {
+        console.warn('Error logging selected entity:', error)
       }
 
       return result !== null

@@ -1,37 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed, readonly } from 'vue'
-
-// Message types
-export interface ChatMessage {
-  id: string
-  content: string
-  timestamp: string
-  type: 'user' | 'agent' | 'system'
-  status: 'sending' | 'sent' | 'error' | 'streaming'
-  metadata?: {
-    rating?: 'up' | 'down' | null
-    tokens?: number
-    model?: string
-    tools?: string[]
-    context?: {
-      projects?: string[]
-      minerals?: string[]
-      audience?: string[]
-    }
-  }
-}
-
-export interface ChatState {
-  messages: ChatMessage[]
-  isLoading: boolean
-  isStreaming: boolean
-  error: string | null
-  context: {
-    projects: string[]
-    minerals: string[]
-    audience: string[]
-  }
-}
+import type { ChatMessage, ChatState } from '../../shared/interfaces'
 
 export const useChatStore = defineStore('chat', () => {
   // State

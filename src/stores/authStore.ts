@@ -2,16 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed, readonly } from 'vue'
 import { getCurrentUser, signOut as amplifySignOut, fetchUserAttributes } from 'aws-amplify/auth'
 import type { AuthUser } from 'aws-amplify/auth'
-
-export interface AppUser {
-  userId: string
-  username: string
-  email: string
-  name?: string
-  givenName?: string
-  familyName?: string
-  signInDetails?: Record<string, unknown>
-}
+import type { AppUser } from '../../shared/interfaces'
 
 export const useAuthStore = defineStore('auth', () => {
   // State
