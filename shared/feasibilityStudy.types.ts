@@ -9,6 +9,7 @@ export type FeasibilityStudySectionStatus = 'not_started' | 'in_progress' | 'com
 export interface FeasibilityStudySectionEntity {
     content: string; // Markdown string content
     qualityAssessment: string;  // Markdown string
+    [key: string]: string | undefined; // Index signature for dynamic access
 }
 
 // Main DynamoDB table record interface (raw from database)
@@ -19,7 +20,7 @@ export interface FeasibilityStudySection {
   percentComplete: number;
   status: FeasibilityStudySectionStatus;
   qualityRating: string;
-  entity: Record<string, unknown> | string;  // Can be JSON object or JSON string
+  entity: FeasibilityStudySectionEntity;  // Always typed entity, no string union
   createdAt?: string | null;
   updatedAt?: string | null;
 }

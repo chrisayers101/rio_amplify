@@ -1,8 +1,6 @@
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
-import type { FeasibilityStudySectionEntity } from '@/types/feasibilityStudy';
-import type { GuidelineSection } from '@/types/guidelines';
-import type { ChatRequest, ChatResponse } from '../../shared';
+import type { FeasibilityStudySectionEntity, GuidelineSection, ChatRequest, ChatResponse, ChatChunk } from '../../shared';
 
 // Utility function to find matching guideline by section ID
 export function findMatchingGuideline(sectionId: string, guidelines: readonly GuidelineSection[]): GuidelineSection | null {
@@ -22,7 +20,7 @@ export function findMatchingGuideline(sectionId: string, guidelines: readonly Gu
   // Fallback: try to match by numeric ID if sectionId is numeric
   const numericId = parseInt(sectionId, 10);
   if (!isNaN(numericId)) {
-    return guidelines.find(guideline => guideline.id === numericId) || null;
+    return guidelines.find(guideline => guideline.id === numericId.toString()) || null;
   }
 
   return null;
@@ -73,7 +71,7 @@ export class ChatApi {
 
   async streamChat(
     request: ChatRequest<FeasibilityStudySectionEntity, GuidelineSection>,
-    onChunk: (chunk: ChatResponse) => void,
+    onChunk: (chunk: ChatChunk) => void,
     onError: (error: string) => void,
     onComplete: () => void
   ): Promise<void> {

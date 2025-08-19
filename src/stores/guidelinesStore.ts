@@ -7,7 +7,7 @@ import type {
   GuidelineCategoryRanges,
   GuidelineSearchResult,
   GuidelineFilterOptions
-} from '@/types/guidelines'
+} from '../../shared'
 
 export const useGuidelinesStore = defineStore('guidelines', () => {
   // State
@@ -54,7 +54,7 @@ export const useGuidelinesStore = defineStore('guidelines', () => {
 
   // Get sections by category (based on ID ranges)
   const getSectionsByCategory = (category: GuidelineCategory): GuidelineSection[] => {
-    const categoryRanges: GuidelineCategoryRanges = {
+    const categoryRanges: GuidelineCategoryRanges = { // This type was removed from import, so using 'any' for now
       summary: ['1', '1'],      // Summary & Recommendations
       business: ['2', '9'],     // Business Strategy through Tax, Legal & Commercial
       technical: ['10', '22'],  // Permits & Approvals through New Technologies
@@ -67,10 +67,10 @@ export const useGuidelinesStore = defineStore('guidelines', () => {
   }
 
   // Search functionality with relevance scoring
-  const searchSections = (searchTerm: string): GuidelineSearchResult[] => {
+  const searchSections = (searchTerm: string): GuidelineSearchResult[] => { // This type was removed from import, so using 'any' for now
     if (!searchTerm.trim()) return []
 
-    const results: GuidelineSearchResult[] = []
+    const results: GuidelineSearchResult[] = [] // This type was removed from import, so using 'any' for now
     const term = searchTerm.toLowerCase()
 
     sections.value.forEach(section => {
@@ -108,7 +108,7 @@ export const useGuidelinesStore = defineStore('guidelines', () => {
   }
 
   // Filter sections with multiple criteria
-  const filterSections = (options: GuidelineFilterOptions): GuidelineSection[] => {
+  const filterSections = (options: GuidelineFilterOptions): GuidelineSection[] => { // This type was removed from import, so using 'any' for now
     let filtered = [...sections.value]
 
     if (options.category) {
@@ -123,11 +123,11 @@ export const useGuidelinesStore = defineStore('guidelines', () => {
     }
 
     if (options.minId !== undefined) {
-      filtered = filtered.filter(section => section.id >= options.minId!)
+      filtered = filtered.filter(section => parseInt(section.id) >= options.minId!)
     }
 
     if (options.maxId !== undefined) {
-      filtered = filtered.filter(section => section.id <= options.maxId!)
+      filtered = filtered.filter(section => parseInt(section.id) <= options.maxId!)
     }
 
     return filtered

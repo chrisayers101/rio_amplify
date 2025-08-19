@@ -94,7 +94,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useGuidelinesStore } from '@/stores/guidelinesStore'
-import type { GuidelineCategory } from '@/types/guidelines'
+import type { GuidelineCategory } from '../../shared'
 
 const guidelinesStore = useGuidelinesStore()
 
@@ -129,7 +129,7 @@ const selectCategory = (category: GuidelineCategory) => {
   selectedCategory.value = category
 }
 
-const selectSection = (sectionId: number) => {
+const selectSection = (sectionId: string) => {
   guidelinesStore.selectSectionById(sectionId)
 }
 

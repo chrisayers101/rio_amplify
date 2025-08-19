@@ -100,7 +100,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
-import type { ParsedFeasibilityStudySection } from '@/types/feasibilityStudy'
+import type { ParsedFeasibilityStudySection } from '../../shared'
 import { useSidebarStore } from '@/stores/sidebarStore'
 import { DocumentTextIcon, ChevronLeftIcon, ChevronRightIcon, ExclamationTriangleIcon, ExclamationCircleIcon } from '@heroicons/vue/24/outline'
 

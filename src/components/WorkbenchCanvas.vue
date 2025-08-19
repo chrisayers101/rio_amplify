@@ -135,7 +135,7 @@
 import { PencilSquareIcon } from '@heroicons/vue/24/outline'
 import { ref, watch, nextTick, onMounted } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
-import type { ParsedFeasibilityStudySection } from '@/types/feasibilityStudy'
+import type { ParsedFeasibilityStudySection } from '../../shared'
 import VueMarkdown from 'vue-markdown-render'
 import MarkdownIt from 'markdown-it'
 import mdTaskLists from 'markdown-it-task-lists'

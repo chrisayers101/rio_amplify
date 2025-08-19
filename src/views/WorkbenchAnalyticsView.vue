@@ -63,7 +63,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
-import type { ParsedFeasibilityStudySection } from '@/types/feasibilityStudy'
+import type { ParsedFeasibilityStudySection } from '../../shared'
 import WorkbenchSidebar from '@/components/WorkbenchSidebar.vue'
 import WorkbenchCanvas from '@/components/WorkbenchCanvas.vue'
 import Conversation from '@/components/Conversation.vue'
