@@ -25,17 +25,10 @@
           v-for="section in sections"
           :key="`${section.projectId}-${section.sectionId}`"
           class="section-item"
+          :class="{ 'selected': isSectionSelected(section) }"
+          @click="selectSection(section)"
         >
-          <label class="section-checkbox">
-            <input
-              type="radio"
-              :value="`${section.projectId}-${section.sectionId}`"
-              v-model="radioValue"
-              @change="handleSectionToggle"
-              class="checkbox-input"
-              name="section-selection"
-            />
-            <div class="checkbox-custom"></div>
+          <div class="section-content">
             <div class="section-number">{{ section.sectionId }}</div>
             <div class="section-info">
               <div class="section-name">{{ getSectionDisplayName(section).replace(/^\d+:\s*/, '') }}</div>
@@ -46,7 +39,7 @@
                 </span>
               </div>
             </div>
-          </label>
+          </div>
         </div>
       </div>
 
@@ -95,49 +88,22 @@ const sections = computed(() => {
 const isLoading = computed(() => sectionStore.isLoading)
 const error = computed(() => sectionStore.error)
 
-// Track selected sections (using composite key format: "projectId-sectionId")
-const selectedSections = ref<string[]>(props.modelValue || [])
-
 // Sync with store's selected sections
 const storeSelectedSections = computed(() => sectionStore.selectedSections)
 
-// Reactive ref for radio button state
-const radioValue = ref<string>('')
-
-// Watch for changes in store selection and update radio button state
-watch(storeSelectedSections, (newSelectedSections) => {
-  if (newSelectedSections.length > 0) {
-    radioValue.value = `${newSelectedSections[0].projectId}-${newSelectedSections[0].sectionId}`
-  } else {
-    radioValue.value = ''
-  }
-}, { immediate: true })
-
-// Watch for external changes to the modelValue
-watch(() => props.modelValue, (newValue) => {
-  if (newValue) {
-    selectedSections.value = newValue
-  }
-})
-
 
 // Methods
-const handleSectionToggle = () => {
-  // Get the selected section object based on radio button value
-  const selectedSection = sections.value.find(section =>
-    radioValue.value === `${section.projectId}-${section.sectionId}`
+const isSectionSelected = (section: ParsedFeasibilityStudySection): boolean => {
+  return storeSelectedSections.value.some(selected =>
+    selected.projectId === section.projectId && selected.sectionId === section.sectionId
   )
+}
 
+const selectSection = (section: ParsedFeasibilityStudySection) => {
   // Update the store's selected sections (single selection)
-  if (selectedSection) {
-    sectionStore.setSelectedSections([selectedSection])
-    // Emit the selected section for the canvas
-    emit('sections-selected', [selectedSection])
-  } else {
-    sectionStore.setSelectedSections([])
-    // Emit empty selection for the canvas
-    emit('sections-selected', [])
-  }
+  sectionStore.setSelectedSections([section])
+  // Emit the selected section for the canvas
+  emit('sections-selected', [section])
 }
 
 const getSectionDisplayName = (section: ParsedFeasibilityStudySection): string => {
@@ -284,40 +250,25 @@ onMounted(async () => {
 
 .section-item {
   margin: 0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.section-checkbox {
+.section-item:hover {
+  background: #f0f9fa;
+}
+
+.section-item.selected {
+  background: #e6f7f8;
+  border-right: 3px solid #008C8E;
+}
+
+.section-content {
   display: flex;
   align-items: flex-start;
   gap: 12px;
   padding: 12px 24px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
   position: relative;
-}
-
-.section-checkbox:hover {
-  background: #f0f9fa;
-}
-
-.section-checkbox input[type="radio"] {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
-}
-
-.checkbox-custom {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #d1d5db;
-  border-radius: 50%;
-  background: white;
-  position: relative;
-  flex-shrink: 0;
-  margin-top: 2px;
-  transition: all 0.2s ease;
 }
 
 .section-number {
@@ -332,22 +283,6 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   margin-top: 0;
-}
-
-.section-checkbox input[type="radio"]:checked + .checkbox-custom {
-  background: #008C8E;
-  border-color: #008C8E;
-}
-
-.section-checkbox input[type="radio"]:checked + .checkbox-custom::after {
-  content: '';
-  position: absolute;
-  left: 5px;
-  top: 5px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: white;
 }
 
 .section-info {
