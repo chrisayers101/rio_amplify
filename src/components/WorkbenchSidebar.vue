@@ -229,11 +229,36 @@ onMounted(async () => {
   background: white;
   border-right: 1px solid #e5e7eb;
   overflow-y: auto;
+  overflow-x: hidden;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   height: calc(100vh - 84px);
   position: relative;
+}
+
+.workbench-sidebar * {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+/* Sidebar Styles */
+.workbench-sidebar {
+  width: 320px;
+  background: white;
+  border-right: 1px solid #e5e7eb;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 84px);
+  position: relative;
+}
+
+.workbench-sidebar * {
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .workbench-sidebar.collapsed {
@@ -264,12 +289,16 @@ onMounted(async () => {
   border-bottom: 1px solid #e5e7eb;
   background: linear-gradient(135deg, #008C8E, #009688);
   color: white;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .header-row {
   display: flex;
   align-items: center;
   gap: 8px;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .header-icon {
@@ -282,6 +311,8 @@ onMounted(async () => {
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0 0 4px 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .sidebar-header p {
@@ -372,11 +403,15 @@ onMounted(async () => {
 
 .sections-container {
   flex: 1;
+  margin-right: -8px; /* Extend content under scrollbar */
+  padding-right: 8px; /* Compensate for negative margin */
 }
 
 .sections-list {
   padding: 16px 0;
   flex: 1;
+  width: 100%;
+  padding-right: 8px; /* Add padding to prevent content from being cut off */
 }
 
 .section-item {
@@ -400,6 +435,8 @@ onMounted(async () => {
   gap: 12px;
   padding: 12px 24px;
   position: relative;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .section-number {
@@ -414,6 +451,7 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   margin-top: 0;
+  flex-shrink: 0;
 }
 
 .section-icon {
@@ -423,6 +461,7 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   margin-top: 0;
+  flex-shrink: 0;
 }
 
 .section-icon .icon {
@@ -434,6 +473,8 @@ onMounted(async () => {
 .section-info {
   flex: 1;
   min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .section-name {
@@ -442,6 +483,8 @@ onMounted(async () => {
   color: #1f2937;
   line-height: 1.4;
   margin-bottom: 4px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .section-meta {
@@ -455,6 +498,8 @@ onMounted(async () => {
   align-items: center;
   gap: 8px;
   width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .completion-bar {
@@ -464,6 +509,7 @@ onMounted(async () => {
   border-radius: 3px;
   overflow: hidden;
   position: relative;
+  min-width: 0;
 }
 
 .completion-fill {
@@ -510,6 +556,7 @@ onMounted(async () => {
   color: #374151;
   min-width: 32px;
   text-align: right;
+  flex-shrink: 0;
 }
 
 .status {
