@@ -71,10 +71,16 @@
             <div class="section-info">
               <div class="section-name">{{ getSectionDisplayName(section).replace(/^\d+:\s*/, '') }}</div>
               <div class="section-meta">
-                <span class="completion">{{ section.percentComplete || 0 }}% complete</span>
-                <span class="status" :class="getStatusClass(section.status)">
-                  {{ formatStatus(section.status) }}
-                </span>
+                <div class="completion-container">
+                  <div class="completion-bar">
+                    <div
+                      class="completion-fill"
+                      :style="{ width: `${section.percentComplete || 0}%` }"
+                      :class="getCompletionClass(section.percentComplete || 0)"
+                    ></div>
+                  </div>
+                  <span class="completion-text">{{ section.percentComplete || 0 }}%</span>
+                </div>
               </div>
             </div>
           </div>
@@ -162,7 +168,13 @@ const getSectionDisplayName = (section: ParsedFeasibilityStudySection): string =
   return sectionStore.getSectionDisplayName(section)
 }
 
-
+const getCompletionClass = (percentComplete: number): string => {
+  if (percentComplete === 100) return 'completion-complete'
+  if (percentComplete >= 75) return 'completion-high'
+  if (percentComplete >= 50) return 'completion-medium'
+  if (percentComplete >= 25) return 'completion-low'
+  return 'completion-minimal'
+}
 
 const getStatusClass = (status: string): string => {
   switch (status) {
@@ -438,8 +450,66 @@ onMounted(async () => {
   font-size: 11px;
 }
 
-.completion {
-  color: #6b7280;
+.completion-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.completion-bar {
+  flex: 1;
+  height: 6px;
+  background: #f3f4f6;
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.completion-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+  position: relative;
+}
+
+.completion-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+.completion-complete {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.completion-high {
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+}
+
+.completion-medium {
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.completion-low {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.completion-minimal {
+  background: linear-gradient(90deg, #6b7280, #4b5563);
+}
+
+.completion-text {
+  font-size: 11px;
+  font-weight: 600;
+  color: #374151;
+  min-width: 32px;
+  text-align: right;
 }
 
 .status {
@@ -557,11 +627,31 @@ onMounted(async () => {
   .sections-container {
     max-height: 400px;
   }
+
+  .completion-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .completion-bar {
+    width: 100%;
+  }
+
+  .completion-text {
+    font-size: 10px;
+    min-width: auto;
+  }
 }
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 .sidebar-toggle {
