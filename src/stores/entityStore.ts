@@ -19,7 +19,7 @@ const getClient = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       client = generateClient() as any
     } catch (error) {
-      console.error('Failed to initialize Amplify client:', error)
+      // Failed to initialize Amplify client
       throw new Error('Amplify has not been configured. Please call Amplify.configure() before using this service.')
     }
   }
@@ -55,7 +55,7 @@ const runGuidelineAssessment = async (
     })
 
     if (errors) {
-      console.error('Errors calling guideline assessment:', errors)
+      // Errors calling guideline assessment
       throw new Error('Failed to call guideline assessment')
     }
 
@@ -66,7 +66,7 @@ const runGuidelineAssessment = async (
     // Parse the JSON response from the Lambda
     return JSON.parse(result)
   } catch (error) {
-    console.error('Error in runGuidelineAssessment:', error)
+    // Error in runGuidelineAssessment
     throw error
   }
 }
@@ -148,8 +148,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       const { data: sectionsList, errors } = await getClient().models.FeasibilityStudySections.list({})
 
       if (errors) {
-        console.error('Errors fetching sections:', errors)
-        console.error('Full error details:', JSON.stringify(errors, null, 2))
+        // Errors fetching sections
         error.value = 'Failed to fetch sections'
         return
       }
@@ -160,12 +159,10 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         entity: typeof section.entity === 'string' ? JSON.parse(section.entity) : section.entity
       } as ParsedFeasibilityStudySection))
 
-      // Log the loaded sections
-      console.log(`[EntityStore] Loaded ${sections.value.length} sections:`, sections.value.map((s: ParsedFeasibilityStudySection) => ({ projectId: s.projectId, sectionId: s.sectionId, status: s.status })))
-      console.log(`[EntityStore] Full sections data:`, JSON.stringify(sections.value, null, 2))
+      // Sections loaded successfully
 
     } catch (err) {
-      console.error('Error loading sections:', err)
+      // Error loading sections
       error.value = err instanceof Error ? err.message : 'Failed to load sections'
     } finally {
       isLoading.value = false
@@ -186,8 +183,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       })
 
       if (errors) {
-        console.error('Errors fetching project sections:', errors)
-        console.error('Full error details:', JSON.stringify(errors, null, 2))
+        // Errors fetching project sections
         error.value = 'Failed to fetch project sections'
         return
       }
@@ -202,13 +198,10 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       const otherSections = sections.value.filter(s => s.projectId !== projectId)
       sections.value = [...otherSections, ...parsedProjectSections]
 
-      // Log the loaded project sections
-      console.log(`[EntityStore] Loaded ${parsedProjectSections.length} sections for project ${projectId}:`, parsedProjectSections.map((s: ParsedFeasibilityStudySection) => ({ sectionId: s.sectionId, status: s.status })))
-      console.log(`[EntityStore] Full project sections data:`, JSON.stringify(parsedProjectSections, null, 2))
-      console.log(`[EntityStore] Total sections in store: ${sections.value.length}`)
+      // Project sections loaded successfully
 
     } catch (err) {
-      console.error('Error loading project sections:', err)
+      // Error loading project sections
       error.value = err instanceof Error ? err.message : 'Failed to load project sections'
     } finally {
       isLoading.value = false
@@ -244,13 +237,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         qualityAssessment: fieldName === 'qualityAssessment' ? newValue : currentSection.entity.qualityAssessment
       }
 
-      console.log(`[EntityStore] 🔍 Updated entity:`, {
-        keys: Object.keys(updatedEntity),
-        hasContent: !!updatedEntity.content,
-        hasQualityAssessment: !!updatedEntity.qualityAssessment,
-        contentLength: updatedEntity.content?.length || 0,
-        qualityAssessmentLength: updatedEntity.qualityAssessment?.length || 0
-      })
+      // Entity updated successfully
 
       // Update the section using Amplify Data
       // Convert entity object to JSON string for database storage
@@ -261,7 +248,7 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       })
 
       if (errors) {
-        console.error('Errors updating section entity:', errors)
+        // Errors updating section entity
         error.value = 'Failed to update section entity'
         return false
       }
@@ -288,79 +275,24 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         selectedSections.value = [updatedSectionData]
       }
 
-      console.log('[EntityStore] Database update result: success')
+      // Database update successful
       return true
     } catch (err) {
-      console.error('Error updating section entity:', err)
+      // Error updating section entity
       error.value = err instanceof Error ? err.message : 'Failed to update section entity'
       return false
     }
   }
 
   const setSelectedSections = async (selectedSectionsList: readonly ParsedFeasibilityStudySection[]): Promise<void> => {
-    console.log(`[EntityStore] 🔄 setSelectedSections called with ${selectedSectionsList.length} sections`)
-    console.log(`[EntityStore] 📋 Sections:`, selectedSectionsList.map(s => ({ sectionId: s.sectionId, sectionName: s.sectionName })))
-
     // Enforce single selection: keep only the first item if provided
     selectedSections.value = selectedSectionsList.length > 0 ? [selectedSectionsList[0]] : []
 
     if (selectedSectionsList.length === 0) {
-      console.log(`[EntityStore] ℹ️ No sections provided, clearing selection`)
       return
     }
 
     const section = selectedSectionsList[0]
-    console.log(`[EntityStore] 🎯 Section selected: ${section.sectionId} (${section.sectionName || 'Unnamed'})`)
-    console.log(`[EntityStore] 📊 Current section data:`, {
-      projectId: section.projectId,
-      sectionId: section.sectionId,
-      percentComplete: section.percentComplete,
-      status: section.status,
-      hasContent: !!section.entity?.content,
-      hasQualityAssessment: !!section.entity?.qualityAssessment,
-      contentLength: section.entity?.content?.length || 0
-    })
-
-    // Add detailed entity logging
-    if (section.entity) {
-      console.log(`[EntityStore] 🔍 SELECTED ENTITY DETAILS:`, {
-        entityType: typeof section.entity,
-        entityKeys: Object.keys(section.entity),
-        entityContent: section.entity.content,
-        entityQualityAssessment: section.entity.qualityAssessment,
-        contentLength: section.entity.content?.length || 0,
-        qualityAssessmentLength: section.entity.qualityAssessment?.length || 0,
-        fullEntityObject: JSON.stringify(section.entity, null, 2)
-      })
-    } else {
-      console.log(`[EntityStore] ⚠️ No entity found for selected section`)
-    }
-
-    // Log the full section object to see what's actually there
-    console.log(`[EntityStore] 🔍 FULL SELECTED SECTION OBJECT:`, {
-      sectionId: section.sectionId,
-      sectionName: section.sectionName,
-      projectId: section.projectId,
-      percentComplete: section.percentComplete,
-      status: section.status,
-      entity: section.entity,
-      entityType: typeof section.entity,
-      entityKeys: section.entity ? Object.keys(section.entity) : 'NO_ENTITY',
-      rawSection: JSON.stringify(section, null, 2)
-    })
-
-    // Log the store state to see what sections are loaded
-    console.log(`[EntityStore] 📚 STORE STATE:`, {
-      totalSections: sections.value.length,
-      selectedSectionsCount: selectedSections.value.length,
-      storeSections: sections.value.map((s: ParsedFeasibilityStudySection) => ({
-        sectionId: s.sectionId,
-        sectionName: s.sectionName,
-        hasEntity: !!s.entity,
-        entityType: typeof s.entity,
-        entityKeys: s.entity ? Object.keys(s.entity) : 'NO_ENTITY'
-      }))
-    })
 
     // -------------------------
     // 🔁 AUTO-GUIDELINE ASSESSMENT (inlined, reusing updateSectionEntity)
