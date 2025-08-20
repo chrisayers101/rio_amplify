@@ -5,13 +5,16 @@
 // Feasibility Study Section Status Enum
 export type FeasibilityStudySectionStatus = 'not_started' | 'in_progress' | 'complete';
 
+// Quality Rating Enum
+export type FeasibilityStudyQualityRating = 'Unrated' | 'Poor' | 'Fair' | 'Good' | 'Excellent';
+
 // Main section entity interface (what goes in the 'entity' field)
 export interface FeasibilityStudySectionEntity {
     content: string; // Markdown string content
     qualityAssessment: string;  // Markdown string
     percentComplete: number; // Progress percentage (0-100)
     status: FeasibilityStudySectionStatus; // Section status
-    qualityRating: string; // Quality assessment rating
+    qualityRating: FeasibilityStudyQualityRating; // Quality assessment rating
     [key: string]: string | number | undefined; // Index signature for dynamic access
 }
 

@@ -46,7 +46,7 @@ interface Section {
   sectionName: string
   entity: {
     percentComplete: number
-    qualityRating: string
+    qualityRating: 'Unrated' | 'Poor' | 'Fair' | 'Good' | 'Excellent'
   }
   statusOfCompleteness: string
   issues: Array<{
@@ -84,16 +84,17 @@ const getProgressClass = (percent: number) => {
   return 'progress-critical'
 }
 
-const getQualityClass = (quality: string) => {
-  switch (quality.toLowerCase()) {
-    case 'high':
+const getQualityClass = (quality: 'Unrated' | 'Poor' | 'Fair' | 'Good' | 'Excellent') => {
+  switch (quality) {
+    case 'Excellent':
       return 'quality-high'
-    case 'good':
+    case 'Good':
       return 'quality-good'
-    case 'moderate':
+    case 'Fair':
       return 'quality-moderate'
-    case 'low':
+    case 'Poor':
       return 'quality-low'
+    case 'Unrated':
     default:
       return 'quality-unknown'
   }
