@@ -88,6 +88,8 @@ const schema = a.schema({
       projectId: a.string().required(),
       sectionId: a.string().required(),
       qualityAssessment: a.string().required(),
+      qualityRating: a.string().required(),
+      percentComplete: a.integer().required(),
     }))
     .authorization(allow => [allow.authenticated()])
     .handler(a.handler.function(guidelineAssessmentFunction)),

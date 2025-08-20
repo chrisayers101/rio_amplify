@@ -2,6 +2,8 @@
 // GUIDELINES INTERFACES
 // ============================================================================
 
+import type { FeasibilityStudyQualityRating } from './feasibilityStudy.types';
+
 export interface GuidelineSection {
   id: string
   sectionName: string
@@ -19,6 +21,8 @@ export interface GuidelineAssessmentResponse {
   projectId: string
   sectionId: string
   qualityAssessment: string
+  qualityRating: FeasibilityStudyQualityRating
+  percentComplete: number
 }
 
 export type GuidelineCategory = 'summary' | 'business' | 'technical' | 'execution' | 'analysis'

@@ -19,7 +19,7 @@ const getClient = () => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       client = generateClient() as any
-    } catch (error) {
+    } catch {
       // Failed to initialize Amplify client
       throw new Error('Amplify has not been configured. Please call Amplify.configure() before using this service.')
     }
@@ -209,12 +209,12 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     projectId: string,
     sectionId: string,
     fieldName: string,
-    newValue: string
+    newValue: string | number
   ): Promise<boolean> => {
     if (!(await checkAuthentication())) return false
 
     // Validate field name
-    if (!['content', 'qualityAssessment'].includes(fieldName)) {
+    if (!['content', 'qualityAssessment', 'qualityRating', 'percentComplete'].includes(fieldName)) {
       error.value = `Invalid field name: ${fieldName}`
       return false
     }
@@ -370,6 +370,21 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       if (ok) {
         console.log(`✅ [EntityStore] Section entity updated successfully via updateSectionEntity`)
 
+        // Also update qualityRating and percentComplete
+        console.log(`[EntityStore] 🔄 Updating qualityRating and percentComplete...`)
+        await updateSectionEntity(
+          section.projectId,
+          section.sectionId,
+          'qualityRating',
+          assessmentResult.qualityRating
+        )
+        await updateSectionEntity(
+          section.projectId,
+          section.sectionId,
+          'percentComplete',
+          assessmentResult.percentComplete
+        )
+
         // Refresh the selected section data to ensure UI shows updated assessment
         console.log(`[EntityStore] 🔄 Refreshing selected section data...`)
         const refreshedSection = sections.value.find(s => s.projectId === section.projectId && s.sectionId === section.sectionId)
@@ -378,7 +393,9 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
             hasContent: !!refreshedSection.entity?.content,
             hasQualityAssessment: !!refreshedSection.entity?.qualityAssessment,
             qualityAssessmentLength: refreshedSection.entity?.qualityAssessment?.length || 0,
-            qualityAssessmentPreview: refreshedSection.entity?.qualityAssessment?.substring(0, 100) + '...'
+            qualityAssessmentPreview: refreshedSection.entity?.qualityAssessment?.substring(0, 100) + '...',
+            qualityRating: refreshedSection.entity?.qualityRating,
+            percentComplete: refreshedSection.entity?.percentComplete
           })
 
           // Update selectedSections with the refreshed data - force Vue reactivity
@@ -426,10 +443,6 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     if (selectedSectionsList.length === 0) {
       return
     }
-
-    const section = selectedSectionsList[0]
-
-
   }
 
 return {
