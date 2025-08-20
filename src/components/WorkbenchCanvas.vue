@@ -27,6 +27,13 @@
                 @click="setActiveTab(fieldName)"
               >
                 {{ formatTabName(fieldName) }}
+                <!-- Show loader icon for Quality Assessment when running -->
+                <span
+                  v-if="fieldName === 'qualityAssessment' && sectionStore.isAssessmentRunning"
+                  class="tab-loader-icon"
+                >
+                  <span class="loading-spinner-small"></span>
+                </span>
                 <button
                   v-if="fieldName !== 'qualityAssessment'"
                   @click.stop="toggleEditMode(fieldName)"
@@ -118,8 +125,10 @@
                         <button
                           @click="createContentFromCorpus"
                           class="create-content-button"
+                          :disabled="isSaving"
                         >
-                          Create content from document corpus
+                          <span v-if="isSaving" class="loading-spinner-small"></span>
+                          {{ isSaving ? 'Creating content...' : 'Create content from document corpus' }}
                         </button>
                       </div>
                     </div>
@@ -382,7 +391,13 @@ const createContentFromCorpus = async (): Promise<void> => {
   if (!first.value) return
 
   try {
-    // Load the markdown content from the summary file
+    // Set loading state for the button first
+    isSaving.value = true
+
+    // Show loading state for 5 seconds before doing anything
+    await new Promise(resolve => setTimeout(resolve, 5000))
+
+    // Now load the markdown content from the summary file
     const response = await fetch('/shared/summary_feasibility_study.md')
     if (!response.ok) {
       throw new Error(`Failed to fetch markdown: ${response.statusText}`)
@@ -394,10 +409,7 @@ const createContentFromCorpus = async (): Promise<void> => {
     const projectId = first.value.projectId
     const sectionId = first.value.sectionId
     const fieldName = 'content'
-    
-    // Set saving state
-    isSaving.value = true
-    
+
     // Save the content using the existing store method
     const success = await sectionStore.updateSectionEntity(
       projectId,
@@ -409,10 +421,10 @@ const createContentFromCorpus = async (): Promise<void> => {
     if (success) {
       // Update local state immediately for instant UI feedback
       updateLocalSectionData(projectId, sectionId, fieldName, markdownContent)
-      
+
       // Refresh the store data in the background
       sectionStore.fetchSections().catch(console.error)
-      
+
       console.log('Auto-saved markdown content from corpus for:', projectId, sectionId)
     } else {
       throw new Error('Failed to save content from corpus')
@@ -638,6 +650,23 @@ onMounted(() => {
 .edit-icon {
   width: 16px;
   height: 16px;
+}
+
+.tab-loader-icon {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  opacity: 0.8;
+}
+
+.tab-loader-icon .loading-spinner-small {
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid #6b7280;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
 }
 
 .tab-content {
