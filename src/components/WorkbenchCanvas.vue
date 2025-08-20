@@ -85,21 +85,42 @@
                 <!-- View Mode -->
                 <div v-else class="view-mode">
                   <div v-if="Array.isArray(section.entity[activeTab])" class="array-content">
-                    <div v-for="(item, index) in section.entity[activeTab]" :key="index" class="array-item">
-                      <div v-if="typeof item === 'object' && item !== null" class="object-item">
-                        <div v-for="(propValue, propKey) in item" :key="String(propKey)" class="property">
-                          <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
-                          <span class="property-value">
+                    <!-- Special rendering for hyperlinks -->
+                    <div v-if="activeTab === 'hyperlinks'" class="hyperlinks-content">
+                      <div v-for="(hyperlink, index) in section.entity[activeTab]" :key="index" class="hyperlink-item">
+                        <div class="hyperlink-header">
+                          <h4 class="hyperlink-filename">{{ hyperlink.filename }}</h4>
+                          <a
+                            :href="hyperlink.hyperlink"
+                            :target="isExternalLink(hyperlink.hyperlink) ? '_blank' : '_self'"
+                            class="hyperlink-link"
+                            rel="noopener noreferrer"
+                          >
+                            <span class="link-icon">🔗</span>
+                            {{ isExternalLink(hyperlink.hyperlink) ? 'Open Link' : 'View File' }}
+                          </a>
+                        </div>
+                        <p class="hyperlink-description">{{ hyperlink.description }}</p>
+                      </div>
+                    </div>
+                    <!-- Default array rendering for other array types -->
+                    <div v-else>
+                      <div v-for="(item, index) in section.entity[activeTab]" :key="index" class="array-item">
+                        <div v-if="typeof item === 'object' && item !== null" class="object-item">
+                          <div v-for="(propValue, propKey) in item" :key="String(propKey)" class="property">
+                            <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
+                            <span class="property-value">
+                            <span class="markdown-inline">
+                              <VueMarkdown class="markdown-body" :key="`${section.projectId}-${section.sectionId}-${propKey}-${String(propValue).length}`" :source="formatMarkdownSource(String(propValue))" :md="md" />
+                            </span>
+                            </span>
+                          </div>
+                        </div>
+                        <div v-else class="simple-value">
                           <span class="markdown-inline">
-                            <VueMarkdown class="markdown-body" :key="`${section.projectId}-${section.sectionId}-${propKey}-${String(propValue).length}`" :source="formatMarkdownSource(String(propValue))" :md="md" />
-                          </span>
+                            <VueMarkdown class="markdown-body" :key="`${section.projectId}-${section.sectionId}-array-${index}-${String(item).length}`" :source="formatMarkdownSource(String(item))" :md="md" />
                           </span>
                         </div>
-                      </div>
-                      <div v-else class="simple-value">
-                        <span class="markdown-inline">
-                          <VueMarkdown class="markdown-body" :key="`${section.projectId}-${section.sectionId}-array-${index}-${String(item).length}`" :source="formatMarkdownSource(String(item))" :md="md" />
-                        </span>
                       </div>
                     </div>
                   </div>
@@ -332,9 +353,21 @@ const formatPropertyName = (key: string): string => {
   return sectionStore.formatPropertyName(key)
 }
 
-// Compute the visible tabs for a given section, restricted to Content and Quality Assessment in order
+// Helper function to determine if a link is external
+const isExternalLink = (url: string): boolean => {
+  if (!url) return false
+  try {
+    const urlObj = new URL(url)
+    return urlObj.protocol === 'http:' || urlObj.protocol === 'https:'
+  } catch {
+    // If URL parsing fails, assume it's internal
+    return false
+  }
+}
+
+// Compute the visible tabs for a given section, restricted to Content, Quality Assessment, and Hyperlinks in order
 const getVisibleTabs = (section: ParsedFeasibilityStudySection): string[] => {
-  const allowed = ['content', 'qualityAssessment']
+  const allowed = ['content', 'qualityAssessment', 'hyperlinks']
   const entity = section.entity || {}
   return allowed.filter(key => entity[key] !== undefined) // keep even if empty
 }
@@ -969,6 +1002,75 @@ onMounted(() => {
   min-height: 100%;
 }
 
+/* Hyperlinks Styles */
+.hyperlinks-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.hyperlink-item {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.2s;
+}
+
+.hyperlink-item:hover {
+  border-color: #008C8E;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.hyperlink-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 16px;
+}
+
+.hyperlink-filename {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+  flex: 1;
+}
+
+.hyperlink-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #008C8E;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.hyperlink-link:hover {
+  background: #007a7c;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.link-icon {
+  font-size: 14px;
+}
+
+.hyperlink-description {
+  color: #6b7280;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
 .array-content {
   display: flex;
   flex-direction: column;
@@ -1167,6 +1269,17 @@ onMounted(() => {
   .save-button,
   .cancel-button {
     width: 100%;
+  }
+
+  .hyperlink-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .hyperlink-link {
+    width: 100%;
+    justify-content: center;
   }
 }
 </style>
