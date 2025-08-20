@@ -165,6 +165,7 @@ import { PencilSquareIcon } from '@heroicons/vue/24/outline'
 import { ref, watch, nextTick, onMounted, computed } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
 import type { ParsedFeasibilityStudySection } from '../../shared'
+import { feasibilityStudyCorpus, getCorpusSection } from '../../shared'
 import VueMarkdown from 'vue-markdown-render'
 import MarkdownIt from 'markdown-it'
 import mdTaskLists from 'markdown-it-task-lists'
@@ -406,20 +407,21 @@ const createContentFromCorpus = async (): Promise<void> => {
     // Set loading state for the button first
     isSaving.value = true
 
-    // Show loading state for 5 seconds before doing anything
-    await new Promise(resolve => setTimeout(resolve, 5000))
+    // Show loading state for 2 seconds to provide user feedback
+    await new Promise(resolve => setTimeout(resolve, 2000))
 
-    // Now load the markdown content from the summary file
-    const response = await fetch('/shared/summary_feasibility_study.md')
-    if (!response.ok) {
-      throw new Error(`Failed to fetch markdown: ${response.statusText}`)
+    // Get the section ID and load content from the TypeScript corpus
+    const sectionId = first.value.sectionId
+    const corpusSection = getCorpusSection(sectionId)
+
+    if (!corpusSection) {
+      throw new Error(`No corpus content found for section ${sectionId}`)
     }
 
-    const markdownContent = await response.text()
+    const markdownContent = corpusSection.content
 
     // Auto-save the content directly to the store
     const projectId = first.value.projectId
-    const sectionId = first.value.sectionId
     const fieldName = 'content'
 
     // Save the content using the existing store method
@@ -444,7 +446,7 @@ const createContentFromCorpus = async (): Promise<void> => {
 
   } catch (error) {
     console.error('Error loading content from corpus:', error)
-    alert('Failed to load content from document corpus. Please try again.')
+    alert(`Failed to load content from document corpus: ${error instanceof Error ? error.message : 'Unknown error'}`)
   } finally {
     isSaving.value = false
   }
