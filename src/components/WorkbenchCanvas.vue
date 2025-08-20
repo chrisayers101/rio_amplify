@@ -12,7 +12,7 @@
             <div class="section-meta">
               <span class="completion">{{ section.entity.percentComplete || 0 }}% complete</span>
               <span class="quality-rating" :class="getQualityRatingClass(section.entity.qualityRating)">
-                {{ formatQualityRating(section.entity.qualityRating) }}
+                Quality Score: {{ formatQualityRating(section.entity.qualityRating) }}
               </span>
             </div>
           </div>
@@ -53,12 +53,6 @@
                 <!-- Edit Mode -->
                 <div v-if="isEditing(activeTab)" class="edit-mode fill-parent">
                   <div class="edit-controls fill-parent">
-                    <textarea
-                      v-model="editValues[activeTab]"
-                      class="edit-textarea fill-parent"
-                      :placeholder="`Edit ${formatTabName(activeTab)}...`"
-                      :key="`edit-${activeTab}-${currentTabValue.length}`"
-                    ></textarea>
                     <div class="edit-actions">
                       <button
                         @click="saveEdit(section.projectId, section.sectionId, activeTab)"
@@ -76,6 +70,15 @@
                         Cancel
                       </button>
                     </div>
+                    <textarea
+                      v-model="editValues[activeTab]"
+                      class="edit-textarea fill-parent"
+                      :placeholder="`Edit ${formatTabName(activeTab)}...`"
+                      :key="`edit-${activeTab}-${currentTabValue.length}`"
+                      :ref="(el) => { editTextarea = el as HTMLTextAreaElement }"
+                      @input="autoResizeTextarea"
+                      @focus="autoResizeTextarea"
+                    ></textarea>
                   </div>
                 </div>
 
@@ -165,7 +168,7 @@ import { PencilSquareIcon } from '@heroicons/vue/24/outline'
 import { ref, watch, nextTick, onMounted, computed } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
 import type { ParsedFeasibilityStudySection } from '../../shared'
-import { feasibilityStudyCorpus, getCorpusSection } from '../../shared'
+import { getCorpusSection } from '../../shared'
 import VueMarkdown from 'vue-markdown-render'
 import MarkdownIt from 'markdown-it'
 import mdTaskLists from 'markdown-it-task-lists'
@@ -255,6 +258,9 @@ const editValues = ref<Record<string, string>>({})
 const isSaving = ref(false)
 const originalValues = ref<Record<string, string>>({})
 
+// Refs
+const editTextarea = ref<HTMLTextAreaElement | null>(null)
+
 // Set the first available tab as active if sections are selected
 const initializeActiveTab = () => {
   if (resolvedSections.value.length > 0 && resolvedSections.value[0].entity) {
@@ -271,6 +277,24 @@ const initializeActiveTab = () => {
 watch(() => resolvedSections.value, () => {
   initializeActiveTab()
 }, { immediate: true })
+
+// Watch for changes in edit values to auto-resize textarea
+watch(() => editValues.value, () => {
+  if (Object.keys(editMode.value).some(key => editMode.value[key])) {
+    nextTick(() => {
+      autoResizeTextarea()
+    })
+  }
+}, { deep: true })
+
+// Also watch for changes in the active tab to resize when switching tabs
+watch(activeTab, () => {
+  if (Object.keys(editMode.value).some(key => editMode.value[key])) {
+    nextTick(() => {
+      autoResizeTextarea()
+    })
+  }
+})
 
 const getSectionDisplayName = (section: ParsedFeasibilityStudySection): string => {
   return sectionStore.getSectionDisplayName(section)
@@ -349,6 +373,12 @@ const toggleEditMode = (fieldName: string): void => {
       editMode.value[fieldName] = true
       editValues.value[fieldName] = String(currentValue)
       originalValues.value[fieldName] = String(currentValue)
+      // Auto-resize textarea after entering edit mode with proper timing
+      nextTick(() => {
+        setTimeout(() => {
+          autoResizeTextarea()
+        }, 50) // Small delay to ensure DOM is fully updated
+      })
     }
   }
 }
@@ -397,6 +427,43 @@ const cancelEdit = (fieldName: string): void => {
   editMode.value[fieldName] = false
   delete editValues.value[fieldName]
   delete originalValues.value[fieldName]
+}
+
+// Auto-resize textarea to fit content
+const autoResizeTextarea = (): void => {
+  console.log('autoResizeTextarea called - forcing height to fit content')
+
+  nextTick(() => {
+    if (editTextarea.value && editTextarea.value instanceof HTMLTextAreaElement) {
+      const textarea = editTextarea.value
+
+      // Force the textarea to expand to fit its content
+      textarea.style.height = 'auto'
+      const contentHeight = textarea.scrollHeight
+      const newHeight = Math.max(contentHeight, 200) // Ensure minimum height
+
+      // Set the height directly
+      textarea.style.height = `${newHeight}px`
+
+      console.log('Forced textarea height to:', newHeight, 'px (content height was:', contentHeight, 'px)')
+
+      // Also try to expand the parent containers if needed
+      let parent = textarea.parentElement
+      let levelsUp = 0
+      while (parent && levelsUp < 3) {
+        if (parent.classList.contains('edit-controls') || parent.classList.contains('edit-mode')) {
+          const currentHeight = parent.offsetHeight
+          const neededHeight = newHeight + 100 // Add some padding
+          if (currentHeight < neededHeight) {
+            parent.style.height = `${neededHeight}px`
+            console.log('Expanded parent', parent.className, 'to height:', neededHeight, 'px')
+          }
+        }
+        parent = parent.parentElement
+        levelsUp++
+      }
+    }
+  })
 }
 
 // Handle creating content from document corpus
@@ -515,6 +582,7 @@ onMounted(() => {
 .canvas-content {
   padding: 24px;
   height: 100%;
+  overflow-y: auto;
 }
 
 .canvas-placeholder {
@@ -536,7 +604,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  height: 100%;
+  height: auto;
   min-height: 100%;
 }
 
@@ -544,16 +612,19 @@ onMounted(() => {
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  flex: 1;
+  height: 100%;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .section-header {
   padding: 20px 24px;
   border-bottom: 1px solid #e5e7eb;
   background: #f9fafb;
+  flex-shrink: 0;
 }
 
 .section-header h3 {
@@ -610,12 +681,17 @@ onMounted(() => {
 
 .section-entity {
   padding: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .entity-tabs {
   display: flex;
   border-bottom: 1px solid #e5e7eb;
   background: #f9fafb;
+  flex-shrink: 0;
 }
 
 .tab-header {
@@ -690,11 +766,18 @@ onMounted(() => {
 
 .tab-content {
   padding: 24px;
+  height: 100%;
   min-height: 200px;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
 }
 
 .tab-panel {
   height: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .no-tab-selected {
@@ -707,13 +790,15 @@ onMounted(() => {
 .edit-mode {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: auto;
+  min-height: 300px;
 }
 
 .edit-controls {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: auto;
+  min-height: 300px;
 }
 
 .edit-textarea {
@@ -724,9 +809,13 @@ onMounted(() => {
   font-family: inherit;
   font-size: 14px;
   line-height: 1.6;
-  resize: none;
+  resize: vertical;
   outline: none;
   transition: border-color 0.2s;
+  height: auto;
+  min-height: 200px;
+  max-height: none;
+  overflow-y: auto;
 }
 
 .edit-textarea:focus {
@@ -737,8 +826,9 @@ onMounted(() => {
 .edit-actions {
   display: flex;
   gap: 12px;
-  margin-top: 16px;
+  margin-bottom: 16px;
   justify-content: flex-end;
+  flex-shrink: 0;
 }
 
 .save-button,
@@ -875,7 +965,8 @@ onMounted(() => {
 
 /* View Mode Styles */
 .view-mode {
-  height: 100%;
+  height: auto;
+  min-height: 100%;
 }
 
 .array-content {
@@ -926,12 +1017,14 @@ onMounted(() => {
 }
 
 .simple-content {
-  height: 100%;
+  height: auto;
+  min-height: 100%;
 }
 
 .markdown-content {
-  height: 100%;
-  overflow-y: auto;
+  height: auto;
+  min-height: 100%;
+  overflow: visible;
 }
 
 .markdown-inline {
@@ -1035,12 +1128,13 @@ onMounted(() => {
 
 /* Utility Classes */
 .fill-parent {
-  height: 100%;
+  height: auto;
+  min-height: 100%;
   width: 100%;
 }
 
 .scrollable {
-  overflow-y: auto;
+  overflow-y: visible;
 }
 
 /* Mobile responsive styles */
