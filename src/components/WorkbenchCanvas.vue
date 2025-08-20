@@ -35,7 +35,7 @@
                   <span class="loading-spinner-small"></span>
                 </span>
                 <button
-                  v-if="fieldName !== 'qualityAssessment'"
+                  v-if="fieldName !== 'qualityAssessment' && fieldName !== 'hyperlinks'"
                   @click.stop="toggleEditMode(fieldName)"
                   class="edit-button"
                   :class="{ 'is-hidden': !(activeTab === fieldName && !isEditing(fieldName)) }"
