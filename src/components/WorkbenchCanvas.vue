@@ -11,8 +11,8 @@
             <h3>{{ getSectionDisplayName(section) }}</h3>
             <div class="section-meta">
               <span class="completion">{{ section.entity.percentComplete || 0 }}% complete</span>
-              <span class="status" :class="getStatusClass(section.entity.status)">
-                {{ formatStatus(section.entity.status) }}
+              <span class="quality-rating" :class="getQualityRatingClass(section.entity.qualityRating)">
+                {{ formatQualityRating(section.entity.qualityRating) }}
               </span>
             </div>
           </div>
@@ -275,12 +275,24 @@ const getSectionDisplayName = (section: ParsedFeasibilityStudySection): string =
   return sectionStore.getSectionDisplayName(section)
 }
 
-const getStatusClass = (status: string): string => {
-  return sectionStore.getStatusClass(status)
+const getQualityRatingClass = (qualityRating: string): string => {
+  switch (qualityRating) {
+    case 'Excellent':
+      return 'quality-rating-excellent'
+    case 'Good':
+      return 'quality-rating-good'
+    case 'Fair':
+      return 'quality-rating-fair'
+    case 'Poor':
+      return 'quality-rating-poor'
+    case 'Unrated':
+    default:
+      return 'quality-rating-unrated'
+  }
 }
 
-const formatStatus = (status: string): string => {
-  return sectionStore.formatStatus(status)
+const formatQualityRating = (qualityRating: string): string => {
+  return qualityRating || 'Unrated'
 }
 
 const setActiveTab = (tabKey: string): void => {
@@ -560,31 +572,36 @@ onMounted(() => {
   color: #6b7280;
 }
 
-.status {
+.quality-rating {
   padding: 4px 8px;
   border-radius: 6px;
-  font-size: 0.75rem;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.status-complete {
+.quality-rating-excellent {
   background: #dcfce7;
   color: #166534;
 }
 
-.status-in-progress {
+.quality-rating-good {
   background: #dbeafe;
   color: #1e40af;
 }
 
-.status-not-started {
+.quality-rating-fair {
   background: #fef3c7;
   color: #92400e;
 }
 
-.status-unknown {
+.quality-rating-poor {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.quality-rating-unrated {
   background: #f3f4f6;
   color: #6b7280;
 }
