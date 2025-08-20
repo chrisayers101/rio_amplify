@@ -28,6 +28,7 @@
               >
                 {{ formatTabName(fieldName) }}
                 <button
+                  v-if="fieldName !== 'qualityAssessment'"
                   @click.stop="toggleEditMode(fieldName)"
                   class="edit-button"
                   :class="{ 'is-hidden': !(activeTab === fieldName && !isEditing(fieldName)) }"
