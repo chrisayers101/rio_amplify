@@ -27,12 +27,7 @@ const getClient = () => {
   return client
 }
 
-// Helper functions for guideline assessment
-const isQualityAssessmentCompleted = (entity: unknown): boolean => {
-  if (!entity || typeof entity !== 'object') return false
-  return !!(entity && typeof entity === 'object' && 'qualityAssessment' in entity &&
-    (entity as Record<string, unknown>).qualityAssessment !== 'no data available')
-}
+
 
 const findMatchingGuideline = (sectionId: string) => {
   const guidelinesStore = useGuidelinesStore()
@@ -276,6 +271,23 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         selectedSections.value = [updatedSectionData]
       }
 
+      // If content was updated, automatically run guideline assessment
+      if (fieldName === 'content') {
+        console.log(`🔄 [EntityStore] Content updated, triggering automatic guideline assessment...`)
+        console.log(`[EntityStore] 📝 Field name: ${fieldName}, Section ID: ${sectionId}, Project ID: ${projectId}`)
+        console.log(`[EntityStore] 📊 Updated section data:`, updatedSectionData)
+        try {
+          console.log(`[EntityStore] 🚀 About to call runAutomaticGuidelineAssessment...`)
+          await runAutomaticGuidelineAssessment(updatedSectionData)
+          console.log(`[EntityStore] ✅ runAutomaticGuidelineAssessment completed successfully`)
+        } catch (error) {
+          console.error(`💥 [EntityStore] Error during automatic guideline assessment after content update:`, error)
+          // Don't fail the update operation if assessment fails
+        }
+      } else {
+        console.log(`⏭️ [EntityStore] Skipping automatic guideline assessment - fieldName is '${fieldName}', not 'content'`)
+      }
+
       // Database update successful
       return true
     } catch (err) {
@@ -285,143 +297,112 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
     }
   }
 
-  const setSelectedSections = async (selectedSectionsList: readonly ParsedFeasibilityStudySection[]): Promise<void> => {
-    // Enforce single selection: keep only the first item if provided
-    selectedSections.value = selectedSectionsList.length > 0 ? [selectedSectionsList[0]] : []
-
-    if (selectedSectionsList.length === 0) {
-      return
-    }
-
-    const section = selectedSectionsList[0]
-
-    // -------------------------
-    // 🔁 AUTO-GUIDELINE ASSESSMENT (inlined, reusing updateSectionEntity)
-    // -------------------------
+  /**
+   * Runs automatic guideline assessment for a section if needed
+   */  async function runAutomaticGuidelineAssessment(section: ParsedFeasibilityStudySection): Promise<void> {
     try {
-      // Check if assessment is needed
-      const alreadyAssessed = isQualityAssessmentCompleted(section.entity)
-      const hasContent = !!section.entity?.content
+      // Set loading state
+      isAssessmentRunning.value = true
 
-      if (hasContent && !alreadyAssessed) {
+      const matchingGuideline = findMatchingGuideline(section.sectionId)
 
-        // Set loading state
-        isAssessmentRunning.value = true
-
-        const matchingGuideline = findMatchingGuideline(section.sectionId)
-
-        if (!matchingGuideline) {
-          console.log(`⚠️ [EntityStore] No matching guideline found for section: ${section.sectionId}`)
-          console.log(`[EntityStore] This section will not be automatically assessed`)
-          return
-        }
-
-        console.log(`✅ [EntityStore] Found matching guideline: "${matchingGuideline.sectionName}" (ID: ${matchingGuideline.id})`)
-        console.log(`[EntityStore] 📋 Guideline markdown length: ${matchingGuideline.markdown.length} chars`)
-
-        // Prepare content to assess; support stringified JSON with { content }
-        let contentToAssess: unknown = section.entity!.content
-        if (typeof contentToAssess === 'string') {
-          try {
-            const parsed = JSON.parse(contentToAssess)
-            if (parsed && typeof parsed === 'object' && (parsed as Record<string, unknown>).content) {
-              contentToAssess = (parsed as Record<string, unknown>).content
-            }
-          } catch {
-            console.log(`[EntityStore] Content is already a string, using as-is`)
-          }
-        }
-
-
-        const assessmentResult: GuidelineAssessmentResponse = await runGuidelineAssessment(
-          contentToAssess as string,
-          matchingGuideline.markdown,
-          section.sectionName || section.sectionId,
-          section.projectId,
-          section.sectionId
-        )
-
-        if (!assessmentResult) {
-          console.warn(`❌ [EntityStore] Guideline assessment FAILED for section: ${section.sectionId}`)
-          console.warn(`[EntityStore] No assessment result returned from AI function`)
-          return
-        }
-
-        // Defensive check: ensure qualityAssessment exists and is not empty
-        if (!assessmentResult.qualityAssessment || assessmentResult.qualityAssessment.trim() === '') {
-          console.warn(`⚠️ [EntityStore] No qualityAssessment in result or it's empty; nothing to update`)
-          return
-        }
-
-        console.log(`🎉 [EntityStore] GUIDELINE ASSESSMENT COMPLETED SUCCESSFULLY!`)
-        console.log(`[EntityStore] 📊 Assessment Results:`, {
-          projectId: assessmentResult.projectId,
-          sectionId: assessmentResult.sectionId,
-          qualityAssessment: assessmentResult.qualityAssessment.substring(0, 100) + '...'
-        })
-
-        // ✅ Reuse the existing update method to write qualityAssessment only
-        console.log(`[EntityStore] 🔄 Updating via updateSectionEntity('qualityAssessment')...`)
-        const ok = await updateSectionEntity(
-          section.projectId,
-          section.sectionId,
-          'qualityAssessment',
-          assessmentResult.qualityAssessment
-        )
-
-        if (ok) {
-          console.log(`✅ [EntityStore] Section entity updated successfully via updateSectionEntity`)
-
-          // Refresh the selected section data to ensure UI shows updated assessment
-          console.log(`[EntityStore] 🔄 Refreshing selected section data...`)
-          const refreshedSection = sections.value.find(s => s.projectId === section.projectId && s.sectionId === section.sectionId)
-          if (refreshedSection) {
-            console.log(`[EntityStore] 📊 Refreshed section data:`, {
-              hasContent: !!refreshedSection.entity?.content,
-              hasQualityAssessment: !!refreshedSection.entity?.qualityAssessment,
-              qualityAssessmentLength: refreshedSection.entity?.qualityAssessment?.length || 0,
-              qualityAssessmentPreview: refreshedSection.entity?.qualityAssessment?.substring(0, 100) + '...'
-            })
-
-            // Update selectedSections with the refreshed data - force Vue reactivity
-            selectedSections.value = []
-            await nextTick()
-            selectedSections.value = [refreshedSection]
-
-            // Force another tick to ensure UI updates
-            await nextTick()
-            console.log(`[EntityStore] ✅ Selected sections updated with refreshed data`)
-
-            // Trigger a manual reactivity update by temporarily modifying and restoring
-            const temp = selectedSections.value
-            selectedSections.value = []
-            await nextTick()
-            selectedSections.value = temp
-            console.log(`[EntityStore] 🔄 Forced reactivity update`)
-          } else {
-            console.warn(`[EntityStore] ⚠️ Could not find refreshed section data`)
-          }
-        } else {
-          console.warn(`⚠️ [EntityStore] Failed to update section entity via updateSectionEntity`)
-        }
-
-        // Loading state will be reset in finally block
-        console.log(`[EntityStore] ✅ Assessment process completed successfully`)
-      } else {
-        console.log(`⏭️ [EntityStore] Skipping guideline assessment`)
-        const qaDone = isQualityAssessmentCompleted(section.entity)
-        console.log(`[EntityStore] Reason:`, {
-          hasContent,
-          hasQualityAssessment: qaDone,
-          contentLength: section.entity?.content?.length || 0,
-          qualityAssessmentLength: section.entity?.qualityAssessment?.length || 0
-        })
-
-
-
-        // Loading state will be reset in finally block
-        console.log(`[EntityStore] ℹ️ Assessment skipped`)
+      if (!matchingGuideline) {
+        console.log(`⚠️ [EntityStore] No matching guideline found for section: ${section.sectionId}`)
+        console.log(`[EntityStore] This section will not be automatically assessed`)
+        return
       }
+
+      console.log(`✅ [EntityStore] Found matching guideline: "${matchingGuideline.sectionName}" (ID: ${matchingGuideline.id})`)
+      console.log(`[EntityStore] 📋 Guideline markdown length: ${matchingGuideline.markdown.length} chars`)
+
+      // Prepare content to assess; support stringified JSON with { content }
+      let contentToAssess: unknown = section.entity!.content
+      if (typeof contentToAssess === 'string') {
+        try {
+          const parsed = JSON.parse(contentToAssess)
+          if (parsed && typeof parsed === 'object' && (parsed as Record<string, unknown>).content) {
+            contentToAssess = (parsed as Record<string, unknown>).content
+          }
+        } catch {
+          console.log(`[EntityStore] Content is already a string, using as-is`)
+        }
+      }
+
+
+      const assessmentResult: GuidelineAssessmentResponse = await runGuidelineAssessment(
+        contentToAssess as string,
+        matchingGuideline.markdown,
+        section.sectionName || section.sectionId,
+        section.projectId,
+        section.sectionId
+      )
+
+      if (!assessmentResult) {
+        console.warn(`❌ [EntityStore] Guideline assessment FAILED for section: ${section.sectionId}`)
+        console.warn(`[EntityStore] No assessment result returned from AI function`)
+        return
+      }
+
+      // Defensive check: ensure qualityAssessment exists and is not empty
+      if (!assessmentResult.qualityAssessment || assessmentResult.qualityAssessment.trim() === '') {
+        console.warn(`⚠️ [EntityStore] No qualityAssessment in result or it's empty; nothing to update`)
+        return
+      }
+
+      console.log(`🎉 [EntityStore] GUIDELINE ASSESSMENT COMPLETED SUCCESSFULLY!`)
+      console.log(`[EntityStore] 📊 Assessment Results:`, {
+        projectId: assessmentResult.projectId,
+        sectionId: assessmentResult.sectionId,
+        qualityAssessment: assessmentResult.qualityAssessment.substring(0, 100) + '...'
+      })
+
+      // ✅ Reuse the existing update method to write qualityAssessment only
+      console.log(`[EntityStore] 🔄 Updating via updateSectionEntity('qualityAssessment')...`)
+      const ok = await updateSectionEntity(
+        section.projectId,
+        section.sectionId,
+        'qualityAssessment',
+        assessmentResult.qualityAssessment
+      )
+
+      if (ok) {
+        console.log(`✅ [EntityStore] Section entity updated successfully via updateSectionEntity`)
+
+        // Refresh the selected section data to ensure UI shows updated assessment
+        console.log(`[EntityStore] 🔄 Refreshing selected section data...`)
+        const refreshedSection = sections.value.find(s => s.projectId === section.projectId && s.sectionId === section.sectionId)
+        if (refreshedSection) {
+          console.log(`[EntityStore] 📊 Refreshed section data:`, {
+            hasContent: !!refreshedSection.entity?.content,
+            hasQualityAssessment: !!refreshedSection.entity?.qualityAssessment,
+            qualityAssessmentLength: refreshedSection.entity?.qualityAssessment?.length || 0,
+            qualityAssessmentPreview: refreshedSection.entity?.qualityAssessment?.substring(0, 100) + '...'
+          })
+
+          // Update selectedSections with the refreshed data - force Vue reactivity
+          selectedSections.value = []
+          await nextTick()
+          selectedSections.value = [refreshedSection]
+
+          // Force another tick to ensure UI updates
+          await nextTick()
+          console.log(`[EntityStore] ✅ Selected sections updated with refreshed data`)
+
+          // Trigger a manual reactivity update by temporarily modifying and restoring
+          const temp = selectedSections.value
+          selectedSections.value = []
+          await nextTick()
+          selectedSections.value = temp
+          console.log(`[EntityStore] 🔄 Forced reactivity update`)
+        } else {
+          console.warn(`[EntityStore] ⚠️ Could not find refreshed section data`)
+        }
+      } else {
+        console.warn(`⚠️ [EntityStore] Failed to update section entity via updateSectionEntity`)
+      }
+
+      // Loading state will be reset in finally block
+      console.log(`[EntityStore] ✅ Assessment process completed successfully`)
     } catch {
       console.error(`💥 [EntityStore] ERROR during automatic guideline assessment`)
       console.error(`[EntityStore] Section: ${section.sectionId}`)
@@ -433,6 +414,20 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       isAssessmentRunning.value = false
       console.log(`[EntityStore] 🔄 Loading state reset in finally block to: ${isAssessmentRunning.value}`)
     }
+  }
+
+
+  const setSelectedSections = async (selectedSectionsList: readonly ParsedFeasibilityStudySection[]): Promise<void> => {
+    // Enforce single selection: keep only the first item if provided
+    selectedSections.value = selectedSectionsList.length > 0 ? [selectedSectionsList[0]] : []
+
+    if (selectedSectionsList.length === 0) {
+      return
+    }
+
+    const section = selectedSectionsList[0]
+
+
   }
 
 return {

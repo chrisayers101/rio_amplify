@@ -177,6 +177,7 @@ onUnmounted(() => {
   display: flex;
   overflow: hidden;
   position: relative;
+  height: 100%;
 }
 
 /* Chat Section (Left Half) */
@@ -186,7 +187,7 @@ onUnmounted(() => {
   background: white;
   min-width: 0;
   transition: width 0.1s ease;
-  max-height: calc(100vh - 84px);
+  height: 100%;
   overflow: hidden;
   position: relative;
 }

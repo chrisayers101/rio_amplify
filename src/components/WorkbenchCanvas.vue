@@ -395,7 +395,7 @@ onMounted(() => {
 .canvas-section {
   background: #f8fafc;
   overflow-y: auto;
-  height: calc(100vh - 84px);
+  height: 100%;
 }
 
 .canvas-content {
