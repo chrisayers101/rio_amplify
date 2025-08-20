@@ -6,7 +6,7 @@
       </div>
 
       <div v-else class="canvas-sections">
-        <div v-for="section in selectedSectionObjects" :key="`${section.projectId}-${section.sectionId}`" class="section-content">
+        <div v-for="section in resolvedSections" :key="`${section.projectId}-${section.sectionId}`" class="section-content">
           <div class="section-header">
             <h3>{{ getSectionDisplayName(section) }}</h3>
             <div class="section-meta">
@@ -42,7 +42,7 @@
             </div>
 
             <div class="tab-content">
-              <div v-if="activeTab && section.entity && section.entity[activeTab]" class="tab-panel fill-parent">
+              <div v-if="activeTab && section.entity" class="tab-panel fill-parent">
                 <!-- Edit Mode -->
                 <div v-if="isEditing(activeTab)" class="edit-mode fill-parent">
                   <div class="edit-controls fill-parent">
@@ -50,6 +50,7 @@
                       v-model="editValues[activeTab]"
                       class="edit-textarea fill-parent"
                       :placeholder="`Edit ${formatTabName(activeTab)}...`"
+                      :key="`edit-${activeTab}-${currentTabValue.length}`"
                     ></textarea>
                     <div class="edit-actions">
                       <button
@@ -80,14 +81,14 @@
                           <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
                           <span class="property-value">
                           <span class="markdown-inline">
-                            <VueMarkdown class="markdown-body" :source="formatMarkdownSource(String(propValue))" :md="md" />
+                            <VueMarkdown class="markdown-body" :key="`${section.projectId}-${section.sectionId}-${propKey}-${String(propValue).length}`" :source="formatMarkdownSource(String(propValue))" :md="md" />
                           </span>
                           </span>
                         </div>
                       </div>
                       <div v-else class="simple-value">
                         <span class="markdown-inline">
-                          <VueMarkdown class="markdown-body" :source="formatMarkdownSource(String(item))" :md="md" />
+                          <VueMarkdown class="markdown-body" :key="`${section.projectId}-${section.sectionId}-array-${index}-${String(item).length}`" :source="formatMarkdownSource(String(item))" :md="md" />
                         </span>
                       </div>
                     </div>
@@ -98,7 +99,7 @@
                       <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
                       <span class="property-value">
                         <span class="markdown-inline">
-                          <VueMarkdown class="markdown-body" :source="formatMarkdownSource(String(propValue))" :md="md" />
+                          <VueMarkdown class="markdown-body" :key="`${section.projectId}-${section.sectionId}-${propKey}-${String(propValue).length}`" :source="formatMarkdownSource(String(propValue))" :md="md" />
                         </span>
                       </span>
                     </div>
@@ -114,7 +115,8 @@
                     <div v-else class="markdown-content scrollable">
                       <VueMarkdown
                         class="markdown-body"
-                        :source="formatMarkdownSource(section.entity[activeTab] || '')"
+                        :key="mdKey"
+                        :source="formatMarkdownSource(currentTabValue)"
                         :md="md"
                       />
                     </div>
@@ -139,7 +141,7 @@
 
 <script setup lang="ts">
 import { PencilSquareIcon } from '@heroicons/vue/24/outline'
-import { ref, watch, nextTick, onMounted } from 'vue'
+import { ref, watch, nextTick, onMounted, computed } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
 import type { ParsedFeasibilityStudySection } from '../../shared'
 import VueMarkdown from 'vue-markdown-render'
@@ -190,6 +192,31 @@ const emit = defineEmits<{
 // Use the store
 const sectionStore = useFeasibilityStudySectionStore()
 
+// Computed properties for better reactivity
+const resolvedSections = computed(() => {
+  // for each section coming in via props,
+  // try to find the latest version by id in the store
+  return props.selectedSectionObjects.map(p =>
+    sectionStore.sections.find(
+      s => s.projectId === p.projectId && s.sectionId === p.sectionId
+    ) ?? p // fall back to the prop object if not found yet
+  )
+})
+
+const first = computed(() => resolvedSections.value[0])
+
+const currentTabValue = computed(() => {
+  const s = first.value
+  if (!s || !s.entity || !activeTab.value) return ''
+  return String(s.entity[activeTab.value] ?? '')
+})
+
+// Change the key whenever the content changes
+const mdKey = computed(() => {
+  const s = first.value
+  return `${s?.projectId}-${s?.sectionId}-${activeTab.value}-${currentTabValue.value.length}`
+})
+
 // State
 const activeTab = ref<string>('')
 
@@ -201,8 +228,8 @@ const originalValues = ref<Record<string, string>>({})
 
 // Set the first available tab as active if sections are selected
 const initializeActiveTab = () => {
-  if (props.selectedSectionObjects.length > 0 && props.selectedSectionObjects[0].entity) {
-    const entity = props.selectedSectionObjects[0].entity
+  if (resolvedSections.value.length > 0 && resolvedSections.value[0].entity) {
+    const entity = resolvedSections.value[0].entity
     const preferredOrder = ['content', 'qualityAssessment']
     const firstKey = preferredOrder.find(k => typeof entity[k] === 'string' && String(entity[k]).trim().length > 0) || preferredOrder[0]
     activeTab.value = firstKey
@@ -211,8 +238,8 @@ const initializeActiveTab = () => {
   }
 }
 
-// Watch for changes in selected sections
-watch(() => props.selectedSectionObjects, () => {
+// Watch for changes in resolved sections (which includes store updates)
+watch(() => resolvedSections.value, () => {
   initializeActiveTab()
 }, { immediate: true })
 
@@ -244,13 +271,13 @@ const formatPropertyName = (key: string): string => {
 const getVisibleTabs = (section: ParsedFeasibilityStudySection): string[] => {
   const allowed = ['content', 'qualityAssessment']
   const entity = section.entity || {}
-  return allowed.filter(key => entity[key] !== undefined && String(entity[key]).trim().length > 0)
+  return allowed.filter(key => entity[key] !== undefined) // keep even if empty
 }
 
 // Helper function to update local section data immediately
 const updateLocalSectionData = (projectId: string, sectionId: string, fieldName: string, newValue: string): void => {
   // Update the selected sections immediately for instant UI feedback
-  const updatedSections = props.selectedSectionObjects.map(section => {
+  const updatedSections = resolvedSections.value.map(section => {
     if (section.projectId === projectId && section.sectionId === sectionId) {
       // Create a new section object with updated entity
       const updatedEntity = {
@@ -276,7 +303,7 @@ const toggleEditMode = (fieldName: string): void => {
     cancelEdit(fieldName)
   } else {
     // Enter edit mode
-    const currentValue = props.selectedSectionObjects[0]?.entity?.[fieldName]
+    const currentValue = resolvedSections.value[0]?.entity?.[fieldName]
     if (currentValue !== undefined) {
       editMode.value[fieldName] = true
       editValues.value[fieldName] = String(currentValue)
@@ -311,15 +338,7 @@ const saveEdit = async (projectId: string, sectionId: string, fieldName: string)
       // Update local state immediately for instant UI feedback
       updateLocalSectionData(projectId, sectionId, fieldName, savedValue)
 
-      // Ensure the active tab is still set and content is visible
-      if (activeTab.value === fieldName) {
-        // Force a reactive update by temporarily clearing and restoring the active tab
-        const currentTab = activeTab.value
-        activeTab.value = ''
-        setTimeout(() => {
-          activeTab.value = currentTab
-        }, 10)
-      }
+      // The computed properties will handle reactivity automatically
 
       // Refresh the store data in the background
       sectionStore.fetchSections().catch(console.error)
@@ -382,7 +401,7 @@ const renderMermaidBlocks = (): void => {
 }
 
 // Re-render diagrams when content/tab changes
-watch([activeTab, () => props.selectedSectionObjects], () => {
+watch([activeTab, () => resolvedSections.value], () => {
   renderMermaidBlocks()
 })
 

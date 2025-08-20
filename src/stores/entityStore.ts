@@ -263,12 +263,14 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
       const index = sections.value.findIndex(s => s.projectId === projectId && s.sectionId === sectionId)
       if (index !== -1) {
         sections.value[index] = updatedSectionData
+        sections.value = [...sections.value] // Force new array ref for better reactivity
       }
 
       // Keep selectedSections in sync
       const isSelected = selectedSections.value.some(s => s.projectId === projectId && s.sectionId === sectionId)
       if (isSelected) {
         selectedSections.value = [updatedSectionData]
+        // Force new array ref for better reactivity
       }
 
       // If content was updated, automatically run guideline assessment
