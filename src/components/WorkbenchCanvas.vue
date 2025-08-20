@@ -422,6 +422,8 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  height: 100%;
+  min-height: 100%;
 }
 
 .section-content {
@@ -430,6 +432,8 @@ onMounted(() => {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  min-height: 0;
 }
 
 .section-header {
