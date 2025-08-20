@@ -9,7 +9,8 @@
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
     "entity": {
-      "content": "## Feasibility Study – Executive Summary\n\n*Generated: 07 Aug 2025 • Consolidated from internal sources and prior studies*\n\n---\n\n## 1. Project Snapshot\n\n| Item | Detail |\n|---|---|\n| **Location** | Weipa, Western Cape York, QLD (Australia) |\n| **Leases** | Andoom – Special Bauxite Mining Lease ML7024 (plus ML6024) |\n| **Development Window** | 2008–2020 (baseline 2008–2013) |\n| **Mine Life** | ~20 years |\n| **Mining Method** | Open-pit; truck-and-shovel |\n| **Target Market** | China primary; global demand supports base case |\n| **Regulatory Regime** | EPBC Act; Water Resources Act; Sea Dumping Act; QLD EPA & SDPWO Act |\n| **Key Agreements** | Western Cape Communities Co‑existence Agreement (WCCCA) |\n\n---\n\n## 2. Executive Summary\n\n- Environmental and operational approvals substantially secured (2008–2013); clear pathway for remaining permits.\n- Phased ramp-up aligns with portfolio strategy; limits early capital exposure.\n- NPV (10% DR) remains positive across modeled sensitivities.\n- IRR ~15% (>12% hurdle).\n- CAPEX ~US$500M initial; OPEX competitive versus peers.\n- Break-even targeted within five years of first production.\n- 20-year LOM supported by current reserve models and optimization studies.\n\n---\n\n## 3. Finance\n\n| Metric | Value | Notes |\n|---|---|---|\n| Discount rate (base) | 10% | Risk-adjusted |\n| NPV (10%) | Positive | See sensitivities |\n| IRR | ~15% | Above hurdle |\n| CAPEX | US$300M (detail), US$500M total incl. contingency | 10% contingency |\n| OPEX | US$50/t | Benchmarked to peers |\n| Break-even volume | 3 Mtpa | Scenario analysis |\n\nSensitivity analysis indicates resilience to price, FX, and cost shocks.\n\n---\n\n## 4. Strategic Alignment\n\n- Tier‑1 brownfield expansion in Rio Tinto Aluminium – Weipa hub.\n- Supports goals for reserve replacement, portfolio optimization, and ESG leadership.\n- Leverages existing port and road infrastructure; ~10% incremental share capture potential.\n- Aligns with Rio Tinto Environmental & Communities Standards and The Way We Work.\n\n---\n\n## 5. Regulatory & Approvals\n\n**Federal**\n\n- EPBC Act approvals (Commonwealth waters and MNES).\n- Sea Dumping Act consent for marine works.\n\n**State (Queensland)**\n\n- SDPWO Act coordination; QLD EPA licenses for Environmentally Relevant Activities.\n- Coordinator‑General oversight; design acceptances obtained.\n\n**Stakeholder Framework**\n\n- WCCCA provides engagement and social‑license structure.\n- EIS program (initiated 2008) with specialist providers across environment and heritage.\n\n---\n\n## 6. Business Structure\n\n- Entity: Rio Tinto Alcan (100% ownership; no JVs).\n- Leases: ML7024 (tidal wharf works), ML6024 (harbor rights).\n- Clear governance and decision rights; balanced capital structure and diversified funding.\n\n---\n\n## 7. Resources & Reserves\n\n| Category | Tonnes (Mt) | Grade % Al₂O₃ | Contained Metal (Mt) | Cut‑off % | Density (t/m³) | Confidence | Notes |\n|---:|---:|---:|---:|---:|---:|---|---|\n| Measured | 100 | 45.0 | 45 | 30.5 | — | High | Dense drill grid |\n| Indicated | 200 | 42.5 | 85 | 30.5 | — | Moderate | Geo‑model validated |\n| Inferred | 50 | 40.0 | 20 | 30.5 | — | Low | Further drilling required |\n| Proven | 80 | 44.0 | 35 | 30.5 | — | High | Core sampled |\n| Probable | 120 | 43.0 | 52 | 30.5 | — | Moderate | Reserve models |\n\nEstimation follows JORC 2012 guidance with block modeling and geostatistical validation.\n\n---\n\n## 8. Risks & Mitigations\n\n| Risk Class | Key Exposure | Mitigation |\n|---|---|---|\n| High (III–IV) | Marine Protected Areas; EPBC‑listed species | Route optimization; offsets |\n| High (III–IV) | Outload equipment failure | Redundant design; regular NDT |\n| High (III–IV) | Demand volatility (China) | Diversified offtake; price hedging |\n| Moderate (II) | Ground conditions / mobility | Bearing‑capacity testing; design margins |\n| Moderate (II) | Weather delays | Historical weather analytics; berth redundancy |\n| Low (I) | Community relations | WCCCA engagement; benefit sharing |\n\nRisk register reviewed quarterly; owners assigned and residual risk tracked.\n\n---\n\n## 9. Development Options & Decision Rationale\n\n| Scenario | CAPEX | NPV | IRR | LOM | Key Finding |\n|---|---|---|---|---|---|\n| 5 Mtpa | Base case | ✔︎ | ✔︎ | 20 y | Meets strategic goals with lower risk |\n| 10 Mtpa | +30% | ↑ | ↑ | 18 y | Higher value but larger exposure |\n| 15 Mtpa | +60% | Highest | Highest | 16 y | Best NPV but capital‑intensive |\n\nWeighted decision matrix indicates 5 Mtpa preferred, balancing value and risk.\n\n---\n\n## 10. Technical Overview\n\n- Mining: open‑pit; truck‑shovel fleet sized via optimization; ~95% recovery.\n- Processing: proven bauxite beneficiation; low‑complexity, cost‑efficient configuration.\n- Infrastructure: 50 MW power, 100 km water pipeline, port upgrades (ML7024).\n- Geotechnical: stable host; UCS ~150 MPa; minimal seismicity.\n\n---\n\n## 11. Assumptions & Validation\n\n| Domain | Key Assumption | Validation |\n|---|---|---|\n| Market | US$50/t bauxite | Historical trends; expert consensus |\n| Discount rate | 10% | WACC + risk premium |\n| Inflation | 2% CPI | Government data and internal forecasts |\n| Recovery | 95% | Pilot trials; benchmarks |\n\nSensitivity tests (±20%) show robust NPV; contingency plans in place.\n\n---\n\n## 12. Timeline (2008–2013 key milestones)\n\n```mermaid\ngantt\n    title Development & Approval Schedule\n    dateFormat  YYYY\n    section Approvals\n    EPBC Approval           :done, a1, 2008, 1y\n    State Permits           :done, a2, 2008, 1y\n    EIS Public Display      :a3, 2009, 0.5y\n    Coordinator-General Eval:after a3, 0.5y\n    section Construction\n    Early Works             :b1, 2010, 1y\n    Plant & Port Build      :b2, 2011, 2y\n    Commissioning           :c1, 2013, 0.5y\n    section Operations\n    Ramp-up to 5 Mtpa       :c2, after c1, 2y\n```",
+      // "content": "## Feasibility Study – Executive Summary\n\n*Generated: 07 Aug 2025 • Consolidated from internal sources and prior studies*\n\n---\n\n## 1. Project Snapshot\n\n| Item | Detail |\n|---|---|\n| **Location** | Weipa, Western Cape York, QLD (Australia) |\n| **Leases** | Andoom – Special Bauxite Mining Lease ML7024 (plus ML6024) |\n| **Development Window** | 2008–2020 (baseline 2008–2013) |\n| **Mine Life** | ~20 years |\n| **Mining Method** | Open-pit; truck-and-shovel |\n| **Target Market** | China primary; global demand supports base case |\n| **Regulatory Regime** | EPBC Act; Water Resources Act; Sea Dumping Act; QLD EPA & SDPWO Act |\n| **Key Agreements** | Western Cape Communities Co‑existence Agreement (WCCCA) |\n\n---\n\n## 2. Executive Summary\n\n- Environmental and operational approvals substantially secured (2008–2013); clear pathway for remaining permits.\n- Phased ramp-up aligns with portfolio strategy; limits early capital exposure.\n- NPV (10% DR) remains positive across modeled sensitivities.\n- IRR ~15% (>12% hurdle).\n- CAPEX ~US$500M initial; OPEX competitive versus peers.\n- Break-even targeted within five years of first production.\n- 20-year LOM supported by current reserve models and optimization studies.\n\n---\n\n## 3. Finance\n\n| Metric | Value | Notes |\n|---|---|---|\n| Discount rate (base) | 10% | Risk-adjusted |\n| NPV (10%) | Positive | See sensitivities |\n| IRR | ~15% | Above hurdle |\n| CAPEX | US$300M (detail), US$500M total incl. contingency | 10% contingency |\n| OPEX | US$50/t | Benchmarked to peers |\n| Break-even volume | 3 Mtpa | Scenario analysis |\n\nSensitivity analysis indicates resilience to price, FX, and cost shocks.\n\n---\n\n## 4. Strategic Alignment\n\n- Tier‑1 brownfield expansion in Rio Tinto Aluminium – Weipa hub.\n- Supports goals for reserve replacement, portfolio optimization, and ESG leadership.\n- Leverages existing port and road infrastructure; ~10% incremental share capture potential.\n- Aligns with Rio Tinto Environmental & Communities Standards and The Way We Work.\n\n---\n\n## 5. Regulatory & Approvals\n\n**Federal**\n\n- EPBC Act approvals (Commonwealth waters and MNES).\n- Sea Dumping Act consent for marine works.\n\n**State (Queensland)**\n\n- SDPWO Act coordination; QLD EPA licenses for Environmentally Relevant Activities.\n- Coordinator‑General oversight; design acceptances obtained.\n\n**Stakeholder Framework**\n\n- WCCCA provides engagement and social‑license structure.\n- EIS program (initiated 2008) with specialist providers across environment and heritage.\n\n---\n\n## 6. Business Structure\n\n- Entity: Rio Tinto Alcan (100% ownership; no JVs).\n- Leases: ML7024 (tidal wharf works), ML6024 (harbor rights).\n- Clear governance and decision rights; balanced capital structure and diversified funding.\n\n---\n\n## 7. Resources & Reserves\n\n| Category | Tonnes (Mt) | Grade % Al₂O₃ | Contained Metal (Mt) | Cut‑off % | Density (t/m³) | Confidence | Notes |\n|---:|---:|---:|---:|---:|---:|---|---|\n| Measured | 100 | 45.0 | 45 | 30.5 | — | High | Dense drill grid |\n| Indicated | 200 | 42.5 | 85 | 30.5 | — | Moderate | Geo‑model validated |\n| Inferred | 50 | 40.0 | 20 | 30.5 | — | Low | Further drilling required |\n| Proven | 80 | 44.0 | 35 | 30.5 | — | High | Core sampled |\n| Probable | 120 | 43.0 | 52 | 30.5 | — | Moderate | Reserve models |\n\nEstimation follows JORC 2012 guidance with block modeling and geostatistical validation.\n\n---\n\n## 8. Risks & Mitigations\n\n| Risk Class | Key Exposure | Mitigation |\n|---|---|---|\n| High (III–IV) | Marine Protected Areas; EPBC‑listed species | Route optimization; offsets |\n| High (III–IV) | Outload equipment failure | Redundant design; regular NDT |\n| High (III–IV) | Demand volatility (China) | Diversified offtake; price hedging |\n| Moderate (II) | Ground conditions / mobility | Bearing‑capacity testing; design margins |\n| Moderate (II) | Weather delays | Historical weather analytics; berth redundancy |\n| Low (I) | Community relations | WCCCA engagement; benefit sharing |\n\nRisk register reviewed quarterly; owners assigned and residual risk tracked.\n\n---\n\n## 9. Development Options & Decision Rationale\n\n| Scenario | CAPEX | NPV | IRR | LOM | Key Finding |\n|---|---|---|---|---|---|\n| 5 Mtpa | Base case | ✔︎ | ✔︎ | 20 y | Meets strategic goals with lower risk |\n| 10 Mtpa | +30% | ↑ | ↑ | 18 y | Higher value but larger exposure |\n| 15 Mtpa | +60% | Highest | Highest | 16 y | Best NPV but capital‑intensive |\n\nWeighted decision matrix indicates 5 Mtpa preferred, balancing value and risk.\n\n---\n\n## 10. Technical Overview\n\n- Mining: open‑pit; truck‑shovel fleet sized via optimization; ~95% recovery.\n- Processing: proven bauxite beneficiation; low‑complexity, cost‑efficient configuration.\n- Infrastructure: 50 MW power, 100 km water pipeline, port upgrades (ML7024).\n- Geotechnical: stable host; UCS ~150 MPa; minimal seismicity.\n\n---\n\n## 11. Assumptions & Validation\n\n| Domain | Key Assumption | Validation |\n|---|---|---|\n| Market | US$50/t bauxite | Historical trends; expert consensus |\n| Discount rate | 10% | WACC + risk premium |\n| Inflation | 2% CPI | Government data and internal forecasts |\n| Recovery | 95% | Pilot trials; benchmarks |\n\nSensitivity tests (±20%) show robust NPV; contingency plans in place.\n\n---\n\n## 12. Timeline (2008–2013 key milestones)\n\n```mermaid\ngantt\n    title Development & Approval Schedule\n    dateFormat  YYYY\n    section Approvals\n    EPBC Approval           :done, a1, 2008, 1y\n    State Permits           :done, a2, 2008, 1y\n    EIS Public Display      :a3, 2009, 0.5y\n    Coordinator-General Eval:after a3, 0.5y\n    section Construction\n    Early Works             :b1, 2010, 1y\n    Plant & Port Build      :b2, 2011, 2y\n    Commissioning           :c1, 2013, 0.5y\n    section Operations\n    Ramp-up to 5 Mtpa       :c2, after c1, 2y\n```",
+      "content": "not started" ,
       "qualityAssessment": "no data available"
 }
   },
@@ -23,7 +24,7 @@
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
     "entity": {
-      "content": "## Business Strategy Summary\n\nThe Amrun Bauxite Project represents a strategic investment aligned with Rio Tinto's portfolio optimization strategy. The project demonstrates strong alignment with business unit objectives and shows potential for significant value creation through operational excellence and market positioning.\n\nKey business strategy elements include:\n\n- **Portfolio Alignment**: Fits strategically within Rio Tinto's bauxite portfolio\n- **Market Position**: Leverages existing infrastructure and market relationships\n- **Operational Synergies**: Builds on established operational capabilities\n- **Growth Potential**: Provides platform for future expansion opportunities\n\n### Strategic Objectives\n\n- Achieve first quartile cost position in the bauxite industry\n- Establish sustainable operations with strong community relationships\n- Develop export infrastructure supporting regional economic development\n- Maintain environmental leadership standards throughout project lifecycle",
+     "content": "not started" ,
       "qualityAssessment": "no data available"
     }
   },
@@ -36,7 +37,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -47,7 +48,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -58,7 +59,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -69,7 +70,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -80,7 +81,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -91,7 +92,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -102,7 +103,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -113,7 +114,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -124,7 +125,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -135,7 +136,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -146,7 +147,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -157,7 +158,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -168,7 +169,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -179,7 +180,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -190,7 +191,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -201,7 +202,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -212,7 +213,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -223,7 +224,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -234,7 +235,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -245,7 +246,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -256,7 +257,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -267,7 +268,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -278,7 +279,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -289,7 +290,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -300,7 +301,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -311,7 +312,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -322,7 +323,7 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   },
   {
     "projectId": "AMRUN",
@@ -333,6 +334,6 @@
     "qualityRating": "Unrated",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-12-19T14:30:00Z",
-    "entity": { "content": "## not started" , "qualityAssessment": "no data available" }
+    "entity": { "content": "not started" , "qualityAssessment": "no data available" }
   }
 ]

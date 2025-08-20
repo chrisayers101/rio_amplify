@@ -111,6 +111,18 @@
                       <div class="loading-spinner-large"></div>
                       <p class="loading-text">Running quality assessment...</p>
                     </div>
+                    <!-- Show create content button when content is "not started" -->
+                    <div v-else-if="isContentNotStarted" class="create-content-container">
+                      <div class="create-content-message">
+                        <p class="create-content-text">No content has been created for this section yet.</p>
+                        <button
+                          @click="createContentFromCorpus"
+                          class="create-content-button"
+                        >
+                          Create content from document corpus
+                        </button>
+                      </div>
+                    </div>
                     <!-- Render all content as markdown when not loading -->
                     <div v-else class="markdown-content scrollable">
                       <VueMarkdown
@@ -209,6 +221,13 @@ const currentTabValue = computed(() => {
   const s = first.value
   if (!s || !s.entity || !activeTab.value) return ''
   return String(s.entity[activeTab.value] ?? '')
+})
+
+// Check if content is "not started" to show the create content button
+const isContentNotStarted = computed(() => {
+  const s = first.value
+  if (!s || !s.entity || activeTab.value !== 'content') return false
+  return String(s.entity.content || '').trim().toLowerCase() === 'not started'
 })
 
 // Change the key whenever the content changes
@@ -356,6 +375,22 @@ const cancelEdit = (fieldName: string): void => {
   editMode.value[fieldName] = false
   delete editValues.value[fieldName]
   delete originalValues.value[fieldName]
+}
+
+// Handle creating content from document corpus
+const createContentFromCorpus = async (): Promise<void> => {
+  if (!first.value) return
+
+  try {
+    // TODO: Implement the actual logic to create content from document corpus
+    console.log('Creating content from document corpus for:', first.value.projectId, first.value.sectionId)
+
+    // For now, just show a placeholder message
+    // This would typically call an API endpoint or trigger a workflow
+    alert('Content creation from document corpus feature coming soon!')
+  } catch (error) {
+    console.error('Error creating content from corpus:', error)
+  }
 }
 
 // Markdown is rendered via <VueMarkdown :source="..." />
@@ -705,6 +740,51 @@ onMounted(() => {
   font-size: 16px;
   font-weight: 500;
   margin: 0;
+}
+
+/* Create Content Styles */
+.create-content-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 40px;
+}
+
+.create-content-message {
+  text-align: center;
+  max-width: 400px;
+}
+
+.create-content-text {
+  color: #6b7280;
+  font-size: 16px;
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+}
+
+.create-content-button {
+  background: #008C8E;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.create-content-button:hover {
+  background: #007a7c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.create-content-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 @keyframes spin {
