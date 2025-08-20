@@ -35,7 +35,7 @@
                   <span class="loading-spinner-small"></span>
                 </span>
                 <button
-                  v-if="fieldName !== 'qualityAssessment' && fieldName !== 'hyperlinks'"
+                  v-if="fieldName !== 'qualityAssessment' && fieldName !== 'references'"
                   @click.stop="toggleEditMode(fieldName)"
                   class="edit-button"
                   :class="{ 'is-hidden': !(activeTab === fieldName && !isEditing(fieldName)) }"
@@ -84,43 +84,42 @@
 
                 <!-- View Mode -->
                 <div v-else class="view-mode">
-                  <div v-if="Array.isArray(section.entity[activeTab])" class="array-content">
-                    <!-- Special rendering for hyperlinks -->
-                    <div v-if="activeTab === 'hyperlinks'" class="hyperlinks-content">
-                      <div v-for="(hyperlink, index) in section.entity[activeTab]" :key="index" class="hyperlink-item">
-                        <div class="hyperlink-header">
-                          <h4 class="hyperlink-filename">{{ hyperlink.filename }}</h4>
-                          <a
-                            :href="hyperlink.hyperlink"
-                            :target="isExternalLink(hyperlink.hyperlink) ? '_blank' : '_self'"
-                            class="hyperlink-link"
-                            rel="noopener noreferrer"
-                          >
-                            <span class="link-icon">🔗</span>
-                            {{ isExternalLink(hyperlink.hyperlink) ? 'Open Link' : 'View File' }}
-                          </a>
-                        </div>
-                        <p class="hyperlink-description">{{ hyperlink.description }}</p>
+                  <!-- Special rendering for references tab -->
+                  <div v-if="activeTab === 'references'" class="references-content">
+                    <div v-for="(reference, index) in getReferences(section)" :key="index" class="reference-item">
+                      <div class="reference-header">
+                        <h4 class="reference-filename">{{ reference.filename }}</h4>
+                        <a
+                          :href="reference.hyperlink"
+                          :target="isExternalLink(reference.hyperlink) ? '_blank' : '_self'"
+                          class="reference-link"
+                          rel="noopener noreferrer"
+                        >
+                          <span class="link-icon">🔗</span>
+                          {{ isExternalLink(reference.hyperlink) ? 'Open Link' : 'View File' }}
+                        </a>
                       </div>
+                      <p class="reference-description">{{ reference.description }}</p>
                     </div>
-                    <!-- Default array rendering for other array types -->
-                    <div v-else>
-                      <div v-for="(item, index) in section.entity[activeTab]" :key="index" class="array-item">
-                        <div v-if="typeof item === 'object' && item !== null" class="object-item">
-                          <div v-for="(propValue, propKey) in item" :key="String(propKey)" class="property">
-                            <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
-                            <span class="property-value">
-                            <span class="markdown-inline">
-                              <VueMarkdown class="markdown-body" :key="`${section.projectId}-${section.sectionId}-${propKey}-${String(propValue).length}`" :source="formatMarkdownSource(String(propValue))" :md="md" />
-                            </span>
-                            </span>
-                          </div>
-                        </div>
-                        <div v-else class="simple-value">
+                  </div>
+
+                  <!-- Default array rendering for other array types -->
+                  <div v-else-if="Array.isArray(section.entity[activeTab])" class="array-content">
+                    <div v-for="(item, index) in section.entity[activeTab]" :key="index" class="array-item">
+                      <div v-if="typeof item === 'object' && item !== null" class="object-item">
+                        <div v-for="(propValue, propKey) in item" :key="String(propKey)" class="property">
+                          <span class="property-key">{{ formatPropertyName(String(propKey)) }}:</span>
+                          <span class="property-value">
                           <span class="markdown-inline">
-                            <VueMarkdown class="markdown-body" :key="`${section.projectId}-${section.sectionId}-array-${index}-${String(item).length}`" :source="formatMarkdownSource(String(item))" :md="md" />
+                            <VueMarkdown class="markdown-body" :key="`${section.projectId}-${section.sectionId}-${propKey}-${String(propValue).length}`" :source="formatMarkdownSource(String(propValue))" :md="md" />
+                          </span>
                           </span>
                         </div>
+                      </div>
+                      <div v-else class="simple-value">
+                        <span class="markdown-inline">
+                          <VueMarkdown class="markdown-body" :key="`${section.projectId}-${section.sectionId}-array-${index}-${String(item).length}`" :source="formatMarkdownSource(String(item))" :md="md" />
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -188,7 +187,7 @@
 import { PencilSquareIcon } from '@heroicons/vue/24/outline'
 import { ref, watch, nextTick, onMounted, computed } from 'vue'
 import { useFeasibilityStudySectionStore } from '@/stores/entityStore'
-import type { ParsedFeasibilityStudySection } from '../../shared'
+import type { ParsedFeasibilityStudySection, Reference } from '../../shared'
 import { getCorpusSection } from '../../shared'
 import VueMarkdown from 'vue-markdown-render'
 import MarkdownIt from 'markdown-it'
@@ -365,11 +364,31 @@ const isExternalLink = (url: string): boolean => {
   }
 }
 
-// Compute the visible tabs for a given section, restricted to Content, Quality Assessment, and Hyperlinks in order
-const getVisibleTabs = (section: ParsedFeasibilityStudySection): string[] => {
-  const allowed = ['content', 'qualityAssessment', 'hyperlinks']
+// Helper function to get references from either 'references' or 'hyperlinks' property
+// This provides backward compatibility while we transition from the old property name
+const getReferences = (section: ParsedFeasibilityStudySection): Reference[] => {
   const entity = section.entity || {}
-  return allowed.filter(key => entity[key] !== undefined) // keep even if empty
+  // Check for new 'references' property first, fall back to old 'hyperlinks' property
+  const references = (entity.references as Reference[]) || (entity.hyperlinks as Reference[]) || []
+  console.log('getReferences called for section:', section.sectionId, 'entity:', entity, 'result:', references)
+  return references
+}
+
+// Compute the visible tabs for a given section, restricted to Content, Quality Assessment, and References in order
+const getVisibleTabs = (section: ParsedFeasibilityStudySection): string[] => {
+  const allowed = ['content', 'qualityAssessment']
+  const entity = section.entity || {}
+  const tabs = allowed.filter(key => entity[key] !== undefined)
+
+  // Add References tab if either 'references' or 'hyperlinks' property exists and has items
+  const references = getReferences(section)
+  console.log('getVisibleTabs for section:', section.sectionId, 'references found:', references, 'length:', references?.length)
+  if (references && references.length > 0) {
+    tabs.push('references')
+    console.log('Added references tab for section:', section.sectionId)
+  }
+
+  return tabs
 }
 
 // Helper function to update local section data immediately
@@ -1002,14 +1021,14 @@ onMounted(() => {
   min-height: 100%;
 }
 
-/* Hyperlinks Styles */
-.hyperlinks-content {
+/* References Styles */
+.references-content {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.hyperlink-item {
+.reference-item {
   background: #f9fafb;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -1017,12 +1036,12 @@ onMounted(() => {
   transition: all 0.2s;
 }
 
-.hyperlink-item:hover {
+.reference-item:hover {
   border-color: #008C8E;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.hyperlink-header {
+.reference-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -1030,7 +1049,7 @@ onMounted(() => {
   gap: 16px;
 }
 
-.hyperlink-filename {
+.reference-filename {
   font-size: 1.1rem;
   font-weight: 600;
   color: #111827;
@@ -1038,7 +1057,7 @@ onMounted(() => {
   flex: 1;
 }
 
-.hyperlink-link {
+.reference-link {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1054,7 +1073,7 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-.hyperlink-link:hover {
+.reference-link:hover {
   background: #007a7c;
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
@@ -1064,7 +1083,7 @@ onMounted(() => {
   font-size: 14px;
 }
 
-.hyperlink-description {
+.reference-description {
   color: #6b7280;
   font-size: 0.875rem;
   line-height: 1.5;
@@ -1271,13 +1290,13 @@ onMounted(() => {
     width: 100%;
   }
 
-  .hyperlink-header {
+  .reference-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
 
-  .hyperlink-link {
+  .reference-link {
     width: 100%;
     justify-content: center;
   }
