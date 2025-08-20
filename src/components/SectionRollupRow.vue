@@ -9,16 +9,16 @@
       <div class="progress-bar">
         <div
           class="progress-fill"
-          :style="{ width: `${section.percentComplete}%` }"
-          :class="getProgressClass(section.percentComplete)"
+          :style="{ width: `${section.entity.percentComplete}%` }"
+          :class="getProgressClass(section.entity.percentComplete)"
         ></div>
       </div>
-      <div class="progress-text">{{ section.percentComplete }}%</div>
+      <div class="progress-text">{{ section.entity.percentComplete }}%</div>
     </div>
 
     <div class="section-metrics">
-      <div class="quality-badge" :class="getQualityClass(section.qualityRating)">
-        {{ section.qualityRating }}
+      <div class="quality-badge" :class="getQualityClass(section.entity.qualityRating)">
+        {{ section.entity.qualityRating }}
       </div>
       <div class="metrics">
         <span class="metric">
@@ -44,11 +44,23 @@
 interface Section {
   sectionId: string
   sectionName: string
-  percentComplete: number
+  entity: {
+    percentComplete: number
+    qualityRating: string
+  }
   statusOfCompleteness: string
-  qualityRating: string
-  issues: any[]
-  observations: any[]
+  issues: Array<{
+    id: string
+    description: string
+    status: string
+    source: string
+  }>
+  observations: Array<{
+    id: string
+    text: string
+    source: string
+    changeOccurred: boolean
+  }>
 }
 
 interface Props {

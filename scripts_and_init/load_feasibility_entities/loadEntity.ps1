@@ -20,6 +20,9 @@ foreach ($tableName in $tableNames) {
         # Build the entity map structure properly for DynamoDB
         $entityMap = @{
             "content" = @{ "S" = $item.entity.content }
+            "percentComplete" = @{ "N" = $item.entity.percentComplete.ToString() }
+            "status" = @{ "S" = $item.entity.status }
+            "qualityRating" = @{ "S" = $item.entity.qualityRating }
         }
         
         if ($null -eq $item.entity.qualityAssessment) {
@@ -32,9 +35,6 @@ foreach ($tableName in $tableNames) {
             "projectId" = @{ "S" = $item.projectId }
             "sectionId" = @{ "S" = $item.sectionId }
             "sectionName" = @{ "S" = $item.sectionName }
-            "percentComplete" = @{ "N" = $item.percentComplete.ToString() }
-            "status" = @{ "S" = $item.status }
-            "qualityRating" = @{ "S" = $item.qualityRating }
             "createdAt" = @{ "S" = $item.createdAt }
             "updatedAt" = @{ "S" = $item.updatedAt }
             "entity" = @{ "M" = $entityMap }

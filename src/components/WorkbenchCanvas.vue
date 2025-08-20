@@ -10,9 +10,9 @@
           <div class="section-header">
             <h3>{{ getSectionDisplayName(section) }}</h3>
             <div class="section-meta">
-              <span class="completion">{{ section.percentComplete || 0 }}% complete</span>
-              <span class="status" :class="getStatusClass(section.status)">
-                {{ formatStatus(section.status) }}
+              <span class="completion">{{ section.entity.percentComplete || 0 }}% complete</span>
+              <span class="status" :class="getStatusClass(section.entity.status)">
+                {{ formatStatus(section.entity.status) }}
               </span>
             </div>
           </div>

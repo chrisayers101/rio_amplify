@@ -75,11 +75,11 @@
                   <div class="completion-bar">
                     <div
                       class="completion-fill"
-                      :style="{ width: `${section.percentComplete || 0}%` }"
-                      :class="getCompletionClass(section.percentComplete || 0)"
+                      :style="{ width: `${section.entity.percentComplete || 0}%` }"
+                      :class="getCompletionClass(section.entity.percentComplete || 0)"
                     ></div>
                   </div>
-                  <span class="completion-text">{{ section.percentComplete || 0 }}%</span>
+                  <span class="completion-text">{{ section.entity.percentComplete || 0 }}%</span>
                 </div>
               </div>
             </div>

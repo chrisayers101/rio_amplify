@@ -227,10 +227,10 @@ export const useFeasibilityStudySectionStore = defineStore('feasibilityStudySect
         return false
       }
 
-      // Create updated entity with the new value
+      // Create updated entity with the new value, preserving all existing fields
       const updatedEntity: FeasibilityStudySectionEntity = {
-        content: fieldName === 'content' ? newValue : currentSection.entity.content,
-        qualityAssessment: fieldName === 'qualityAssessment' ? newValue : currentSection.entity.qualityAssessment
+        ...currentSection.entity, // Preserve all existing fields
+        [fieldName]: newValue // Update only the specified field
       }
 
       // Entity updated successfully

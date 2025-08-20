@@ -27,7 +27,7 @@
         v-for="section in sections"
         :key="section.sectionId"
         class="heatmap-cell"
-        :class="getQualityClass(section.qualityRating)"
+        :class="getQualityClass(section.entity.qualityRating)"
         @click="handleCellClick(section)"
       >
         <div class="cell-header">
@@ -36,9 +36,9 @@
             <div class="progress-bar">
               <div
                 class="progress-fill"
-                :style="{ width: `${section.percentComplete}%` }"
+                :style="{ width: `${section.entity.percentComplete}%` }"
               ></div>
-              <span class="progress-text">{{ section.percentComplete }}%</span>
+              <span class="progress-text">{{ section.entity.percentComplete }}%</span>
             </div>
           </div>
         </div>
@@ -63,9 +63,11 @@
 interface Section {
   sectionId: string
   sectionName: string
-  percentComplete: number
+  entity: {
+    percentComplete: number
+    qualityRating: string
+  }
   statusOfCompleteness: string
-  qualityRating: string
   issues: Array<{
     id: string
     description: string
