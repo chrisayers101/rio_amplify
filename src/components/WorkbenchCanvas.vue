@@ -382,14 +382,47 @@ const createContentFromCorpus = async (): Promise<void> => {
   if (!first.value) return
 
   try {
-    // TODO: Implement the actual logic to create content from document corpus
-    console.log('Creating content from document corpus for:', first.value.projectId, first.value.sectionId)
+    // Load the markdown content from the summary file
+    const response = await fetch('/shared/summary_feasibility_study.md')
+    if (!response.ok) {
+      throw new Error(`Failed to fetch markdown: ${response.statusText}`)
+    }
 
-    // For now, just show a placeholder message
-    // This would typically call an API endpoint or trigger a workflow
-    alert('Content creation from document corpus feature coming soon!')
+    const markdownContent = await response.text()
+
+    // Auto-save the content directly to the store
+    const projectId = first.value.projectId
+    const sectionId = first.value.sectionId
+    const fieldName = 'content'
+    
+    // Set saving state
+    isSaving.value = true
+    
+    // Save the content using the existing store method
+    const success = await sectionStore.updateSectionEntity(
+      projectId,
+      sectionId,
+      fieldName,
+      markdownContent
+    )
+
+    if (success) {
+      // Update local state immediately for instant UI feedback
+      updateLocalSectionData(projectId, sectionId, fieldName, markdownContent)
+      
+      // Refresh the store data in the background
+      sectionStore.fetchSections().catch(console.error)
+      
+      console.log('Auto-saved markdown content from corpus for:', projectId, sectionId)
+    } else {
+      throw new Error('Failed to save content from corpus')
+    }
+
   } catch (error) {
-    console.error('Error creating content from corpus:', error)
+    console.error('Error loading content from corpus:', error)
+    alert('Failed to load content from document corpus. Please try again.')
+  } finally {
+    isSaving.value = false
   }
 }
 
