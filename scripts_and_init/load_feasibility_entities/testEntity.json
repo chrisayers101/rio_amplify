@@ -10,7 +10,19 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": [
+        {
+          "filename": "Project_Summary_Report.pdf",
+          "hyperlink": "https://www.riotinto.com/",
+          "description": "Comprehensive project overview and executive summary"
+        },
+        {
+          "filename": "Recommendations_Document.docx",
+          "hyperlink": "https://www.riotinto.com/",
+          "description": "Detailed recommendations and next steps"
+        }
+      ]
     }
   },
   {
@@ -24,7 +36,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -38,7 +51,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -52,7 +66,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -66,7 +81,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -80,7 +96,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -94,7 +111,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -108,7 +126,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -122,7 +141,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -136,7 +156,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -150,7 +171,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -164,7 +186,19 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": [
+        {
+          "filename": "Environmental_Impact_Assessment.pdf",
+          "hyperlink": "https://example.com/documents/env-assessment.pdf",
+          "description": "Comprehensive environmental impact analysis and compliance report"
+        },
+        {
+          "filename": "Compliance_Checklist.xlsx",
+          "hyperlink": "https://example.com/documents/compliance-checklist.xlsx",
+          "description": "Environmental compliance checklist and audit findings"
+        }
+      ]
     }
   },
   {
@@ -178,7 +212,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -192,7 +227,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -206,7 +242,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -220,7 +257,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -234,7 +272,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -248,7 +287,14 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": [
+        {
+          "filename": "Process_Flow_Diagram.pdf",
+          "hyperlink": "https://example.com/documents/process-flow.pdf",
+          "description": "Detailed process flow diagrams and technical specifications"
+        }
+      ]
     }
   },
   {
@@ -262,7 +308,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -276,7 +323,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -290,7 +338,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -304,7 +353,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -318,7 +368,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -332,7 +383,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -346,7 +398,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -360,7 +413,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -374,7 +428,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -388,7 +443,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -402,7 +458,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   },
   {
@@ -416,7 +473,8 @@
       "qualityAssessment": "no data available",
       "percentComplete": 0,
       "status": "not_started",
-      "qualityRating": "Unrated"
+      "qualityRating": "Unrated",
+      "hyperlinks": []
     }
   }
 ]

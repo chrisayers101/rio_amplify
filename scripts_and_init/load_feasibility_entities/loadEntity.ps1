@@ -35,6 +35,26 @@ foreach ($tableName in $tableNames) {
       $entityMap.qualityAssessment = @{ S = $item.entity.qualityAssessment }
     }
 
+    # Handle hyperlinks field - convert to DynamoDB list format
+    if ($null -eq $item.entity.hyperlinks -or $item.entity.hyperlinks.Count -eq 0) {
+      $entityMap.hyperlinks = @{ L = @() }  # Empty array
+    }
+    else {
+      # Convert each hyperlink object to DynamoDB map format
+      $hyperlinksList = @()
+      foreach ($link in $item.entity.hyperlinks) {
+        $linkMap = @{
+          M = @{
+            filename = @{ S = $link.filename }
+            hyperlink = @{ S = $link.hyperlink }
+            description = @{ S = $link.description }
+          }
+        }
+        $hyperlinksList += $linkMap
+      }
+      $entityMap.hyperlinks = @{ L = $hyperlinksList }
+    }
+
     $dynamoItem = @{
       projectId   = @{ S = $item.projectId }
       sectionId   = @{ S = $item.sectionId }

@@ -8,6 +8,13 @@ export type FeasibilityStudySectionStatus = 'not_started' | 'in_progress' | 'com
 // Quality Rating Enum
 export type FeasibilityStudyQualityRating = 'Unrated' | 'Poor' | 'Fair' | 'Good' | 'Excellent';
 
+// Hyperlink interface for file references
+export interface Hyperlink {
+    filename: string;    // Human-readable filename
+    hyperlink: string;   // The actual URL
+    description: string; // Description of the file/document
+}
+
 // Main section entity interface (what goes in the 'entity' field)
 export interface FeasibilityStudySectionEntity {
     content: string; // Markdown string content
@@ -15,7 +22,8 @@ export interface FeasibilityStudySectionEntity {
     percentComplete: number; // Progress percentage (0-100)
     status: FeasibilityStudySectionStatus; // Section status
     qualityRating: FeasibilityStudyQualityRating; // Quality assessment rating
-    [key: string]: string | number | undefined; // Index signature for dynamic access
+    hyperlinks: Hyperlink[]; // Array of hyperlink objects
+    [key: string]: string | number | Hyperlink[] | undefined; // Index signature for dynamic access
 }
 
 // Main DynamoDB table record interface (raw from database)
